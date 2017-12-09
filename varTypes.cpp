@@ -1057,6 +1057,142 @@ namespace var
 				}
 			}
 		}	
+
+		bool movingCircle::doesIntersect(movingCircle & first, movingCircle & second, double time)
+		{
+			auto getXAt = [](movingCircle circle, double time)
+			{
+				return circle.velocity.x * time + circle.center.x;
+			};
+
+			auto getYAt = [](movingCircle circle, double time)
+			{
+				return circle.velocity.y * time + circle.center.y;
+			};
+
+			auto deltaX = [getXAt, first, second](double time)
+			{
+				return getXAt(first, time) - getXAt(second, time);
+			};
+
+			auto deltaY = [getYAt, first, second](double time)
+			{
+				return getYAt(first, time) - getYAt(second, time);
+			};
+
+			auto dist = [deltaX, deltaY, first, second](double time)
+			{
+				return sqrt(
+					pow(
+						deltaX(time)
+						, 2)
+					+ pow(
+						deltaY(time)
+						, 2)
+				);
+			};
+
+			//deriv_function is the derivative of 'function'
+			auto deriv_deltaX = [first, second]()
+			{
+				return first.velocity.x - second.velocity.x;
+			};
+
+			auto deriv_deltaY = [first, second]()
+			{
+				return first.velocity.y - second.velocity.y;
+			};
+
+			auto deriv_dist = [deltaX, deltaY, deriv_deltaX, deriv_deltaY, first, second](double time)
+			{
+				return .5 * pow(								// (1/2) *
+					pow(deltaX(time), 2) + pow(deltaY(time), 2)	// ( del_x(t)^2 + del_y(t)^2) 
+					, -0.5)										// ^(-1/2)
+					* (											// * (
+						2 * deltaX(time) * deriv_deltaX()		// 2 * del_x(t) * del_x'(t)
+						+ 2 * deltaY(time) * deriv_deltaY()		// 2 * del_y(t) * del_y'(t)
+						);										// )
+			};
+
+			//See "OneNote/C++ Programming / varTypes / Calculating if two circles in linear motion intersect" for full documentation
+			
+			//NOTE: in this section the intersect is defined as the point at which the MOTION LINES intersect, not necssarily the circles
+
+			double deriv_D_t0;	//D'(t_0)
+			double deriv_D_tf;	//D'(t_f)
+
+			double rSum = first.getRadius() + second.getRadius();
+
+			deriv_D_t0 = deriv_dist(0);
+
+			if (deriv_D_t0 > 0)		//Case 3 - moving away from the intersect
+			{
+				//If the circles are moving away from the intesect, then the initial t ( t = 0 ) is the closest point within the range of times given
+				if (dist(0) <= rSum) return true;	//If the distance between the circles is less than the sum of their radii, at (t = 0), then there is an intersection
+				else return false;
+			}
+			else if(deriv_D_t0 < 0)	//Preform additional calculations to validate case 1 or 2
+			{
+				deriv_D_tf = deriv_dist(time);
+
+				if (deriv_D_tf < 0)			//Case 1 - moving toward the intersect
+				{
+					if (dist(time) <= rSum) return true;
+					else return false;
+				}
+				else if(deriv_D_tf > 0)		//Case 2 - passing over the closest point
+				{
+					//Calculate the value of t at which the the distance is the least - solve D'(t) = 0 for t
+
+					//Raw formula dumped out by matlab: (v_y2 - v_y1 - 2*i_x1*v_x1 + 2*i_x1*v_x2 + 2*i_x2*v_x1 - 2*i_x2*v_x2 + (4*i_y2*v_x1^2 - 4*i_y1*v_x1^2 - 4*i_y1*v_x2^2 - 2*v_y1*v_y2 + 4*i_y2*v_x2^2 + v_y1^2 + v_y2^2 + 4*i_x1*v_x1*v_y1 - 4*i_x1*v_x1*v_y2 - 4*i_x1*v_x2*v_y1 - 4*i_x2*v_x1*v_y1 + 8*i_y1*v_x1*v_x2 + 4*i_x1*v_x2*v_y2 + 4*i_x2*v_x1*v_y2 + 4*i_x2*v_x2*v_y1 - 8*i_y2*v_x1*v_x2 - 4*i_x2*v_x2*v_y2)^(1/2))/(2*(v_x1^2 - 2*v_x1*v_x2 + v_x2^2))
+					
+					/*
+					v_x1 = first.velocity.x;
+					v_y1 = first.velocity.y;
+					v_x2 = second.velocity.x;
+					v_y2 = second.velocity.y;
+
+					i_x1 = first.center.x;
+					i_y1 = first.center.y;
+					i_x2 = second.center.x;
+					i_y2 = second.center.y;
+					*/
+
+					double closest_t = (
+							second.velocity.y - first.velocity.y - 2 * first.center.x*first.velocity.x + 2 * first.center.x*second.velocity.x + 2 * second.center.x*first.velocity.x - 2 * second.center.x*second.velocity.x + pow(
+								4 * second.center.y*pow(first.velocity.x, 2) - 4 * first.center.y*pow(first.velocity.x, 2) - 4 * first.center.y*pow(second.velocity.x, 2) - 2 * first.velocity.y*second.velocity.y + 4 * second.center.y*pow(second.velocity.x, 2) + pow(first.velocity.y, 2) + pow(second.velocity.y, 2) + 4 * first.center.x*first.velocity.x*first.velocity.y - 4 * first.center.x*first.velocity.x*second.velocity.y - 4 * first.center.x*second.velocity.x*first.velocity.y - 4 * second.center.x*first.velocity.x*first.velocity.y + 8 * first.center.y*first.velocity.x*second.velocity.x + 4 * first.center.x*second.velocity.x*second.velocity.y + 4 * second.center.x*first.velocity.x*second.velocity.y + 4 * second.center.x*second.velocity.x*first.velocity.y - 8 * second.center.y*first.velocity.x*second.velocity.x - 4 * second.center.x*second.velocity.x*second.velocity.y
+								, 1 / 2)
+							) / (2 * (
+								pow(first.velocity.x, 2) - 2 * first.velocity.x*second.velocity.x + pow(second.velocity.x, 2)
+								)
+								);
+
+					//If the distance between points at the time at which they are closest (closest_t) is less than or equal to the sum of the radii, they must intersect at some point
+
+					if (dist(closest_t) <= rSum)	return true;
+					return false;
+				}
+				else if (deriv_D_tf == 0)	//D'(t_f) = 0, the intersect point.  Not officially handled in the documentation, but if  D(t_f) <= rSum there is a colission
+				{
+					return dist(time) < rSum;
+				}
+				else						//This isn't mathematically possible (error state)
+				{
+					throw "deriv_D_tf failed all cases, this is mathematically impossible";
+				}
+
+			}
+			else if (deriv_D_t0 == 0)	//If D' == 0, it is the intersect point.  This isn't noted in the documentation, but if D(t0) < rSum there is a colission
+			{
+				return dist(0) < rSum;
+			}
+			else			//Error case, this shouldn't be accessible
+			{
+				throw "deriv_D_t0 failed all cases, this is mathematically impossible";
+			}
+
+		}
+
 	};
 
 

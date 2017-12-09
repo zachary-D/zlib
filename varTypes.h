@@ -257,6 +257,7 @@ namespace var
 		};
 
 
+
 		class square
 		{
 		public:
@@ -274,6 +275,7 @@ namespace var
 			coord2 getBottomLeft();
 			coord2 getBottomRight();
 		};
+
 
 
 		class circle
@@ -303,6 +305,17 @@ namespace var
 
 			int getNumIntercepts(line _line);				//returns the number of intercept points the circle and the line passed to the function have.  (returns 0 if none, duh)
 			vector<coord2> getIntercept(line _line);	//Returns the intercept point(s) of the circle and the line passed to the function, if any
+		};
+
+
+
+		class movingCircle : public circle    //The same as a circle, but with momentum 
+		{
+		public:
+			var::coord2 velocity;      //The velocity of the circle 
+
+
+			static bool doesIntersect(movingCircle & first, movingCircle & second, double time = 1);  //Returns true of the two circles intersect within 'time'  
 		};
 	};
 
