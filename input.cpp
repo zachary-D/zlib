@@ -41,49 +41,6 @@ namespace input
 		else if (forceCase == 'u') conv::toUppercase(inp, true);
 		return inp;
 	}
-
-	int getInt(string prompt)
-	{
-		stringstream convert;
-		int output;
-		while (true)
-		{
-			cout << prompt;
-			convert << input::getLine();
-			convert >> output;
-			if (convert.fail())
-			{
-				cout << "Please enter a number." << endl;
-				convert = stringstream();	//Clear out the data
-				convert.clear();
-			}
-			else return output;
-		}
-	}
-
-	int getInt(int lowerLimit, int upperLimit, string prompt)
-	{
-		stringstream convert;
-		int output;
-		while (true)
-		{
-			cout << prompt;
-		
-			convert << input::getLine();
-			convert >> output;
-			if (convert.fail())
-			{
-				cout << "Please enter a number." << endl;
-				convert = stringstream();	//Clear out the data
-				convert.clear();
-			}
-			else
-			{
-				if( lowerLimit <= output && output <= upperLimit) return output;
-				else cout << "Please enter a value between " << lowerLimit << " and " << upperLimit << endl;
-			}
-		}
-	}
 #elif USING_CINDER
 	button::button(string _name, var::coord2 _position, var::coord2 _size)
 	{

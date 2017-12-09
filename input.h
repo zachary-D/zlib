@@ -7,9 +7,9 @@
 
 #ifdef USING_CINDER
 #include "cinder/app/AppNative.h"
+#endif
 
 #include "varTypes/varTypes.h"
-#endif
 
 using std::string;
 
@@ -21,8 +21,6 @@ namespace input
 {
 #ifndef USING_CINDER
 	string getLine(char forceCase = 'n'); 	//Returns the user input from the console.  If forceCase == 'l', the text will be returned as lowercase.  If forceCase == 'u' the text will be returned as uppercase
-	int getInt(string prompt = ">");		//Returns an integer from the console
-	int getInt(int lowerLimit, int upperLimit, string prompt = ">");
 #elif USING_CINDER
 	class button
 	{
