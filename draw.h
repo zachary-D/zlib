@@ -1,0 +1,70 @@
+#pragma once;
+
+//Written by and copyright Zachary Damato
+//draw.h is part of the draw submodule
+//This header requires the varTypes submodule, which must be included in the same directiory as this submodule
+
+#include <string> 
+
+#include "cinder/gl/Texture.h"
+#include "cinder/app/AppNative.h"
+#include "cinder/gl/gl.h"
+#include "cinder/Text.h"
+#include "cinder/app/App.h"
+#include "cinder/Font.h"
+#include "cinder/gl/Texture.h"
+#include "cinder/gl/TextureFont.h"
+#include "cinder/ImageIo.h"
+#include "cinder/app/window.h"
+
+#include "varTypes/varTypes.h"
+
+using namespace ci;
+using namespace ci::app;
+
+//All static functions ignore window::getDisplacement, all functions without static take it into account
+
+namespace draw
+{
+	void drawStaticTexture(gl::Texture _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
+	void drawTexture(gl::Texture _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false);																			//Draws a texture
+	
+	void drawStaticRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(), float rotation = 0, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB(-1, -1, -1), bool ignoreZoom = true);	//Draws a rectangle, ignoring window::displacement and window::zoom
+	void drawRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(), float rotation = 0, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB(-1, -1, -1));													//Draws a rectangle
+	
+																																																																		//void drawRect(float x1, float y1, float x2, float y2, float rotPtX, float rotPtY, float rotation = 45, bool avgRotation = false, bool preScaled = false, float R = -1, float G = -1, float B = -1, float opacity = -1);
+	//void drawRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt, float rotation = 45, bool avgRotation = false, bool preScaled = false, float R = -1, float G = -1, float B = -1, float opacity = -1);
+	
+	void drawStaticStrokedRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(0, 0), float rotation = 0.0f, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB());				//Draws a stroked rect
+	void drawStrokedRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(0, 0), float rotation = 0.0f, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB());
+
+	void drawStaticHollowRect(var::coord2 pointA, var::coord2 pointB, var::coord2 lineThickness = var::coord2(0.25, 0.25), var::color_RGB color = var::color_RGB(), var::coord2 rotPt = var::coord2(0, 0), float rotation = 0.0f, bool avgRotation = false, bool preScaled = false, bool ignoreZoom = true);
+	void drawHollowRect(var::coord2 pointA, var::coord2 pointB, var::coord2 lineThickness = var::coord2(0.25, 0.25), var::color_RGB color = var::color_RGB(), var::coord2 rotPt = var::coord2(0, 0), float rotation = 0.0f, bool avgRotation = false, bool preScaled = false);
+	
+	void drawStaticCircle(var::coord2 position, float radius, bool preScaled = false, var::color_RGB color = var::color_RGB());
+	void drawCircle(var::coord2 position, float radius, bool preScaled = false, var::color_RGB color = var::color_RGB());
+	
+	void drawStaticStrokedCircle(var::coord2 position, float radius, bool preScaled = false, var::color_RGB color = var::color_RGB());
+	void drawStrokedCircle(var::coord2 position, float radius, bool preScaled = false, var::color_RGB color = var::color_RGB());
+
+	void drawStaticTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
+	void drawTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
+
+	void drawStaticStrokedTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
+	void drawStrokedTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
+
+	//Draws a string 'text' at 'position' (centered on top middle), with font size 'size' in color 'color'
+	void drawStaticStringCentered(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+	//Draw a string 'text' at 'position' (centered on top middle), with font size 'size' in color 'color'
+	void drawStringCentered(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+	
+	//Draws a string 'text' at 'position' (centered on the top right), with font size 'size' in color 'color'
+	void drawStaticStringRight(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+	//Draw a string 'text' at 'position' (centered on the top right), with font size 'size' in color 'color'
+	void drawStringRight(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+	
+	//Draws a string 'text' at 'position' (centered on the top left), with font size 'size' in color 'color'
+	void drawStaticStringLeft(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+	//Draws a string 'text' at 'position' (centered on the top left), with font size 'size' in color 'color'
+	void drawStringLeft(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+}
