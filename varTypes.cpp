@@ -1,6 +1,9 @@
 #pragma once
 
 //Written by and copyright Zachary Damato
+//varTypes.cpp is part of the zlib submodule
+
+//Written by and copyright Zachary Damato
 //varTypes.cpp is part of the varTypes submodule
 
 #include <string>
@@ -16,9 +19,13 @@ using namespace std;
 #include "debug.h"
 #endif
 
-#include "varTypes.h"
-#include "varConv.h"
+#include "zlib/varTypes.h"
+#include "zlib/varConv.h"
 
+using namespace zlib;
+
+namespace zlib
+{
 namespace var
 {
 	coord2::coord2()
@@ -1943,3 +1950,4 @@ namespace var
 		}
 #endif
 };
+}
