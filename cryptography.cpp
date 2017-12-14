@@ -3,6 +3,8 @@
 //Written by and copyright Zachary Damato
 //cryptography.h is part of the zlib submodule
 
+#ifdef USING_ZLIB_CRYPTO
+
 #define debug
 
 #include <string>
@@ -257,3 +259,5 @@ namespace zlib
 		}
 	}
 }
+
+#endif

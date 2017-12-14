@@ -3,6 +3,8 @@
 //Written by and copyright Zachary Damato
 //cryptography.cpp is part of the zlib submodule
 
+#ifdef USING_ZLIB_CRYPTO
+
 #include <string>
 #include <vector>
 
@@ -50,3 +52,5 @@ namespace zlib
 		}
 	}
 }
+
+#endif

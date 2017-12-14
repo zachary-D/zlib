@@ -3,7 +3,7 @@
 //Written by and copyright Zachary Damato
 //module.h is part of the zlib submodule
 
-#ifdef USING_CINDER
+#ifdef USING_CINDER && USING_ZLIB_MODEL
 
 #include<vector>
 
