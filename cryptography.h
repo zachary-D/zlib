@@ -11,6 +11,8 @@
 using std::string;
 using std::vector;
 
+namespace zlib {} //This is here so we can set the using namespace below, so that if we need to include another file from zlib the zlib namespace will already be assumed
+
 using namespace zlib;
 
 namespace zlib
