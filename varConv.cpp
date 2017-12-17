@@ -119,6 +119,33 @@ namespace zlib
 			else if(inp == false) return "false";
 		}
 
+		string toString(var::formattedTime time)
+		{
+			bool higherValue = false;		//True when a unit has been not 0, and therefore all below it must be displayed
+			string ret = "";						//The output
+			bool overrideAnd = true;
+
+			//Processes a part of the formatted time.
+			auto processSegment = [&ret, &higherValue, &overrideAnd] (int value, string name)
+			{
+				if(value != 0 || higherValue)
+				{
+					
+					ret =  (!higherValue || overrideAnd ? "and " : "") + toString(value) + " " + name + (value == 1 ? "" : "s") + (!(!higherValue || overrideAnd) ? "," : "") + " " + ret;
+					higherValue = true;
+				}
+			};
+			processSegment(time.tm_year, "year");
+			overrideAnd = false;
+			processSegment(time.tm_mon, "month");
+			processSegment(time.tm_mday, "day");
+			processSegment(time.tm_hour, "hour");
+			processSegment(time.tm_min, "minute");
+			processSegment(time.tm_sec, "second");
+
+			return ret;
+		}
+
 
 		string toLowercase(string & inp, bool changeArg = true)		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{

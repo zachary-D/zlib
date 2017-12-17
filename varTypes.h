@@ -196,7 +196,7 @@ namespace zlib
 #endif
 		};
 
-		typedef struct tm formattedTime;
+		typedef struct tm formattedTime;		//A time represented as second/minute/hour/day/month/year, from time.h
 
 		enum day {
 			monday,

@@ -24,6 +24,7 @@ namespace zlib
 		string toString(var::coord2 inp, bool multiLine = true);
 		string toString(var::color_RGB inp, bool multiLine = true);
 		string toString(bool inp);
+		string toString(var::formattedTime time);	//Leaves off values if they are 0, starting from years down to the smallest value that is not 0.  (At minimum, 0 seconds will be returned)
 
 		string toLowercase(string & inp, bool changeArg = true);	//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		char toLowercase(char & inp, bool changeArg = false);		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
@@ -50,6 +51,6 @@ namespace zlib
 		double toDegrees(double radians);
 		double toRadians(double degrees);
 
-		var::formattedTime getFormattedTime(time_t rawTime = time(0));	//Returns 'rawTime' divided into seconds/minutes/hours.../years.  If no a
+		var::formattedTime getFormattedTime(time_t rawTime = time(0));	//Returns 'rawTime' divided into seconds/minutes/hours.../years/etc.  If no argument is given, the current time is used
 	}
 }
