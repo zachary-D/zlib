@@ -37,6 +37,11 @@ namespace zlib
 {
 	namespace var
 	{
+		enum class varExceptions
+		{
+			fraction_denom0,	//The denominator is 0.  This is a math no-no (divide by 0)
+		};
+
 		class mVector;	//Forward declaration
 
 		class coord2
@@ -169,6 +174,22 @@ namespace zlib
 #ifdef USING_CINDER
 			ci::Vec3f toVec3f();
 #endif
+		};
+
+		struct fraction
+		{
+			fraction(bool _autoReduce = true);
+			//fraction(float value); commented bc float should automatically convert to double
+			fraction(double value, bool _autoReduce = true);
+			fraction(int _numer, int _denom = 1, bool _autoReduce = true);
+
+			int numer = 0;		//The numerator
+			int denom = 0;		//The denominator
+
+			bool autoReduce = true;		//If the fraction should be reduced when possible (2/4 -> 1/2)
+
+			void reduce();
+			double toDouble();
 		};
 
 		class color_RGB
