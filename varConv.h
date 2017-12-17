@@ -33,11 +33,13 @@ namespace zlib
 
 		bool isNum(string inp);
 		bool isNum(char inp);
+
 		double toNum(string inp);
 		double toNum(char inp);
 
 
 		bool isBool(string inp);
+
 		bool toBool(string inp);
 		bool toBool(double inp);
 
@@ -47,5 +49,7 @@ namespace zlib
 
 		double toDegrees(double radians);
 		double toRadians(double degrees);
+
+		var::formattedTime getFormattedTime(time_t rawTime = time(0));	//Returns 'rawTime' divided into seconds/minutes/hours.../years.  If no a
 	}
 }

@@ -119,6 +119,7 @@ namespace zlib
 			else if(inp == false) return "false";
 		}
 
+
 		string toLowercase(string & inp, bool changeArg = true)		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
 			string ret;
@@ -151,6 +152,7 @@ namespace zlib
 			return ret;
 		}
 
+
 		string toUppercase(string & inp, bool changeArg = true)		//Coverts 'inp' to uppercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
 			string ret;
@@ -181,6 +183,7 @@ namespace zlib
 			}
 			return ret;
 		}
+
 
 		bool isNum(string inp)
 		{
@@ -216,6 +219,7 @@ namespace zlib
 			}
 		}
 
+
 		double toNum(string inp)
 		{
 			convert.clear();
@@ -234,11 +238,13 @@ namespace zlib
 			return doubleOut;
 		}
 
+
 		bool isBool(string inp)
 		{
 			if(inp == "true" || inp == "false") return true;
 			else return false;
 		}
+
 
 		bool toBool(string inp)
 		{
@@ -254,12 +260,14 @@ namespace zlib
 			else return false;
 		}
 
+
 #ifdef USING_CINDER
 		var::coord2 toCoord2(ci::Vec2f coordinate)
 		{
 			return var::coord2(coordinate.x, coordinate.y);
 		}
 #endif
+
 
 		double toDegrees(double radians)
 		{
@@ -269,6 +277,13 @@ namespace zlib
 		double toRadians(double degrees)
 		{
 			return degrees * var::math::pi / 180;
+		}
+
+		var::formattedTime getFormattedTime(time_t rawTime)
+		{
+			var::formattedTime _time;
+			localtime_s(&_time, &rawTime);
+			return _time;
 		}
 	}
 }
