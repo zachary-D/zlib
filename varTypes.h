@@ -171,6 +171,14 @@ namespace zlib
 #endif
 		};
 
+
+
+		class exactValue	//An exact value, garunteed to be correct after all operations (A solution to floating point rounding errors)
+		{
+
+
+		};
+
 		class color_RGB
 		{
 		public:
