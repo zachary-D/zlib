@@ -8,6 +8,7 @@
 #include "zlib/cryptography.h"
 #include "zlib/draw.h"
 #include "zlib/input.h"
+#include "zlib/math.h"
 #include "zlib/model.h"
 #include "zlib/varConv.h"
 #include "zlib/varTypes.h"
