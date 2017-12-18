@@ -506,6 +506,19 @@ namespace zlib
 			}
 		}
 
+		fraction fraction::reduce(fraction frac)
+		{
+			for(int factor = 2; factor <= frac.numer && factor <= frac.denom; factor++)
+			{
+				if(frac.numer%factor == 0 && frac.denom%factor == 0)
+				{
+					frac.numer /= factor;
+					frac.denom /= factor;
+				}
+			}
+			return frac;
+		}
+
 		std::pair<fraction, fraction> fraction::convCommonBase(fraction first, fraction second)
 		{
 			//If they already have a common denominator
@@ -519,7 +532,7 @@ namespace zlib
 				while(base1 % factor == 0 && base2 % factor == 0)
 				{
 					base1 /= factor;
-						base2 /= factor;
+					base2 /= factor;
 				}
 			}
 
@@ -533,17 +546,107 @@ namespace zlib
 			return std::pair<fraction, fraction>(first, second);
 		}
 
-		fraction fraction::operator+(fraction & other)
+		fraction fraction::getReciprocal()
+		{
+			return fraction(denom, numer, autoReduce);
+		}
+
+		fraction fraction::operator+(fraction const & other)
 		{
 			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
 			return fraction(fPair.first.numer + fPair.second.numer, fPair.first.denom, autoReduce);
 		}
 
-		fraction fraction::operator-(fraction & other)
+		fraction fraction::operator-(fraction const & other)
 		{
 			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
 			return fraction(fPair.first.numer - fPair.second.numer, fPair.first.denom, autoReduce);
 		}
+
+		fraction fraction::operator*(fraction const & other)
+		{
+			return fraction(numer * other.numer, denom * other.denom, autoReduce);
+		}
+
+		fraction fraction::operator/(fraction const & other)
+		{
+			return fraction(numer * other.denom, denom * other.numer, autoReduce);
+		}
+
+		void fraction::operator+=(fraction const & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+			numer = fPair.first.numer + fPair.second.numer;
+			denom = fPair.first.denom;
+			if(autoReduce) reduce();
+		}
+
+		void fraction::operator-=(fraction const & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+			numer = fPair.first.numer - fPair.second.numer;
+			denom = fPair.first.denom;
+			if(autoReduce) reduce();
+		}
+
+		void fraction::operator*=(fraction const & other)
+		{
+			numer *= other.numer;
+			denom *= other.denom;
+			if(autoReduce) reduce();
+		}
+		
+		void fraction::operator/=(fraction const & other)
+		{
+			numer *= other.denom;
+			denom *= other.numer;
+			if(autoReduce) reduce();
+		}
+
+		bool fraction::operator==(fraction const & other)
+		{
+			fraction first = reduce(*this);
+			fraction second = reduce(other);
+
+			return first.numer == second.numer && first.denom == second.denom;
+		}
+
+		bool fraction::operator!=(fraction const & other)
+		{
+			fraction first = reduce(*this);
+			fraction second = reduce(other);
+
+			return first.numer != second.numer || first.denom != second.denom;
+		}
+
+		bool fraction::operator<(fraction const & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+
+			return fPair.first.numer < fPair.second.numer;
+		}
+
+		bool fraction::operator<=(fraction const & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+
+			return fPair.first.numer <= fPair.second.numer;
+		}
+
+		bool fraction::operator>(fraction const & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+
+			return fPair.first.numer > fPair.second.numer;
+		}
+
+		bool fraction::operator>=(fraction const & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+
+			return fPair.first.numer >= fPair.second.numer;
+		}
+
 
 
 		color_RGB::color_RGB()

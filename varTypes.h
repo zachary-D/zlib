@@ -189,25 +189,28 @@ namespace zlib
 			bool autoReduce = true;		//If the fraction should be reduced when possible (2/4 -> 1/2)
 
 			void reduce();
+			fraction static reduce(fraction frac);
 			std::pair<fraction, fraction> static convCommonBase(fraction first, fraction second);	//Returns first and second, converted so that they have a common denominator
 			double toDouble() { double(numer) / denom; }
 
-			fraction operator+(fraction & other);
-			fraction operator-(fraction & other);
-			fraction operator*(fraction & other);
-			fraction operator/(fraction & other);
-			
-			void operator+=(fraction & other);
-			void operator-=(fraction & other);
-			void operator*=(fraction & other);
-			void operator/=(fraction & other);
+			fraction getReciprocal();
 
-			bool operator==(fraction & other);
-			bool operator!=(fraction & other);
-			bool operator<(fraction & other);
-			bool operator<=(fraction & other);
-			bool operator>(fraction & other);
-			bool operator>=(fraction & other);
+			fraction operator+(fraction const & other);
+			fraction operator-(fraction const & other);
+			fraction operator*(fraction const & other);
+			fraction operator/(fraction const & other);
+			
+			void operator+=(fraction const & other);
+			void operator-=(fraction const & other);
+			void operator*=(fraction const & other);
+			void operator/=(fraction const & other);
+
+			bool operator==(fraction const & other);
+			bool operator!=(fraction const & other);
+			bool operator<(fraction const & other);
+			bool operator<=(fraction const & other);
+			bool operator>(fraction const & other);
+			bool operator>=(fraction const & other);
 
 
 
