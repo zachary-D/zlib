@@ -18,8 +18,9 @@ using namespace std;
 #include "debug.h"
 #endif
 
-#include "zlib/varTypes.h"
-#include "zlib/varConv.h"
+#include "math.h"
+#include "varTypes.h"
+#include "varConv.h"
 
 using namespace zlib;
 

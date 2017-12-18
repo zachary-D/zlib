@@ -28,7 +28,8 @@ using namespace std;
 #include "cinder/gl/gl.h"
 #endif
 
-#include "zlib/varTypes.h"
+#include "math.h"
+#include "varTypes.h"
 
 using namespace zlib;
 
@@ -298,12 +299,12 @@ namespace zlib
 
 		double toDegrees(double radians)
 		{
-			return radians * 180 / var::math::pi;
+			return radians * 180 / math::pi;
 		}
 
 		double toRadians(double degrees)
 		{
-			return degrees * var::math::pi / 180;
+			return degrees * math::pi / 180;
 		}
 
 		var::formattedTime getFormattedTime(time_t rawTime)
