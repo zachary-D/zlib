@@ -3,10 +3,9 @@
 //Written by and copyright Zachary Damato
 //varTypes.cpp is part of the zlib submodule
 
-//Written by and copyright Zachary Damato
-//varTypes.cpp is part of the varTypes submodule
-
 #include <string>
+#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -481,22 +480,23 @@ namespace zlib
 
 		fraction::fraction(bool _autoReduce)
 		{
-
+			autoReduce = _autoReduce;
 		}
 		
 		fraction::fraction(double value, bool _autoReduce)
 		{
-			double whole;
-			double remainder = modf(value, &whole);
+			autoReduce = _autoReduce;
+			
+			double exp = floor(log10(abs(value)));
+			long int coefficient = value / pow(10, exp);
 
-			whole = int(whole);
-
-
+			
 
 		}
 
 		fraction::fraction(int _numer, int _denom, bool _autoReduce)
 		{
+			autoReduce = _autoReduce;
 			if(_denom = 0) throw varExceptions::fraction_denom0;
 
 			numer = _numer;
@@ -507,7 +507,14 @@ namespace zlib
 		
 		void fraction::reduce()
 		{
-
+			for(int factor = 2; factor < numer && factor < denom; factor++)
+			{
+				if(numer%factor == 0 && denom%factor == 0)
+				{
+					numer /= factor;
+					denom /= factor;
+				}
+			}
 		}
 		
 		

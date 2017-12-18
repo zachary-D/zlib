@@ -189,7 +189,24 @@ namespace zlib
 			bool autoReduce = true;		//If the fraction should be reduced when possible (2/4 -> 1/2)
 
 			void reduce();
-			double toDouble();
+			double toDouble() { double(numer) / denom; }
+
+			fraction operator+(fraction & other);
+			void operator+=(fraction & other);
+			fraction operator-(fraction & other);
+			void operator-=(fraction & other);
+			fraction operator*(fraction & other);
+			void operator*=(fraction & other);
+			fraction operator/(fraction & other);
+			void operator/=(fraction & other);
+
+			bool operator==(fraction & other);
+			bool operator!=(fraction & other);
+			bool operator<(fraction & other);
+			bool operator<=(fraction & other);
+			bool operator>(fraction & other);
+			bool operator>=(fraction & other);
+
 		};
 
 		class color_RGB
