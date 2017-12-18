@@ -482,17 +482,6 @@ namespace zlib
 		{
 			autoReduce = _autoReduce;
 		}
-		
-		fraction::fraction(double value, bool _autoReduce)
-		{
-			autoReduce = _autoReduce;
-			
-			double exp = floor(log10(abs(value)));
-			long int coefficient = value / pow(10, exp);
-
-			
-
-		}
 
 		fraction::fraction(int _numer, int _denom, bool _autoReduce)
 		{
@@ -515,6 +504,20 @@ namespace zlib
 					denom /= factor;
 				}
 			}
+		}
+
+		std::pair<fraction, fraction> fraction::convCommonBase(fraction first, fraction second)
+		{
+			//If they already have a common denominator
+			if(first.denom == second.denom) return std::pair<fraction, fraction>(first, second);
+
+			//Factor the denominators
+
+		}
+
+		fraction operator+(fraction & other)
+		{
+
 		}
 		
 		

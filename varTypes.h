@@ -180,7 +180,7 @@ namespace zlib
 		{
 			fraction(bool _autoReduce = true);
 			//fraction(float value); commented bc float should automatically convert to double
-			fraction(double value, bool _autoReduce = true);
+			//fraction(double value, bool _autoReduce = true);		//To be added at a later date
 			fraction(int _numer, int _denom = 1, bool _autoReduce = true);
 
 			int numer = 0;		//The numerator
@@ -189,6 +189,7 @@ namespace zlib
 			bool autoReduce = true;		//If the fraction should be reduced when possible (2/4 -> 1/2)
 
 			void reduce();
+			std::pair<fraction, fraction> convCommonBase(fraction first, fraction second);	//Returns first and second, converted so that they have a common denominator
 			double toDouble() { double(numer) / denom; }
 
 			fraction operator+(fraction & other);
@@ -206,6 +207,8 @@ namespace zlib
 			bool operator<=(fraction & other);
 			bool operator>(fraction & other);
 			bool operator>=(fraction & other);
+
+
 
 		};
 
