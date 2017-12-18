@@ -266,11 +266,6 @@ namespace zlib
 			december = 12,
 		};
 
-		namespace math
-		{
-			const double pi = 4 * atan(1);
-		}
-
 		namespace geom	//As in geometry
 		{
 			class line
