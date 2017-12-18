@@ -496,7 +496,7 @@ namespace zlib
 
 		void fraction::reduce()
 		{
-			for(int factor = 2; factor < numer && factor < denom; factor++)
+			for(int factor = 2; factor <= numer && factor <= denom; factor++)
 			{
 				if(numer%factor == 0 && denom%factor == 0)
 				{
@@ -514,9 +514,9 @@ namespace zlib
 			//Remove any common factors from the denominators
 			int base1 = first.denom;
 			int base2 = second.denom;
-			for(int factor = 2; factor < base1 && factor < base2; factor++)
+			for(int factor = 2; factor <= base1 && factor <= base2; factor++)
 			{
-				if(base1 % factor == 0 && base2 % factor == 0)
+				while(base1 % factor == 0 && base2 % factor == 0)
 				{
 					base1 /= factor;
 						base2 /= factor;
@@ -539,6 +539,11 @@ namespace zlib
 			return fraction(fPair.first.numer + fPair.second.numer, fPair.first.denom, autoReduce);
 		}
 
+		fraction fraction::operator-(fraction & other)
+		{
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+			return fraction(fPair.first.numer - fPair.second.numer, fPair.first.denom, autoReduce);
+		}
 
 
 		color_RGB::color_RGB()

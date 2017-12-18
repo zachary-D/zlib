@@ -193,12 +193,13 @@ namespace zlib
 			double toDouble() { double(numer) / denom; }
 
 			fraction operator+(fraction & other);
-			void operator+=(fraction & other);
 			fraction operator-(fraction & other);
-			void operator-=(fraction & other);
 			fraction operator*(fraction & other);
-			void operator*=(fraction & other);
 			fraction operator/(fraction & other);
+			
+			void operator+=(fraction & other);
+			void operator-=(fraction & other);
+			void operator*=(fraction & other);
 			void operator/=(fraction & other);
 
 			bool operator==(fraction & other);
