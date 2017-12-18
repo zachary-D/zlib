@@ -189,7 +189,7 @@ namespace zlib
 			bool autoReduce = true;		//If the fraction should be reduced when possible (2/4 -> 1/2)
 
 			void reduce();
-			std::pair<fraction, fraction> convCommonBase(fraction first, fraction second);	//Returns first and second, converted so that they have a common denominator
+			std::pair<fraction, fraction> static convCommonBase(fraction first, fraction second);	//Returns first and second, converted so that they have a common denominator
 			double toDouble() { double(numer) / denom; }
 
 			fraction operator+(fraction & other);

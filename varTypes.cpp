@@ -476,7 +476,7 @@ namespace zlib
 #endif
 
 
-		
+
 
 		fraction::fraction(bool _autoReduce)
 		{
@@ -486,14 +486,14 @@ namespace zlib
 		fraction::fraction(int _numer, int _denom, bool _autoReduce)
 		{
 			autoReduce = _autoReduce;
-			if(_denom = 0) throw varExceptions::fraction_denom0;
+			if(_denom == 0) throw varExceptions::fraction_denom0;
 
 			numer = _numer;
 			denom = _denom;
 
 			if(autoReduce) reduce();
 		}
-		
+
 		void fraction::reduce()
 		{
 			for(int factor = 2; factor < numer && factor < denom; factor++)
@@ -511,17 +511,36 @@ namespace zlib
 			//If they already have a common denominator
 			if(first.denom == second.denom) return std::pair<fraction, fraction>(first, second);
 
-			//Factor the denominators
+			//Remove any common factors from the denominators
+			int base1 = first.denom;
+			int base2 = second.denom;
+			for(int factor = 2; factor < base1 && factor < base2; factor++)
+			{
+				if(base1 % factor == 0 && base2 % factor == 0)
+				{
+					base1 /= factor;
+						base2 /= factor;
+				}
+			}
 
+			//Cross multiply using the reduced denominators
+			first.numer *= base2;
+			first.denom *= base2;
+
+			second.numer *= base1;
+			second.denom *= base1;
+
+			return std::pair<fraction, fraction>(first, second);
 		}
 
-		fraction operator+(fraction & other)
+		fraction fraction::operator+(fraction & other)
 		{
-
+			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
+			return fraction(fPair.first.numer + fPair.second.numer, fPair.first.denom, autoReduce);
 		}
-		
-		
-		
+
+
+
 		color_RGB::color_RGB()
 		{
 			R = 1;
@@ -564,7 +583,7 @@ namespace zlib
 		{
 			if(0 <= A && A <= 1) return ci::ColorA(R, G, B, A);
 			return ci::ColorA(R, G, B, 1);
-		}
+	}
 #endif
 
 
@@ -1107,7 +1126,7 @@ namespace zlib
 					}
 				}
 			}
-		};
+		}
 
 
 
@@ -1990,7 +2009,7 @@ namespace zlib
 					while(localChange);
 					return totalChange;
 				}
-			}
+}
 #endif
-	};
+	}
 }
