@@ -496,6 +496,12 @@ namespace zlib
 
 		void fraction::reduce()
 		{
+			if(denom < 0)	//Move the negative in the denominator to the numerator
+			{
+				numer *= -1;
+				denom *= -1;
+			}
+
 			for(int factor = 2; factor <= numer && factor <= denom; factor++)
 			{
 				if(numer%factor == 0 && denom%factor == 0)
@@ -508,6 +514,12 @@ namespace zlib
 
 		fraction fraction::reduce(fraction frac)
 		{
+			if(frac.denom < 0)	//Move the negative in the denominator to the numerator
+			{
+				frac.numer *= -1;
+				frac.denom *= -1;
+			}
+
 			for(int factor = 2; factor <= frac.numer && factor <= frac.denom; factor++)
 			{
 				if(frac.numer%factor == 0 && frac.denom%factor == 0)
