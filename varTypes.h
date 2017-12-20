@@ -191,7 +191,7 @@ namespace zlib
 			void reduce();
 			fraction static reduce(fraction frac);
 			std::pair<fraction, fraction> static convCommonBase(fraction first, fraction second);	//Returns first and second, converted so that they have a common denominator
-			double toDouble() { double(numer) / denom; }
+			double toDouble() { return double(numer) / denom; }
 
 			fraction getReciprocal();
 
