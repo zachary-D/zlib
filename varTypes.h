@@ -241,7 +241,48 @@ namespace zlib
 #endif
 		};
 
-		typedef struct tm formattedTime;		//A time represented as second/minute/hour/day/month/year, from time.h
+		typedef struct tm longTime;		//A time represented as second/minute/hour/day/month/year, from time.h
+
+		struct shortTime
+		{
+			shortTime() {}
+			shortTime(int _seconds, int minutes = 0, int hours = 0, int days = 0);
+
+		private:
+			int seconds;
+
+		public:
+			int getTotalSeconds();
+			
+			int getSeconds();
+			int getMinutes();
+			int getHours();
+			int getDays();
+
+			static const int secondsPerMinute = 60;
+			static const int minutesPerHour = 60;
+			static const int hoursPerDay = 24;
+
+			static const int secondsPerHour = secondsPerMinute * minutesPerHour;
+			static const int secondsPerDay = secondsPerHour * hoursPerDay;
+
+			shortTime operator+(shortTime & other);
+			shortTime operator-(shortTime & other);
+			shortTime operator*(shortTime & other);
+			shortTime operator/(shortTime & other);
+
+			void operator+=(shortTime & other);
+			void operator-=(shortTime & other);
+			void operator*=(shortTime & other);
+			void operator/=(shortTime & other);
+
+			bool operator==(shortTime & other);
+			bool operator!=(shortTime & other);
+			bool operator<(shortTime & other);
+			bool operator<=(shortTime & other);
+			bool operator>(shortTime & other);
+			bool operator>=(shortTime & other);
+		};
 
 		enum day {
 			monday,
