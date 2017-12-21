@@ -29,7 +29,7 @@ using namespace std;
 #endif
 
 #include "math.h"
-#include "zlib/varTypes.h"
+#include "varTypes.h"
 
 using namespace zlib;
 
