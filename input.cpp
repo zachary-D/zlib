@@ -44,6 +44,25 @@ namespace zlib
 			else if(forceCase == 'u') conv::toUppercase(inp, true);
 			return inp;
 		}
+
+		double getNumInput(string prompt)
+		{
+			while(true)
+			{
+				string value;
+				cout << prompt << ":";
+				getline(cin, value);
+
+				if(conv::isNum(value))
+				{
+					return conv::toNum(value);
+				}
+				else
+				{
+					cout << "I'm sorry, I don't understand \"" << value << "\".  Please enter a numerical value." << endl;
+				}
+			}
+		}
 #elif USING_CINDER
 		button::button(string _name, var::coord2 _position, var::coord2 _size)
 		{
