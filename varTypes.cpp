@@ -18,8 +18,9 @@ using namespace std;
 #include "debug.h"
 #endif
 
-#include "zlib/varTypes.h"
-#include "zlib/varConv.h"
+#include "math.h"
+#include "varTypes.h"
+#include "varConv.h"
 
 using namespace zlib;
 
@@ -705,6 +706,127 @@ namespace zlib
 			return ci::ColorA(R, G, B, 1);
 	}
 #endif
+
+
+
+
+		shortTime::shortTime(int _seconds, int minutes, int hours, int days)
+		{
+			seconds = _seconds +
+				minutes * secondsPerMinute + 
+				hours * secondsPerHour + 
+				days * secondsPerDay;
+		}
+		
+		int shortTime::getTotalSeconds()
+		{
+			return seconds;
+		}
+
+		int shortTime::getSeconds()
+		{
+			return seconds % secondsPerMinute;
+		}
+
+		int shortTime::getMinutes()
+		{
+			return seconds % secondsPerHour / secondsPerMinute;
+		}
+
+		int shortTime::getHours()
+		{
+			return seconds % secondsPerDay / secondsPerHour;
+		}
+
+		int shortTime::getDays()
+		{
+			return seconds / secondsPerDay;
+		}
+
+		string shortTime::toStringDHMS()
+		{
+			return "Days: " + conv::toString(getDays()) + " " + toStringHMS();
+		}
+
+		string shortTime::toStringHMS()
+		{
+			return "Hours: " + conv::toString(getHours()) + " " + toStringMS();
+		}
+
+		string shortTime::toStringMS()
+		{
+			return "Minutes: " + conv::toString(getMinutes()) + " Seconds: " + conv::toString(getSeconds());
+		}
+
+		shortTime shortTime::operator+(shortTime & other)
+		{
+			return shortTime(getTotalSeconds() + other.getTotalSeconds());
+		}
+
+		shortTime shortTime::operator-(shortTime & other)
+		{
+			return shortTime(getTotalSeconds() - other.getTotalSeconds());
+		}
+
+		shortTime shortTime::operator*(shortTime & other)
+		{
+			return shortTime(getTotalSeconds() * other.getTotalSeconds());
+		}
+
+		shortTime shortTime::operator/(shortTime & other)
+		{
+			return shortTime(getTotalSeconds() / other.getTotalSeconds());
+		}
+
+		void shortTime::operator+=(shortTime & other)
+		{
+			seconds += other.getTotalSeconds();
+		}
+
+		void shortTime::operator-=(shortTime & other)
+		{
+			seconds -= other.getTotalSeconds();
+		}
+
+		void shortTime::operator*=(shortTime & other)
+		{
+			seconds *= other.getTotalSeconds();
+		}
+
+		void shortTime::operator/=(shortTime & other)
+		{
+			seconds /= other.getTotalSeconds();
+		}
+
+		bool shortTime::operator==(shortTime & other)
+		{
+			return seconds == other.getTotalSeconds();
+		}
+
+		bool shortTime::operator!=(shortTime & other)
+		{
+			return seconds != other.getTotalSeconds();
+		}
+
+		bool shortTime::operator<(shortTime & other)
+		{
+			return seconds < other.getTotalSeconds();
+		}
+
+		bool shortTime::operator<=(shortTime & other)
+		{
+			return seconds <= other.getTotalSeconds();
+		}
+
+		bool shortTime::operator>(shortTime & other)
+		{
+			return seconds > other.getTotalSeconds();
+		}
+
+		bool shortTime::operator>=(shortTime & other)
+		{
+			return seconds >= other.getTotalSeconds();
+		}
 
 
 

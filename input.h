@@ -25,6 +25,7 @@ namespace zlib
 	{
 #ifndef USING_CINDER
 		string getLine(char forceCase = 'n'); 	//Returns the user input from the console.  If forceCase == 'l', the text will be returned as lowercase.  If forceCase == 'u' the text will be returned as uppercase
+		double getNumInput(string prompt);
 #elif USING_CINDER
 		class button
 		{
