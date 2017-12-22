@@ -743,6 +743,21 @@ namespace zlib
 			return seconds / secondsPerDay;
 		}
 
+		string shortTime::toStringDHMS()
+		{
+			return "Days: " + conv::toString(getDays()) + " " + toStringHMS();
+		}
+
+		string shortTime::toStringHMS()
+		{
+			return "Hours: " + conv::toString(getHours()) + " " + toStringMS();
+		}
+
+		string shortTime::toStringMS()
+		{
+			return "Minutes: " + conv::toString(getMinutes()) + " Seconds: " + conv::toString(getSeconds());
+		}
+
 		shortTime shortTime::operator+(shortTime & other)
 		{
 			return shortTime(getTotalSeconds() + other.getTotalSeconds());
