@@ -120,7 +120,7 @@ namespace zlib
 			else if(inp == false) return "false";
 		}
 
-		string toString(var::formattedTime time)
+		string toString(var::longTime time)
 		{
 			bool higherValue = false;		//True when a unit has been not 0, and therefore all below it must be displayed
 			string ret = "";						//The output
@@ -307,9 +307,9 @@ namespace zlib
 			return degrees * math::pi / 180;
 		}
 
-		var::formattedTime getFormattedTime(time_t rawTime)
+		var::longTime getFormattedTime(time_t rawTime)
 		{
-			var::formattedTime _time;
+			var::longTime _time;
 			localtime_s(&_time, &rawTime);
 			return _time;
 		}
