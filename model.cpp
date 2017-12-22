@@ -3,7 +3,7 @@
 //Written by and copyright Zachary Damato
 //module.cpp is part of the zlib submodule
 
-#ifdef USING_CINDER && USING_ZLIB_MODEL
+#if defined(USING_CINDER) && defined(USING_ZLIB_MODEL)
 
 #include<iostream>
 #include<sstream>
@@ -31,18 +31,18 @@ using namespace std;
 using namespace ci;
 using namespace ci::app;
 
-#include "zlib/draw.h"
-#include "zlib/model.h"
-#include "zlib/varConv.h"
-#include "zlib/varTypes.h"
-#include "zlib/windInfo.h"
+#include "draw.h"
+#include "model.h"
+#include "varConv.h"
+#include "varTypes.h"
+#include "windInfo.h"
 
 using namespace zlib;
-using namespace window;
+using namespace zlib::window;
 
 namespace zlib
 {
-	namespace window
+	namespace model
 	{
 		anim_segment::anim_segment()
 		{

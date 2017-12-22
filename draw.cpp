@@ -37,9 +37,9 @@ using namespace ci::app;
 #include "HUD.h"
 #endif
 
-#include "zlib/varConv.h"
-#include "zlib/varTypes.h"
-#include "zlib/windInfo.h"
+#include "varConv.h"
+#include "varTypes.h"
+#include "windInfo.h"
 
 using namespace zlib;
 
