@@ -259,6 +259,10 @@ namespace zlib
 			int getHours();
 			int getDays();
 
+			string toStringDHMS();
+			string toStringHMS();
+			string toStringMS();
+
 			static const int secondsPerMinute = 60;
 			static const int minutesPerHour = 60;
 			static const int hoursPerDay = 24;
