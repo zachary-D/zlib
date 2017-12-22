@@ -19,8 +19,8 @@ using namespace std;
 #endif
 
 #include "math.h"
-#include "zlib/varTypes.h"
-#include "zlib/varConv.h"
+#include "varTypes.h"
+#include "varConv.h"
 
 using namespace zlib;
 

@@ -7,6 +7,7 @@
 
 #include "zlib/cryptography.h"
 #include "zlib/draw.h"
+#include "zlib/fileIO.h"
 #include "zlib/input.h"
 #include "zlib/math.h"
 #include "zlib/model.h"
