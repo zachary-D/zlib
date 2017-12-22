@@ -58,10 +58,13 @@ namespace zlib
 			void openRaw(std::string _file);	//Opens the file for writing, not preforming any checks on the filename given
 			void close();
 
-			void writeRaw(char value) { file << value; }
-			void writeRaw(std::string value) { file << value << std::endl; }
+			void writeRaw(char value);
+			void writeRaw(std::string value);
 			void writeEndLine() { file << std::endl; }
 			
+			void write(std::string value);
+			void write(int value);
+
 			/*
 			//These functions write data to the file in the ZML format
 			void write(var::color_RGB value);

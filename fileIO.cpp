@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "varConv.h"
 #include "fileIO.h"
 
 namespace zlib
@@ -110,6 +111,16 @@ namespace zlib
 		void fileWriter::writeRaw(std::string value)
 		{
 			file << value;
+		}
+
+		void fileWriter::write(std::string value)
+		{
+			file << value << std::endl;
+		}
+
+		void fileWriter::write(int value)
+		{
+			file << conv::toString(value) << std::endl;
 		}
 	}
 }
