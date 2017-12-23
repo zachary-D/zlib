@@ -28,9 +28,9 @@
 #include "cinder/ImageIo.h"
 #include "cinder/app/window.h"
 
-#include "zlib/varConv.h"
-#include "zlib/varTypes.h"
-#include "zlib/windInfo.h"
+#include "varConv.h"
+#include "varTypes.h"
+#include "windInfo.h"
 
 using namespace std;
 using namespace ci;

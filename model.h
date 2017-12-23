@@ -3,12 +3,12 @@
 //Written by and copyright Zachary Damato
 //module.h is part of the zlib submodule
 
-#ifdef USING_CINDER && USING_ZLIB_MODEL
+#if defined(USING_CINDER) && defined(USING_ZLIB_MODEL)
 
 #include<vector>
 
-#include "zlib/model.h"
-#include "zlib/varTypes.h"
+#include "model.h"
+#include "varTypes.h"
 
 using namespace zlib;
 
