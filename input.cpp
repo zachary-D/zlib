@@ -64,6 +64,8 @@ namespace zlib
 			}
 		}
 #elif USING_CINDER
+		//Button member functions
+
 		button::button(string _name, var::coord2 _position, var::coord2 _size)
 		{
 			setName(_name);
@@ -96,7 +98,7 @@ namespace zlib
 			{
 				size = _size;
 			}
-			else _DEBUG_ERROR("Invalid button size!");
+			else throw inputError::button_badSize;
 		}
 
 		void button::setFunction(void(*function)())
@@ -137,7 +139,7 @@ namespace zlib
 
 		bool button::checkPressed(var::coord2 _coords, bool _rawCoords)
 		{
-			if(_rawCoords) _coords = window::scale(_coords);
+			if(_rawCoords) _coords = window::unscale(_coords);
 
 			if(_coords.isWithin(getPosition(), getPosition() + getSize()))
 			{
@@ -147,6 +149,8 @@ namespace zlib
 			else return false;
 		}
 
+
+		//ButtonList member functions
 
 		buttonList::internalButton::internalButton(var::coord2 * _size, var::coord2 * _listOrigin, int _buttonIndex, void(*_function)(), string _name, var::color_RGB _color)
 		{
@@ -185,7 +189,7 @@ namespace zlib
 
 		buttonList::internalButton * buttonList::operator[](int & index)
 		{
-			if(index >= buttons.size()) _DEBUG_ERROR("\nbuttonList::operator[] | Error:\nRequested index does note exist!");
+			if(0 > index || index >= buttons.size()) throw inputError::buttonList_badIndex;
 			return &buttons[index];
 		}
 
@@ -194,6 +198,60 @@ namespace zlib
 			for(int iter = 0; iter < buttons.size(); iter++)
 			{
 				buttons[iter].draw();
+			}
+		}
+
+
+		//numberBox member functions
+
+		void numberBox::handleKeyEvent(KeyEvent event)
+		{
+			
+		}
+
+		bool numberBox::checkClicked(var::coord2 click, bool rawCoords)
+		{
+			if(rawCoords == false) click = window::unscale(click);
+
+			if(click.isWithin(position, position + size))
+			{
+				elementContainers::activeElement = this;
+
+				//eventually placing the text cursor in different points in the string will be implimented here
+
+				return true;
+			}
+		}
+
+		namespace elementContainers
+		{
+			void handleMouseDown(MouseEvent event)
+			{
+				//Handle the buttons
+				for(auto iter = buttons.begin(); iter != buttons.end(); iter++)
+				{
+					if(iter->checkPressed(event.getPos())) return;
+				}
+
+				//Handle the button lists
+				for(auto iter = buttonLists.begin(); iter != buttonLists.end(); iter++)
+				{
+					if(iter->checkPressed(event.getPos()) != -1) return;
+				}
+
+				//Handle the numberBoxes
+				for(auto iter = numberBoxes.begin(); iter != numberBoxes.end(); iter++)
+				{
+					if(iter->checkClicked(event.getPos())) return;
+				}
+			}
+
+			void handleKeyDown(KeyEvent event)
+			{
+				if(elementContainers::activeElement != NULL)
+				{
+					elementContainers::activeElement->handleKeyEvent(event);
+				}
 			}
 		}
 #endif
@@ -216,62 +274,62 @@ namespace zlib
 		}
 
 
-		bool isModifierPressed()
+		bool inline isModifierPressed()
 		{
 			return isShiftPressed() || isAltPressed() || isCtrlPressed();
 		}
 
 
-		bool isShiftPressed()			//Returns true when either of the shift keys are pressed
+		bool inline isShiftPressed()			//Returns true when either of the shift keys are pressed
 		{
 			return isLShiftPressed() || isRShiftPressed();
 		}
 
-		bool isLShiftPressed()			//Returns true when the left shift is pressed
+		bool inline isLShiftPressed()			//Returns true when the left shift is pressed
 		{
 			return keysPressed[304];
 		}
 
-		bool isRShiftPressed()			//Returns true when the right shift is pressed
+		bool inline isRShiftPressed()			//Returns true when the right shift is pressed
 		{
 			return keysPressed[303];
 
 		}
 
 
-		bool isAltPressed()				//Returns true when either of the alt keys are pressed
+		bool inline isAltPressed()				//Returns true when either of the alt keys are pressed
 		{
 			return isLAltPressed() || isRAltPressed();
 		}
 
-		bool isLAltPressed()			//Returns true when the left alt is pressed
+		bool inline isLAltPressed()			//Returns true when the left alt is pressed
 		{
 			return keysPressed[308];
 		}
 
-		bool isRAltPressed()			//Returns true when the right alt is pressed
+		bool inline isRAltPressed()			//Returns true when the right alt is pressed
 		{
 			return keysPressed[307];
 		}
 
 
-		bool isCtrlPressed()			//Returns true when either of the ctrl keys are pressed
+		bool inline isCtrlPressed()			//Returns true when either of the ctrl keys are pressed
 		{
 			return isLCtrlPressed() || isRCtrlPressed();
 		}
 
-		bool isLCtrlPressed()			//Returns true when the left ctrl is pressed
+		bool inline isLCtrlPressed()			//Returns true when the left ctrl is pressed
 		{
 			return keysPressed[306];
 		}
 
-		bool isRCtrlPressed()			//Returns true when the right ctrl is pressed
+		bool inline isRCtrlPressed()			//Returns true when the right ctrl is pressed
 		{
 			return keysPressed[305];
 		}
 
 
-		bool isKeyPressed(keys key)
+		bool inline isKeyPressed(keys key)
 		{
 			return keysPressed[key];
 		}

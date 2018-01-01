@@ -15,7 +15,18 @@ using std::string;
 
 using namespace zlib; 
 
+enum class inputError
+{
 #ifdef USING_CINDER
+	button_badSize,
+	buttonList_badIndex,
+
+#endif
+
+};
+
+#ifdef USING_CINDER
+using cinder::app::MouseEvent;
 using cinder::app::KeyEvent;
 #endif
 
@@ -27,6 +38,7 @@ namespace zlib
 		string getLine(char forceCase = 'n'); 	//Returns the user input from the console.  If forceCase == 'l', the text will be returned as lowercase.  If forceCase == 'u' the text will be returned as uppercase
 		double getNumInput(string prompt);
 #elif USING_CINDER
+		
 		class button
 		{
 		protected:
@@ -103,6 +115,34 @@ namespace zlib
 			void draw();
 		};
 
+		class numberBox		//Displays a number, and allows the user to modify it
+		{
+		protected: 
+			double & value;	//The value the numberBox is displaying/modifying
+
+			string modifValue;	//The text being entered into the numberBox (stored here before as it is being entered, converted to a number and stored in 'value' when the user presses enter)
+
+			var::coord2 position;	//The location of the upper left coorner of the box
+			var::coord2 size;		//The size of the box (Extending down and right)
+
+		public:
+			void handleKeyEvent(KeyEvent event);
+
+			bool checkClicked(var::coord2 click, bool rawCoords = true);
+		};
+
+		namespace elementContainers		//Contains all elements drawn to the screen 
+		{
+			//todo: potentially make the button, buttonList, and numberBox classes inaccessable except through the functions here.  Also move the vectors into the .cpp file so they aren't accessable from other areas
+			vector<button> buttons;
+			vector<buttonList> buttonLists;
+			vector<numberBox> numberBoxes;
+
+			void handleMouseDown(MouseEvent event);
+			void handleKeyDown(KeyEvent event);
+
+			numberBox * activeElement;
+		}
 #endif
 	};
 
@@ -256,21 +296,21 @@ namespace zlib
 		void keyDown(KeyEvent event);	//Handles a keyDown event
 		void keyUp(KeyEvent event);		//Handles a keyUp event
 
-		bool isModifierPressed();		//Returns true when a modifyer key is pressed
+		bool inline isModifierPressed();		//Returns true when a modifyer key is pressed
 
-		bool isShiftPressed();			//Returns true when either of the shift keys are pressed
-		bool isLShiftPressed();			//Returns true when the left shift is pressed
-		bool isRShiftPressed();			//Returns true when the right shift is pressed
+		bool inline isShiftPressed();			//Returns true when either of the shift keys are pressed
+		bool inline isLShiftPressed();			//Returns true when the left shift is pressed
+		bool inline isRShiftPressed();			//Returns true when the right shift is pressed
 
-		bool isAltPressed();			//Returns true when either of the alt keys are pressed
-		bool isLAltPressed();			//Returns true when the left alt is pressed
-		bool isRAltPressed();			//Returns true when the right alt is pressed
+		bool inline isAltPressed();				//Returns true when either of the alt keys are pressed
+		bool inline isLAltPressed();			//Returns true when the left alt is pressed
+		bool inline isRAltPressed();			//Returns true when the right alt is pressed
 
-		bool isCtrlPressed();			//Returns true when either of the ctrl keys are pressed
-		bool isLCtrlPressed();			//Returns true when the left ctrl is pressed
-		bool isRCtrlPressed();			//Returns true when the right ctrl is pressed
+		bool inline isCtrlPressed();			//Returns true when either of the ctrl keys are pressed
+		bool inline isLCtrlPressed();			//Returns true when the left ctrl is pressed
+		bool inline isRCtrlPressed();			//Returns true when the right ctrl is pressed
 
-		bool isKeyPressed(keys key);	//Returns true when the key 'key' is pressed
+		bool inline isKeyPressed(keys key);		//Returns true when the key 'key' is pressed
 	}
 #endif
 }
