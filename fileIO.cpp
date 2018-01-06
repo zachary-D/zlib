@@ -113,6 +113,11 @@ namespace zlib
 			file << value;
 		}
 
+		void fileWriter::write(char value)
+		{
+			file << value << std::endl;
+		}
+
 		void fileWriter::write(std::string value)
 		{
 			file << value << std::endl;

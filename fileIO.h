@@ -62,6 +62,7 @@ namespace zlib
 			void writeRaw(std::string value);
 			void writeEndLine() { file << std::endl; }
 			
+			void write(char value);
 			void write(std::string value);
 			void write(int value);
 
