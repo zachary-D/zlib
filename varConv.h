@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#include "zlib/varTypes.h"
+#include "varTypes.h"
 
 using namespace zlib;
 

@@ -21,13 +21,13 @@
 using namespace ci;
 using namespace ci::app;
 
-#include "varTypes/varTypes.h"
+#include "varTypes.h"
 
 using namespace zlib;
 
 //All static functions ignore window::getDisplacement, all functions without static take it into account
 
-using namespace zlib
+namespace zlib
 {
 	namespace draw
 	{

@@ -16,14 +16,14 @@ using std::map;
 #include "cinder/app/AppNative.h"
 #endif
 
-#include "zlib/input.h"
+#include "input.h"
 
 #ifdef USING_CINDER
-#include "zlib/draw.h"
-#include "zlib/windInfo.h"
+#include "draw.h"
+#include "windInfo.h"
 #endif
-#include "zlib/varTypes.h"
-#include "zlib/varConv.h"
+#include "varTypes.h"
+#include "varConv.h"
 
 using namespace zlib;
 
@@ -113,7 +113,16 @@ namespace zlib
 		void button::draw()
 		{
 			draw::drawStaticRect(getPosition(), getPosition() + getSize(), var::coord2(), 0, false, false, getColor());
-			gl::drawStringCentered(name, window::getScaled(getPosition() + var::coord2(getSize().x / 2, getSize().y), true, true).toVec2f(), ColorA(1, 1, 1, 1), Font("Arial", 50));
+			gl::drawStringCentered(
+				name,
+				window::scale(
+					getPosition() + var::coord2(
+						getSize().x / 2,
+						getSize().y)
+					).toVec2f(),
+				ColorA(1, 1, 1, 1),
+				Font("Arial", 50)
+			);
 		}
 
 		bool button::executeAction()
@@ -128,7 +137,7 @@ namespace zlib
 
 		bool button::checkPressed(var::coord2 _coords, bool _rawCoords)
 		{
-			if(_rawCoords) _coords = window::unScale(_coords);
+			if(_rawCoords) _coords = window::scale(_coords);
 
 			if(_coords.isWithin(getPosition(), getPosition() + getSize()))
 			{

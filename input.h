@@ -11,7 +11,7 @@ using std::string;
 #include "cinder/app/AppNative.h"
 #endif
 
-#include "zlib/varTypes.h"
+#include "varTypes.h"
 
 using namespace zlib; 
 
