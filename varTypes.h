@@ -42,11 +42,10 @@ namespace zlib
 			fraction_denom0,	//The denominator is 0.  This is a math no-no (divide by 0)
 		};
 
-		class mVector;	//Forward declaration
+		struct mVector;	//Forward declaration
 
-		class coord2
+		struct coord2
 		{
-		public:
 			coord2();
 			coord2(double X, double Y);
 #ifdef USING_CINDER
@@ -136,9 +135,8 @@ namespace zlib
 			static double angleBetween(coord2 &first, coord2 &second);		//Returns the angle of a line from 'first' to 'second' (the angle being the angle CCW from Y=0, x+)
 		};
 
-		class mVector	//The math version of a vector, not the infinite-array version
+		struct mVector	//The math version of a vector, not the infinite-array version
 		{
-		public:
 			mVector() {}
 			mVector(double _magnitude, double _angle);
 			mVector(coord2 coordinate);						//Creates a vector based from the origin to 'coordinate'
@@ -153,7 +151,7 @@ namespace zlib
 			coord2 toCoord2();			//Converts the vector to coordinates
 		};
 
-		class coord3
+		struct coord3
 		{
 		public:
 			coord3();
@@ -174,6 +172,35 @@ namespace zlib
 #ifdef USING_CINDER
 			ci::Vec3f toVec3f();
 #endif
+		};
+
+		struct mVector3
+		{
+		public:
+			mVector3() {}
+			mVector3(double _magnitude, double _yaw, double _pitch);
+			mVector3(const coord2 coordinate);	//Constructs a vector in the XY-plane based off of the coordiante (creates a vector with pitch = 0)
+			mVector3(const mVector vector);
+			mVector3(const coord3 coordinate);
+			
+			double magnitude;	//The magnitude of the vector
+			double yaw;		//The angle between the vector and the origin in degrees, horizontally.  (in the XY plane) (aka yaw).  Valid values: -180 -> 180 (values beyond those values will be aliased into that range by adding/subtracting 360)
+			double pitch;		//The angle between the vector and the XY plane in degrees (pitch)
+
+			mVector3 operator+(const mVector3 & other);
+
+			mVector3 operator-(const mVector3 & other);
+			
+			mVector3 operator*(const double & other);
+			mVector3 crossProduct(const mVector3 & other);
+			mVector3 dotProduct(const mVector3 & other);
+
+			mVector3 operator/(const double & other);
+			
+			
+			bool operator==(const mVector3 & other);
+
+			
 		};
 
 		struct fraction
@@ -216,9 +243,8 @@ namespace zlib
 
 		};
 
-		class color_RGB
+		struct color_RGB
 		{
-		public:
 			color_RGB();
 			color_RGB(double r, double g, double b);
 			color_RGB(double r, double g, double b, double a);
@@ -313,9 +339,8 @@ namespace zlib
 
 		namespace geom	//As in geometry
 		{
-			class line
+			struct line
 			{
-			public:
 				line(coord2 _slope = var::coord2(1, 1), coord2 _displacement = var::coord2(0, 0));
 				line(coord2 _slope, coord2 _displacement, double _lowxBound, double _highxBound);
 				line(coord2 _slope, coord2 _displacement, double _lowxBound, double _highxBound, double _lowyBound, double _highyBound);
@@ -372,9 +397,8 @@ namespace zlib
 			};
 
 
-			class square
+			struct square
 			{
-			public:
 				square();
 				square(coord2 _upperRight, coord2 _lowerLeft);
 				square(double _leftX, double _rightX, double _bottomY, double _topY);
