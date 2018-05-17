@@ -44,6 +44,7 @@ namespace zlib
 
 		class mVector;	//Forward declaration
 
+		//2-axis coordinate
 		class coord2
 		{
 		public:
@@ -136,6 +137,7 @@ namespace zlib
 			static double angleBetween(coord2 &first, coord2 &second);		//Returns the angle of a line from 'first' to 'second' (the angle being the angle CCW from Y=0, x+)
 		};
 
+		//2-axis vector
 		class mVector	//The math version of a vector, not the infinite-array version
 		{
 		public:
@@ -153,6 +155,7 @@ namespace zlib
 			coord2 toCoord2();			//Converts the vector to coordinates
 		};
 
+		//3-axis coordiante
 		class coord3
 		{
 		public:
@@ -176,6 +179,7 @@ namespace zlib
 #endif
 		};
 
+		//A fraction
 		struct fraction
 		{
 			fraction(bool _autoReduce = true);
@@ -310,6 +314,48 @@ namespace zlib
 			november = 11,
 			december = 12,
 		};
+
+		enum class LLERROR
+		{
+			invalidIndex
+		};
+
+		template<class T>
+		struct link
+		{
+			link();
+			link(T _data);
+			link(T _Data, link * _previous, link * _next);
+
+			T data;
+			link * next;
+			link * previous;
+
+			inline bool isFirst();
+			inline bool isLast();
+		};
+
+		template<class T>
+		struct linkedList
+		{
+			linkedList();
+			
+			link<T> * first;
+			link<T> * last;
+
+			unsigned size;
+
+			void push(T value);
+			void insert(T value, unsigned index);
+			void erase(unsigned index);
+			T access(unsigned index);
+
+			link<T> * iterateToElement(unsigned index);
+
+			T operator[](unsigned index);
+		};
+
+		
 
 		namespace geom	//As in geometry
 		{
