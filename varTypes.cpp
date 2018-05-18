@@ -828,122 +828,6 @@ namespace zlib
 			return seconds >= other.getTotalSeconds();
 		}
 
-		template<class T>
-		link<T>::link()
-		{
-			next = NULL;
-			previous = NULL;
-		}
-
-		template<class T>
-		link<T>::link(T _data)
-		{
-			data = _data;
-			next = NULL;
-			previous = NULL;
-		}
-
-		template<class T>
-		link<T>::link(T _data, link * _previous, link * _next)
-		{
-			data = _data;
-			next = _next;
-			previous = _previous;
-		}
-
-		template<class T>
-		inline bool link<T>::isFirst()
-		{
-			return previous == NULL;
-		}
-
-		template<class T>
-		inline bool link<T>::isLast()
-		{
-			return next == NULL;
-		}
-
-		template<class T>
-		linkedList<T>::linkedList()
-		{
-			size = 0;
-			first = NULL;
-			last = NULL;
-		}
-
-		template<class T>
-		void linkedList<T>::push(T value)
-		{
-			//Create the new value on the end of the chain
-			last->next = & new link<T>(value, last, NULL);
-
-			//Change the pointer to the last element to the new element created
-			last = last->next;
-
-			size++;
-		}
-
-		template<class T>
-		void linkedList<T>::insert(T value, unsigned index)
-		{
-			//Get a reference to the element we're inserting after
-			link<T> * previous = iterateToElement(index);
-
-			//Store a reference to the element that will be after the one we are inserting
-			T * after = previous->next;
-
-			//Insert the element
-			previous->next = & new link<T>(value, previous, after);
-
-			//Link the element after it backwards to the new element
-			after->last = previous->next;
-
-			size++;
-		}
-
-		template<class T>
-		void linkedList<T>::erase(unsigned index)
-		{
-			if (index > size) throw LLERROR::invalidIndex;
-
-			link<T> * target = iterateToElement(index);
-
-			link<T> * _prev = target->previous;
-			link<T> * _next = target->next;
-
-			_prev->next = _next;
-			_next->previous = _prev;
-
-			delete target;
-		}
-
-		template<class T>
-		T linkedList<T>::access(unsigned index)
-		{
-			return iterateToElement(index)->data;
-		}
-
-		template<class T>
-		link<T> * linkedList<T>::iterateToElement(unsigned index)
-		{
-			link * current = first;
-
-			//Iterate to reach the correct element in the list
-			for (int i = 0; i < value; i++)
-			{
-				if (current->isLast()) throw LLERROR::invalidIndex;
-				current = current->next;
-			}
-
-			return current;
-		}
-
-		template<class T>
-		T linkedList<T>::operator[](unsigned index)
-		{
-			return &access(index);
-		}
-
 		namespace geom	//As in geometry
 		{
 			line::line(coord2 _slope, coord2 _displacement)
@@ -1482,9 +1366,6 @@ namespace zlib
 				}
 			}
 		}
-
-
-
 
 #ifdef USING_VARTYPES_CHEM
 		namespace chem
