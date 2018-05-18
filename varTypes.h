@@ -646,7 +646,7 @@ namespace zlib
 
 #ifdef USING_VARTYPES_CHEM
 		namespace chem
-		{
+		{ 
 			class element
 			{
 			public:
