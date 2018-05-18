@@ -181,14 +181,14 @@ namespace zlib
 
 		bool coord2::operator==(const coord2 & other)
 		{
-			if(x == other.x && y == other.y) return true;
+			if (x == other.x && y == other.y) return true;
 			else return false;
 		}
 
 
 		bool coord2::operator!=(const coord2 & other)
 		{
-			if(x != other.x || y != other.y) return true;
+			if (x != other.x || y != other.y) return true;
 			else return false;
 		}
 
@@ -292,10 +292,10 @@ namespace zlib
 
 		int coord2::getQuadrant()
 		{
-			if(x >= 0 && y >= 0) return 1;
-			else if(x < 0 && y >= 0) return 2;
-			else if(x < 0 && y < 0) return 3;
-			else if(x >= 0 && y < 0) return 4;
+			if (x >= 0 && y >= 0) return 1;
+			else if (x < 0 && y >= 0) return 2;
+			else if (x < 0 && y < 0) return 3;
+			else if (x >= 0 && y < 0) return 4;
 			else
 			{
 				_DEBUG_ERROR("Error determining quadrant.  Coordinates may be improperly defined.  Defaulting to 1");
@@ -310,7 +310,7 @@ namespace zlib
 			double highY = 0;
 			double lowY = 0;
 
-			if(first.x > second.x)
+			if (first.x > second.x)
 			{
 				highX = first.x;
 				lowX = second.x;
@@ -321,7 +321,7 @@ namespace zlib
 				highX = second.x;
 			}
 
-			if(first.y > second.y)
+			if (first.y > second.y)
 			{
 				highY = first.y;
 				lowY = second.y;
@@ -465,7 +465,7 @@ namespace zlib
 
 		bool coord3::operator==(const coord3& other)
 		{
-			if(x == other.x && y == other.y && z == other.z) return true;
+			if (x == other.x && y == other.y && z == other.z) return true;
 			else return false;
 		}
 
@@ -487,25 +487,25 @@ namespace zlib
 		fraction::fraction(int _numer, int _denom, bool _autoReduce)
 		{
 			autoReduce = _autoReduce;
-			if(_denom == 0) throw varExceptions::fraction_denom0;
+			if (_denom == 0) throw varExceptions::fraction_denom0;
 
 			numer = _numer;
 			denom = _denom;
 
-			if(autoReduce) reduce();
+			if (autoReduce) reduce();
 		}
 
 		void fraction::reduce()
 		{
-			if(denom < 0)	//Move the negative in the denominator to the numerator
+			if (denom < 0)	//Move the negative in the denominator to the numerator
 			{
 				numer *= -1;
 				denom *= -1;
 			}
 
-			for(int factor = 2; factor <= numer && factor <= denom; factor++)
+			for (int factor = 2; factor <= numer && factor <= denom; factor++)
 			{
-				if(numer%factor == 0 && denom%factor == 0)
+				if (numer%factor == 0 && denom%factor == 0)
 				{
 					numer /= factor;
 					denom /= factor;
@@ -515,15 +515,15 @@ namespace zlib
 
 		fraction fraction::reduce(fraction frac)
 		{
-			if(frac.denom < 0)	//Move the negative in the denominator to the numerator
+			if (frac.denom < 0)	//Move the negative in the denominator to the numerator
 			{
 				frac.numer *= -1;
 				frac.denom *= -1;
 			}
 
-			for(int factor = 2; factor <= frac.numer && factor <= frac.denom; factor++)
+			for (int factor = 2; factor <= frac.numer && factor <= frac.denom; factor++)
 			{
-				if(frac.numer%factor == 0 && frac.denom%factor == 0)
+				if (frac.numer%factor == 0 && frac.denom%factor == 0)
 				{
 					frac.numer /= factor;
 					frac.denom /= factor;
@@ -535,14 +535,14 @@ namespace zlib
 		std::pair<fraction, fraction> fraction::convCommonBase(fraction first, fraction second)
 		{
 			//If they already have a common denominator
-			if(first.denom == second.denom) return std::pair<fraction, fraction>(first, second);
+			if (first.denom == second.denom) return std::pair<fraction, fraction>(first, second);
 
 			//Remove any common factors from the denominators
 			int base1 = first.denom;
 			int base2 = second.denom;
-			for(int factor = 2; factor <= base1 && factor <= base2; factor++)
+			for (int factor = 2; factor <= base1 && factor <= base2; factor++)
 			{
-				while(base1 % factor == 0 && base2 % factor == 0)
+				while (base1 % factor == 0 && base2 % factor == 0)
 				{
 					base1 /= factor;
 					base2 /= factor;
@@ -591,7 +591,7 @@ namespace zlib
 			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
 			numer = fPair.first.numer + fPair.second.numer;
 			denom = fPair.first.denom;
-			if(autoReduce) reduce();
+			if (autoReduce) reduce();
 		}
 
 		void fraction::operator-=(fraction const & other)
@@ -599,21 +599,21 @@ namespace zlib
 			std::pair<fraction, fraction> fPair = convCommonBase(*this, other);
 			numer = fPair.first.numer - fPair.second.numer;
 			denom = fPair.first.denom;
-			if(autoReduce) reduce();
+			if (autoReduce) reduce();
 		}
 
 		void fraction::operator*=(fraction const & other)
 		{
 			numer *= other.numer;
 			denom *= other.denom;
-			if(autoReduce) reduce();
+			if (autoReduce) reduce();
 		}
-		
+
 		void fraction::operator/=(fraction const & other)
 		{
 			numer *= other.denom;
 			denom *= other.numer;
-			if(autoReduce) reduce();
+			if (autoReduce) reduce();
 		}
 
 		bool fraction::operator==(fraction const & other)
@@ -702,9 +702,9 @@ namespace zlib
 
 		ci::ColorA color_RGB::toCinderColorA()
 		{
-			if(0 <= A && A <= 1) return ci::ColorA(R, G, B, A);
+			if (0 <= A && A <= 1) return ci::ColorA(R, G, B, A);
 			return ci::ColorA(R, G, B, 1);
-	}
+		}
 #endif
 
 
@@ -713,11 +713,11 @@ namespace zlib
 		shortTime::shortTime(int _seconds, int minutes, int hours, int days)
 		{
 			seconds = _seconds +
-				minutes * secondsPerMinute + 
-				hours * secondsPerHour + 
+				minutes * secondsPerMinute +
+				hours * secondsPerHour +
 				days * secondsPerDay;
 		}
-		
+
 		int shortTime::getTotalSeconds()
 		{
 			return seconds;
@@ -827,9 +827,6 @@ namespace zlib
 		{
 			return seconds >= other.getTotalSeconds();
 		}
-
-
-
 
 		namespace geom	//As in geometry
 		{
@@ -1369,9 +1366,6 @@ namespace zlib
 				}
 			}
 		}
-
-
-
 
 #ifdef USING_VARTYPES_CHEM
 		namespace chem
