@@ -533,6 +533,16 @@ namespace zlib
 			return access(index);
 		}
 
+		template<class T, const int arrSize>
+		struct arrList : linkedList<T*>
+		{
+			arrList();
+
+			vector<int> pointers;
+
+
+		};
+
 		namespace geom	//As in geometry
 		{
 			class line
