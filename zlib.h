@@ -5,6 +5,11 @@
 
 //This file serves as a 'shortcut' to the other headers
 
+//Preprocessor directives for enabling different code sections
+//		Directive				Description
+//		USING_CINDER			Enables Cinder-exclusive functions (i.e. conversion from internal color type to Cinder's color type)
+
+
 #include "zlib/cryptography.h"
 #include "zlib/draw.h"
 #include "zlib/fileIO.h"
