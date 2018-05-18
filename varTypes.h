@@ -44,6 +44,7 @@ namespace zlib
 
 		class mVector;	//Forward declaration
 
+		//2-axis coordinate
 		class coord2
 		{
 		public:
@@ -136,6 +137,7 @@ namespace zlib
 			static double angleBetween(coord2 &first, coord2 &second);		//Returns the angle of a line from 'first' to 'second' (the angle being the angle CCW from Y=0, x+)
 		};
 
+		//2-axis vector
 		class mVector	//The math version of a vector, not the infinite-array version
 		{
 		public:
@@ -153,6 +155,7 @@ namespace zlib
 			coord2 toCoord2();			//Converts the vector to coordinates
 		};
 
+		//3-axis coordiante
 		class coord3
 		{
 		public:
@@ -176,6 +179,7 @@ namespace zlib
 #endif
 		};
 
+		//A fraction
 		struct fraction
 		{
 			fraction(bool _autoReduce = true);
@@ -310,6 +314,225 @@ namespace zlib
 			november = 11,
 			december = 12,
 		};
+
+		enum class LLERROR
+		{
+			badIndex,
+			badPointer
+		};
+
+		template<class T>
+		struct link
+		{
+			link();
+			link(T _data);
+			link(T _Data, link * _previous, link * _next);
+
+			T data;
+			link * next;
+			link * previous;
+
+			inline bool isFirst();
+			inline bool isLast();
+		};
+
+		template<class T>
+		link<T>::link()
+		{
+			next = NULL;
+			previous = NULL;
+		}
+
+		template<class T>
+		link<T>::link(T _data)
+		{
+			data = _data;
+			next = NULL;
+			previous = NULL;
+		}
+
+		template<class T>
+		link<T>::link(T _data, link * _previous, link * _next)
+		{
+			data = _data;
+			next = _next;
+			previous = _previous;
+		}
+
+		template<class T>
+		inline bool link<T>::isFirst()
+		{
+			return previous == NULL;
+		}
+
+		template<class T>
+		inline bool link<T>::isLast()
+		{
+			return next == NULL;
+		}
+
+		template<class T>
+		struct linkedList
+		{
+			linkedList();
+			
+			link<T> * first;
+			link<T> * last;
+
+			unsigned size;
+
+			void push(T value);
+			void insert(T value, unsigned index);
+			void erase(unsigned index);
+			T access(unsigned index);
+
+			link<T> * iterateToElement(unsigned index);
+
+			T operator[](unsigned index);
+		};
+
+		template<class T>
+		linkedList<T>::linkedList()
+		{
+			size = 0;
+			first = NULL;
+			last = NULL;
+		}
+
+		template<class T>
+		void linkedList<T>::push(T value)
+		{
+			if (size == 0)
+			//If no other elements exist
+			{
+				first = new link<T>(value, NULL, NULL);
+				last = first;
+			}
+			else
+			//If at least one element already exists
+			{
+				//Create the new value on the end of the chain
+				last->next = new link<T>(value, last, NULL);
+
+				//Change the pointer to the last element to the new element created
+				last = last->next;
+			}
+			size++;
+		}
+
+		template<class T>
+		void linkedList<T>::insert(T value, unsigned index)
+		{
+			if (size == 0)
+			{
+				first = new link<T>(value, NULL, NULL);
+				last = first;
+				size = 1;
+				return;
+			}
+
+			
+			if (index == 0)
+			//If we're adding an element at the beginning
+			{
+				//Get a reference to the element that will be after the first one
+				link<T> * after = first;
+
+				//Create the new element
+				first = new link<T>(value, NULL, after);
+
+				//Link the element after the one begin inserted to the one before it
+				after->previous = first;
+			}
+			else
+			{
+				//If we're adding a element anywhere else
+
+				//Get a reference to the element we're inserting after
+				link<T> * previous = iterateToElement(index - 1);
+
+				link<T> * after = NULL;
+
+				if (!previous->isLast())
+				{
+					//If there is an element after the element we're adding
+					//Store a reference to the element that will be after the one we are inserting
+					after = previous->next;
+				}
+
+				//Insert the element
+				previous->next = new link<T>(value, previous, after);
+
+				if (after != NULL)
+				{
+					//Link the element after it backwards to the new element
+					after->previous = previous->next;
+				}
+			}
+
+			size++;
+		}
+
+		template<class T>
+		void linkedList<T>::erase(unsigned index)
+		{
+			if (index > size) throw LLERROR::badIndex;
+
+			//Get a reference to the element being deleted
+			link<T> * target = iterateToElement(index);
+
+			//Get references to the elements before and after the one being deleted
+			link<T> * _prev = target->previous;
+			link<T> * _next = target->next;
+
+			//Link the elements before and after the one being deleted to each other
+			if(_prev != NULL) _prev->next = _next;
+			if(_next != NULL) _next->previous = _prev;
+
+			//Actually delete the element being deleted
+			delete target;
+
+			//Handle if the element deleted was the first or last
+			if (index == 0)
+			{
+				first = _next;
+			}
+			if (index == size - 1)
+			{
+				last = _prev;
+			}
+			
+			size--;
+		}
+
+		template<class T>
+		T linkedList<T>::access(unsigned index)
+		{
+			return iterateToElement(index)->data;
+		}
+
+		template<class T>
+		link<T> * linkedList<T>::iterateToElement(unsigned index)
+		{
+			if (index > size) throw LLERROR::badIndex;
+
+			link<T> * current = first;
+
+			//Iterate to reach the correct element in the list
+			for (int i = 0; i < index; i++)
+			{
+				if (current->isLast()) throw LLERROR::badPointer;
+				current = current->next;
+			}
+
+			return current;
+		}
+
+		template<class T>
+		T linkedList<T>::operator[](unsigned index)
+		{
+			return access(index);
+		}
 
 		namespace geom	//As in geometry
 		{
