@@ -320,6 +320,8 @@ namespace zlib
 			badPointer
 		};
 
+
+		//An element in a linked list, containing a single value, and pointers to the elements before and after it
 		template<class T>
 		struct link
 		{
@@ -370,6 +372,8 @@ namespace zlib
 			return next == NULL;
 		}
 
+
+		//A simple linked list, with position-tracking in both directions
 		template<class T>
 		struct linkedList
 		{
@@ -532,16 +536,60 @@ namespace zlib
 		{
 			return access(index);
 		}
+		
 
-		template<class T, const int arrSize>
-		struct arrList : linkedList<T*>
+		//A linked list along with a vector containing a reference to each element
+		template<class T>
+		struct arrList : linkedList<T>
 		{
 			arrList();
 
-			vector<int> pointers;
+			vector<T*> elements;		//Pointers to the *data* in each link
+			vector<link<T>*> links;		//Pointers to each link in the list
 
+			void push(T value) override;
+			void insert(T value, unsigned index) override;
+			void erase(unsigned index) override;
+			T access(unsigned index) override;
 
+			//The [] operator is not overridden because it's just a wrapper for access()
 		};
+
+		template<class T>
+		arrList<T>::arrList()
+		{
+			size = 0;
+			first = NULL;
+			last = NULL;
+		}
+
+		template<class T>
+		void arrList<T>::push(T value)
+		{
+			//Get the last link in the list
+			link<T> * last = links[size - 1];
+
+			//Create the new link
+			last->next = new link<T>(value, last, NULL);
+
+			//Add the link and the data to each of the tracker-vectors
+			links.push_back(last->next);
+			elements.push_back( &(last->next).data );
+
+			//Incriment the size tracker of the list
+			size++;
+		}
+
+		template<class T>
+		void arrList<T>::insert(T value, unsigned index)
+		{
+			if (value > size) throw LLERROR::badIndex;
+
+			//Get the links that we're inserting between
+			link<T> * before = links[value];
+			link<T> * after = links[value + 1];
+		}
+
 
 		namespace geom	//As in geometry
 		{
