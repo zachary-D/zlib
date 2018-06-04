@@ -410,6 +410,8 @@ namespace zlib
 			{
 				first = new link<T>(value, NULL, NULL);
 				last = first;
+				size = 1;
+				return;
 			}
 			else
 			//If at least one element already exists
@@ -419,8 +421,9 @@ namespace zlib
 
 				//Change the pointer to the last element to the new element created
 				last = last->next;
+				size++;
+				return;
 			}
-			size++;
 		}
 
 		template<class T>
@@ -546,10 +549,10 @@ namespace zlib
 			
 			vector<link<T>*> links;		//Pointers to each link in the list
 
-			void push(T value) override;
-			void insert(T value, unsigned index) override;
-			void erase(unsigned index) override;
-			T access(unsigned index) override;
+			void push(T value);
+			void insert(T value, unsigned index);
+			void erase(unsigned index);
+			T & access(unsigned index);
 
 			//The [] operator is not overridden because it's just a wrapper for access()
 		};
@@ -565,17 +568,39 @@ namespace zlib
 		template<class T>
 		void arrList<T>::push(T value)
 		{
-			//Get the last link in the list
-			link<T> * last = links[size - 1];
+			if (size == 0)
+			{	//If no other elements exist
 
-			//Create the new link
-			last->next = new link<T>(value, last, NULL);
+				//Allocate the first element
+				first = new link<T>(value, NULL, NULL);
+				
+				//Set the last to the first
+				last = first;
+				
+				//Add a pointer to the new link to the vector, and set the size tracker
+				vector.push(first);
+				size = 1;
 
-			//Add the link and the data to each of the tracker-vectors
-			links.push_back(last->next);
+				return;
+			}
+			else
+			{	//If at least one element exists
 
-			//Incriment the size tracker of the list
-			size++;
+				//Get the last link in the list
+				link<T> * last = links[size - 1];
+
+				//Create the new link
+				last->next = new link<T>(value, last, NULL);
+
+				//Add the link and the data to each of the tracker-vectors
+				links.push_back(last->next);
+
+				//Incriment the size tracker of the list
+				size++;
+
+				return;
+			}
+			
 		}
 
 		template<class T>
@@ -583,9 +608,63 @@ namespace zlib
 		{
 			if (value > size) throw LLERROR::badIndex;
 
-			//Get the links that we're inserting between
-			link<T> * before = links[value];
-			link<T> * after = links[value + 1];
+			if (index == 0)
+			{	//If we're adding an element at the beginning
+				
+				//Allocate space for the new element, and set the appropriate trackers
+				first = new link<T>(value, NULL, NULL);
+				last = first;
+				vector.push(first);
+				size = 1;
+				return;
+			}
+			else
+			{	//If we're adding an element anywhere else
+
+				//Get a reference to the element we're inserting after
+				link<T> * previous = links[index - 1];
+
+				link<T> * after = NULL;
+
+				if (!previous->isLast())
+				{	//If there is an elment after the elemet we're adding, store a reference to the element that will be after the one we are inserting
+					
+					after = previous->next;
+				}
+				
+				//Insert the element
+				previous->next = new link<T>(value, previous, after);
+
+				if (after != NULL)
+				{	//Link the element after it backwards, if it exists
+					
+					after->previous = previous->next;
+				}
+
+				size++;
+			}
+		}
+
+		template<class T>
+		void arrList<T>::erase(unsigned index)
+		{
+			link<T> * target = links[index];
+
+			link<T> * prev = target->previous;
+			link<T> * next = target->next;
+
+			prev->next = next;
+			next->previous = prev;
+
+			delete target;
+
+			links.erase(links.begin() + index);
+		}
+
+		template<class T>
+		T & arrList<T>::access(unsigned index)
+		{
+			return links[index]->data;
 		}
 
 
