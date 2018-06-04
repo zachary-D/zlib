@@ -543,8 +543,7 @@ namespace zlib
 		struct arrList : linkedList<T>
 		{
 			arrList();
-
-			vector<T*> elements;		//Pointers to the *data* in each link
+			
 			vector<link<T>*> links;		//Pointers to each link in the list
 
 			void push(T value) override;
@@ -574,7 +573,6 @@ namespace zlib
 
 			//Add the link and the data to each of the tracker-vectors
 			links.push_back(last->next);
-			elements.push_back( &(last->next).data );
 
 			//Incriment the size tracker of the list
 			size++;
