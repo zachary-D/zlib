@@ -387,11 +387,11 @@ namespace zlib
 			void push(T value);
 			void insert(T value, unsigned index);
 			void erase(unsigned index);
-			T access(unsigned index);
+			T & access(unsigned index);
 
 			link<T> * iterateToElement(unsigned index);
 
-			T operator[](unsigned index);
+			T & operator[](unsigned index);
 		};
 
 		template<class T>
@@ -512,7 +512,7 @@ namespace zlib
 		}
 
 		template<class T>
-		T linkedList<T>::access(unsigned index)
+		T & linkedList<T>::access(unsigned index)
 		{
 			return iterateToElement(index)->data;
 		}
@@ -535,7 +535,7 @@ namespace zlib
 		}
 
 		template<class T>
-		T linkedList<T>::operator[](unsigned index)
+		T & linkedList<T>::operator[](unsigned index)
 		{
 			return access(index);
 		}
@@ -554,7 +554,7 @@ namespace zlib
 			void erase(unsigned index);
 			T & access(unsigned index);
 
-			//The [] operator is not overridden because it's just a wrapper for access()
+			T & operator[](unsigned index);	//Just a wrapper for index, no different than the parent class, but it had to be explicitly defined to prevent bugs (linkedLIst::access() would end up being called instead of arrList::access(), etc.)
 		};
 
 		template<class T>
@@ -578,7 +578,7 @@ namespace zlib
 				last = first;
 				
 				//Add a pointer to the new link to the vector, and set the size tracker
-				vector.push(first);
+				links.push_back(first);
 				size = 1;
 
 				return;
@@ -606,7 +606,7 @@ namespace zlib
 		template<class T>
 		void arrList<T>::insert(T value, unsigned index)
 		{
-			if (value > size) throw LLERROR::badIndex;
+			if (index > size) throw LLERROR::badIndex;
 
 			if (index == 0)
 			{	//If we're adding an element at the beginning
@@ -614,7 +614,7 @@ namespace zlib
 				//Allocate space for the new element, and set the appropriate trackers
 				first = new link<T>(value, NULL, NULL);
 				last = first;
-				vector.push(first);
+				links.push_back(first);
 				size = 1;
 				return;
 			}
@@ -650,11 +650,11 @@ namespace zlib
 		{
 			link<T> * target = links[index];
 
-			link<T> * prev = target->previous;
-			link<T> * next = target->next;
+			link<T> * _prev = target->previous;
+			link<T> * _next = target->next;
 
-			prev->next = next;
-			next->previous = prev;
+			if(_prev != NULL) _prev->next = _next;
+			if(_next != NULL) _next->previous = _prev;
 
 			delete target;
 
@@ -665,6 +665,12 @@ namespace zlib
 		T & arrList<T>::access(unsigned index)
 		{
 			return links[index]->data;
+		}
+
+		template<class T>
+		T & arrList<T>::operator[](unsigned index)
+		{
+			return access(index);
 		}
 
 
