@@ -317,9 +317,10 @@ namespace zlib
 		enum class LLERROR
 		{
 			badIndex,
-			badPointer
+			badPointer,
+			iter_listEnd,
+			iter_badPointer
 		};
-
 
 		//An element in a linked list, containing a single value, and pointers to the elements before and after it
 		template<class T>
@@ -370,6 +371,47 @@ namespace zlib
 		inline bool link<T>::isLast()
 		{
 			return next == NULL;
+		}
+
+
+		template<class T>
+		struct linkIterator
+		{
+			linkIterator(link<T> * _lnk);
+
+			link<T> * _link;
+
+			T & val();
+
+			void operator++();
+			void operator--();
+		};
+
+		template<class T>
+		linkIterator<T>::linkIterator(link<T> * _lnk)
+		{
+			if (_lnk == NULL) throw LLERROR::iter_badPointer;
+			_link = _lnk;
+		}
+
+		template<class T>
+		T & linkIterator<T>::val()
+		{
+			return _link->data;
+		}
+
+		template<class T>
+		void linkIterator<T>::operator++()
+		{
+			if (_link->isLast()) throw LLERROR::iter_listEnd;
+			_link = _link->next;
+		}
+
+		template<class T> 
+		void linkIterator<T>::operator--()
+		{
+			if (_link->isFirst()) throw LLERROR::iter_listEnd;
+			_link = _link->previous;
 		}
 
 
