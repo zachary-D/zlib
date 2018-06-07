@@ -648,16 +648,25 @@ namespace zlib
 		template<class T>
 		void arrList<T>::insert(T value, unsigned index)
 		{
-			if (index > size) throw LLERROR::badIndex;
+			if(index > size) throw LLERROR::badIndex;
 
+			if(size == 0)
+			{	//If we're adding to and empty list
+				first = new link<T>(value, NULL, NULL);
+				last = first;
+				size = 1;
+				links.push_back(first);
+				return;
+			}
 			if (index == 0)
 			{	//If we're adding an element at the beginning
 				
 				//Allocate space for the new element, and set the appropriate trackers
-				first = new link<T>(value, NULL, NULL);
-				last = first;
-				links.push_back(first);
-				size = 1;
+				first = new link<T>(value, NULL, first);
+				
+				//Add the pointer to the tracker and incriment the size tracker
+				links.insert(links.begin() + index, first);
+				size++;
 				return;
 			}
 			else
@@ -683,6 +692,7 @@ namespace zlib
 					after->previous = previous->next;
 				}
 
+				links.insert(links.begin() + index, previous->next);
 				size++;
 			}
 		}
@@ -690,6 +700,8 @@ namespace zlib
 		template<class T>
 		void arrList<T>::erase(unsigned index)
 		{
+			if(index >= size) throw LLERROR::badIndex;
+
 			link<T> * target = links[index];
 
 			link<T> * _prev = target->previous;
@@ -701,11 +713,14 @@ namespace zlib
 			delete target;
 
 			links.erase(links.begin() + index);
+
+			size--;
 		}
 
 		template<class T>
 		T & arrList<T>::access(unsigned index)
 		{
+			if(index >= size) throw LLERROR::badIndex;
 			return links[index]->data;
 		}
 
