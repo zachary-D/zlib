@@ -16,7 +16,7 @@
 
 using namespace std;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #include "cinder/app/AppNative.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
@@ -289,7 +289,7 @@ namespace zlib
 		}
 
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		var::coord2 toCoord2(ci::Vec2f coordinate)
 		{
 			return var::coord2(coordinate.x, coordinate.y);

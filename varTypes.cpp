@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #include "cinder\Color.h"
 #include "cinder\app\AppNative.h"
 #endif
@@ -39,7 +39,7 @@ namespace zlib
 			x = X;
 			y = Y;
 		}
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		coord2::coord2(ci::Vec2i coordinate)
 		{
 			x = coordinate.x;
@@ -268,7 +268,7 @@ namespace zlib
 			y *= -1;
 		}
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		ci::Vec2i coord2::toVec2i()
 		{
 			return ci::Vec2i(x, y);
@@ -469,7 +469,7 @@ namespace zlib
 			else return false;
 		}
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		ci::Vec3f coord3::toVec3f()
 		{
 			return ci::Vec3f(x, y, z);
@@ -689,7 +689,7 @@ namespace zlib
 			return R == other.R && G == other.G && B == other.B && A == other.A;
 		}
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		ci::Color color_RGB::toColor()
 		{
 			return ci::Color(R, G, B);

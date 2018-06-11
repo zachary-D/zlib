@@ -6,7 +6,7 @@
 
 //Preprocessor directives for enabling different code sections
 //		Directive				Description
-//		USING_CINDER			Enables Cinder-exclusive functions (i.e. conversion from internal color type to Cinder's color type)
+//		ZLIB_USING_CINDER			Enables Cinder-exclusive functions (i.e. conversion from internal color type to Cinder's color type)
 
 #include <string>
 #include <vector>
@@ -14,9 +14,9 @@
 using std::string;
 using std::vector;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #include "cinder\Color.h"
-#include "cinder\app\AppNative.h"
+#include "cinder\app\App.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
 #include "cinder/Font.h"
@@ -49,7 +49,7 @@ namespace zlib
 		public:
 			coord2();
 			coord2(double X, double Y);
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 			coord2(ci::Vec2i coordinate);
 			coord2(ci::Vec2f coordinate);
 			coord2(ci::Vec2d coordinate);
@@ -114,7 +114,7 @@ namespace zlib
 			void negateY();			//Negate y
 			void negate();			//Negate x and y
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 			ci::Vec2i toVec2i();
 			ci::Vec2f toVec2f();
 			ci::Vec2d toVec2d();
@@ -173,7 +173,7 @@ namespace zlib
 			double y;
 			double z;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 			ci::Vec3f toVec3f();
 #endif
 		};
@@ -237,7 +237,7 @@ namespace zlib
 			bool isOpacityDefined() { return  A != -1; }						//True when the opacity is defined
 			bool areAllDefined() { return isDefined() && isOpacityDefined(); }	//True when the opacity and color is
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 			ci::Color toColor();			//BEING REMOVED.  use toCinderColor() istead
 			ci::Color toCinderColor();		//Returns the color in Cinder's format, without opacity
 			ci::ColorA toCinderColorA();	//Returns the color in Cinder's format, with opacity

@@ -44,7 +44,7 @@ namespace zlib
 		bool toBool(string inp);
 		bool toBool(double inp);
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		var::coord2 toCoord2(ci::Vec2f coordinate);
 #endif
 

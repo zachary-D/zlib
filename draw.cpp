@@ -3,7 +3,7 @@
 //Written by and copyright Zachary Damato
 //draw.cpp is part of the zlib submodule
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 
 #include<iostream>
 #include<sstream>

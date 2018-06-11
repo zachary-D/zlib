@@ -3,12 +3,12 @@
 //Written by and copyright Zachary Damato
 //draw.h is part of the zlib submodule
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 
 #include <string> 
 
 #include "cinder/gl/Texture.h"
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/gl/gl.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"

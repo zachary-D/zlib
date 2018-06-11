@@ -3,7 +3,7 @@
 //Written by and copyright Zachary Damato
 //windInfo.cpp is part of the zlib submodule
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #define _USE_MATH_DEFINES
 
 #include<iostream>

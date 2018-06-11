@@ -7,15 +7,16 @@
 
 using std::string;
 
-#ifdef USING_CINDER
-#include "cinder/app/AppNative.h"
+#ifdef ZLIB_USING_CINDER
+
+#include "cinder/app/App.h"
 #endif
 
 #include "varTypes.h"
 
 using namespace zlib; 
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 using cinder::app::KeyEvent;
 #endif
 
@@ -23,10 +24,10 @@ namespace zlib
 {
 	namespace input
 	{
-#ifndef USING_CINDER
+#ifndef ZLIB_USING_CINDER
 		string getLine(char forceCase = 'n'); 	//Returns the user input from the console.  If forceCase == 'l', the text will be returned as lowercase.  If forceCase == 'u' the text will be returned as uppercase
 		double getNumInput(string prompt);
-#elif USING_CINDER
+#elif ZLIB_USING_CINDER
 		class button
 		{
 		protected:
@@ -106,7 +107,7 @@ namespace zlib
 #endif
 	};
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 	namespace keyboard
 	{
 		enum keys {		//Just copied from cinder's KeyEvents code, and the capitalization is tweaked
