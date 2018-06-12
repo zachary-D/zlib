@@ -322,6 +322,7 @@ namespace zlib
 			iter_badPointer
 		};
 
+
 		//An element in a linked list, containing a single value, and pointers to the elements before and after it
 		template<class T>
 		struct link
@@ -373,46 +374,9 @@ namespace zlib
 			return next == NULL;
 		}
 
-
+		
 		template<class T>
-		struct linkIterator
-		{
-			linkIterator(link<T> * _lnk);
-
-			link<T> * _link;
-
-			T & val();
-
-			void operator++();
-			void operator--();
-		};
-
-		template<class T>
-		linkIterator<T>::linkIterator(link<T> * _lnk)
-		{
-			if (_lnk == NULL) throw LLERROR::iter_badPointer;
-			_link = _lnk;
-		}
-
-		template<class T>
-		T & linkIterator<T>::val()
-		{
-			return _link->data;
-		}
-
-		template<class T>
-		void linkIterator<T>::operator++()
-		{
-			if (_link->isLast()) throw LLERROR::iter_listEnd;
-			_link = _link->next;
-		}
-
-		template<class T> 
-		void linkIterator<T>::operator--()
-		{
-			if (_link->isFirst()) throw LLERROR::iter_listEnd;
-			_link = _link->previous;
-		}
+		struct linkIterator;	//Forward declaration for down below
 
 
 		//A simple linked list, with position-tracking in both directions
@@ -432,6 +396,8 @@ namespace zlib
 			T & access(unsigned index);
 
 			link<T> * iterateToElement(unsigned index);
+
+			linkIterator<T> & iter();	//Returns an iterator, starting with the first element
 
 			T & operator[](unsigned index);
 		};
@@ -582,6 +548,79 @@ namespace zlib
 			return access(index);
 		}
 		
+		template<class T>
+		linkIterator<T> & linkedList<T>::iter()
+		{
+			return linkIterator<T>(first);
+		}
+
+
+		//An iterator class for linkedLists.  Modifying the values in the iterator will modify the results in the list
+		template<class T>
+		struct linkIterator
+		{
+			linkIterator(link<T> * _lnk);
+			linkIterator(linkedList<T> & list);
+
+		private:
+			link<T> * curr;
+
+		public:
+			T & val();
+
+			bool isFirst();
+			bool isLast();
+
+			void operator++();
+			void operator--();
+		};
+
+		template<class T>
+		linkIterator<T>::linkIterator(link<T> * _lnk)
+		{
+			if(_lnk == NULL) throw LLERROR::iter_badPointer;
+			curr = _lnk;
+		}
+
+		template<class T>
+		linkIterator<T>::linkIterator(linkedList<T> & list)
+		{
+			if(list.first == NULL) throw LLERROR::iter_badPointer;
+			curr = list.first;
+		}
+
+		template<class T>
+		T & linkIterator<T>::val()
+		{
+			return curr->data;
+		}
+
+		template<class T>
+		bool linkIterator<T>::isFirst()
+		{
+			return curr == NULL || curr->isFirst();
+		}
+
+		template<class T>
+		bool linkIterator<T>::isLast()
+		{
+			return curr == NULL || curr->isLast();
+		}
+
+		template<class T>
+		void linkIterator<T>::operator++()
+		{
+			if(curr->isLast()) throw LLERROR::iter_listEnd;
+			curr = curr->next;
+		}
+
+		template<class T>
+		void linkIterator<T>::operator--()
+		{
+			if(curr->isFirst()) throw LLERROR::iter_listEnd;
+			curr = _link->previous;
+		}
+
 
 		//A linked list along with a vector containing a reference to each element
 		template<class T>
@@ -628,14 +667,14 @@ namespace zlib
 			else
 			{	//If at least one element exists
 
-				//Get the last link in the list
-				link<T> * last = links[size - 1];
-
 				//Create the new link
 				last->next = new link<T>(value, last, NULL);
+				
+				//Update the 'last element' pointer
+				last = last->next;
 
-				//Add the link and the data to each of the tracker-vectors
-				links.push_back(last->next);
+				//Add the link to the tracking vector
+				links.push_back(last);
 
 				//Incriment the size tracker of the list
 				size++;
