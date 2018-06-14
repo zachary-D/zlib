@@ -290,7 +290,7 @@ namespace zlib
 
 
 #ifdef ZLIB_USING_CINDER
-		var::coord2 toCoord2(ci::Vec2f coordinate)
+		var::coord2 toCoord2(glm::highp_vec2 coordinate)
 		{
 			return var::coord2(coordinate.x, coordinate.y);
 		}

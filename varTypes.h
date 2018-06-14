@@ -51,7 +51,7 @@ namespace zlib
 			coord2(double X, double Y);
 #ifdef ZLIB_USING_CINDER
 			coord2(ci::Vec2i coordinate);
-			coord2(ci::Vec2f coordinate);
+			coord2(glm::highp_vec2 coordinate);
 			coord2(ci::Vec2d coordinate);
 #endif
 
@@ -115,9 +115,10 @@ namespace zlib
 			void negate();			//Negate x and y
 
 #ifdef ZLIB_USING_CINDER
-			ci::Vec2i toVec2i();
-			ci::Vec2f toVec2f();
-			ci::Vec2d toVec2d();
+			
+			//ci::Vec2i toVec2i();
+			glm::highp_vec2 toVec2();
+			//ci::Vec2d toVec2d();
 #endif
 			string toString();
 			int getQuadrant();

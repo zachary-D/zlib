@@ -11,7 +11,7 @@ using namespace std;
 
 #ifdef ZLIB_USING_CINDER
 #include "cinder\Color.h"
-#include "cinder\app\AppNative.h"
+#include "cinder\app\App.h"
 #endif
 
 #ifdef USING_DEBUG
@@ -40,23 +40,23 @@ namespace zlib
 			y = Y;
 		}
 #ifdef ZLIB_USING_CINDER
-		coord2::coord2(ci::Vec2i coordinate)
+		/*coord2::coord2(ci::Vec2i coordinate)
+		{
+			x = coordinate.x;
+			y = coordinate.y;
+		}*/
+
+		coord2::coord2(glm::highp_vec2 coordinate)
 		{
 			x = coordinate.x;
 			y = coordinate.y;
 		}
 
-		coord2::coord2(ci::Vec2f coordinate)
+		/*coord2::coord2(ci::Vec2d coordinate)
 		{
 			x = coordinate.x;
 			y = coordinate.y;
-		}
-
-		coord2::coord2(ci::Vec2d coordinate)
-		{
-			x = coordinate.x;
-			y = coordinate.y;
-		}
+		}*/
 #endif
 
 		coord2 coord2::operator+(const coord2 & other)
@@ -269,20 +269,20 @@ namespace zlib
 		}
 
 #ifdef ZLIB_USING_CINDER
-		ci::Vec2i coord2::toVec2i()
+		/*ci::Vec2i coord2::toVec2i()
 		{
 			return ci::Vec2i(x, y);
-		}
+		}*/
 
-		ci::Vec2f coord2::toVec2f()
+		glm::highp_vec2 coord2::toVec2f()
 		{
-			return ci::Vec2f(x, y);
+			return glm::highp_vec2(x, y);
 		}
 
-		ci::Vec2d coord2::toVec2d()
+		/*ci::Vec2d coord2::toVec2d()
 		{
 			return ci::Vec2d(x, y);
-		}
+		}*/
 #endif
 
 		string coord2::toString()
@@ -470,9 +470,10 @@ namespace zlib
 		}
 
 #ifdef ZLIB_USING_CINDER
-		ci::Vec3f coord3::toVec3f()
+		
+		glm::highp_vec3 coord3::toVec3()
 		{
-			return ci::Vec3f(x, y, z);
+			return glm::highp_vec3(x, y, z);
 		}
 #endif
 
