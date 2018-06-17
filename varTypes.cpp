@@ -40,23 +40,11 @@ namespace zlib
 			y = Y;
 		}
 #ifdef ZLIB_USING_CINDER
-		/*coord2::coord2(ci::Vec2i coordinate)
-		{
-			x = coordinate.x;
-			y = coordinate.y;
-		}*/
-
 		coord2::coord2(glm::highp_vec2 coordinate)
 		{
 			x = coordinate.x;
 			y = coordinate.y;
 		}
-
-		/*coord2::coord2(ci::Vec2d coordinate)
-		{
-			x = coordinate.x;
-			y = coordinate.y;
-		}*/
 #endif
 
 		coord2 coord2::operator+(const coord2 & other)
@@ -269,20 +257,10 @@ namespace zlib
 		}
 
 #ifdef ZLIB_USING_CINDER
-		/*ci::Vec2i coord2::toVec2i()
-		{
-			return ci::Vec2i(x, y);
-		}*/
-
-		glm::highp_vec2 coord2::toVec2f()
+		glm::highp_vec2 coord2::toGlm()
 		{
 			return glm::highp_vec2(x, y);
 		}
-
-		/*ci::Vec2d coord2::toVec2d()
-		{
-			return ci::Vec2d(x, y);
-		}*/
 #endif
 
 		string coord2::toString()
@@ -471,7 +449,7 @@ namespace zlib
 
 #ifdef ZLIB_USING_CINDER
 		
-		glm::highp_vec3 coord3::toVec3()
+		glm::highp_vec3 coord3::toGlm()
 		{
 			return glm::highp_vec3(x, y, z);
 		}

@@ -13,7 +13,7 @@ using std::string;
 using std::map;
 
 #ifdef ZLIB_USING_CINDER
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #endif
 
 #include "input.h"
@@ -119,7 +119,7 @@ namespace zlib
 					getPosition() + var::coord2(
 						getSize().x / 2,
 						getSize().y)
-					).toVec2f(),
+					).toGlm(),
 				ColorA(1, 1, 1, 1),
 				Font("Arial", 50)
 			);

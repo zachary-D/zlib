@@ -19,7 +19,7 @@
 using namespace std;
 
 
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/gl/gl.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
@@ -65,6 +65,7 @@ namespace zlib
 			{
 				gl::rotate(-_rotation);
 			}
+			gl::draw(
 			gl::draw(_texture, Area(_pointA.x - _rotPt.x, _pointA.y - _rotPt.y, _pointB.x - _rotPt.x, _pointB.y - _rotPt.y));
 			if(_rotation != 0)
 			{
@@ -103,7 +104,7 @@ namespace zlib
 
 			//app::console() << (localDisplacement + rotPt).toString() << endl;
 
-			gl::translate(rotPt.toVec2f());	//Translates the screen so that the point of rotation is at 0, 0 (pixel coordinates)
+			gl::translate(rotPt.toGlm());	//Translates the screen so that the point of rotation is at 0, 0 (pixel coordinates)
 			if(rotation != 0)					//Rotates the screen to the specified amount, if the amount is non-zero
 			{
 				gl::rotate(-rotation);
@@ -114,7 +115,7 @@ namespace zlib
 				gl::rotate(rotation);
 			}
 			//app::console() << (localDisplacement - rotPt).toString() << endl;
-			gl::translate(-rotPt.toVec2f());	//Translates the screen back so that the origin is in the correct place again (undoes the above translation)
+			gl::translate(-rotPt.toGlm());	//Translates the screen back so that the origin is in the correct place again (undoes the above translation)
 			//app::console() << "== == == ==" << endl;
 		}
 
@@ -239,7 +240,7 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			gl::drawSolidCircle(position.toVec2f(), radius);
+			gl::drawSolidCircle(position.toGlm(), radius);
 		}
 
 		void drawCircle(var::coord2 position, float radius, bool preScaled = false, var::color_RGB color = var::color_RGB())
@@ -263,7 +264,7 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			gl::drawStrokedCircle(position.toVec2f(), radius);
+			gl::drawStrokedCircle(position.toGlm(), radius);
 		}
 
 		void drawStrokedCircle(var::coord2 position, float radius, bool preScaled, var::color_RGB color)
@@ -289,17 +290,17 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			gl::translate(position.toVec2f());	//Translate the screen so the position the triangle is supposed to be drawn at is the origin
+			gl::translate(position.toGlm());	//Translate the screen so the position the triangle is supposed to be drawn at is the origin
 			gl::rotate(-rotation);				//Rotate the screen so that the direction the triangle is supposed to face is pointing up
 
 			gl::drawSolidTriangle(			//Draw the triangle (the triangle is drawn centered on the origin, facing right
-				Vec2f((var::coord2(width / 2, 0)).toVec2f()),					//The rightmost point (the tip)
-				Vec2f((var::coord2(-width / 2, -height / 2)).toVec2f()),	//The bottom left point (the left base)
-				Vec2f((var::coord2(-width / 2, height / 2)).toVec2f())		//The top left point (the right base)
+				glm::highp_vec2((var::coord2(width / 2, 0)).toGlm()),					//The rightmost point (the tip)
+				glm::highp_vec2((var::coord2(-width / 2, -height / 2)).toGlm()),	//The bottom left point (the left base)
+				glm::highp_vec2((var::coord2(-width / 2, height / 2)).toGlm())		//The top left point (the right base)
 			);
 
 			gl::rotate(rotation);				//Rotate the screen back so that it is properly oriented, and the triangle is facing the correct direction
-			gl::translate(position.negated().toVec2f());		//Translate the screen so the origin is back at the correct position
+			gl::translate(position.negated().toGlm());		//Translate the screen so the origin is back at the correct position
 		}
 
 		void drawTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
@@ -309,40 +310,41 @@ namespace zlib
 		}
 
 
+		//Cinder removed drawStrokedTriangle?
 
-		void drawStaticStrokedTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
-		{
-			if(preScaled == false)	//If the values aren't pre scaled, scale them
-			{
-				position = window::scale(position);
-				width = window::scaleX(width);
-				height = window::scaleX(height);
-			}
+		//void drawStaticStrokedTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
+		//{
+		//	if(preScaled == false)	//If the values aren't pre scaled, scale them
+		//	{
+		//		position = window::scale(position);
+		//		width = window::scaleX(width);
+		//		height = window::scaleX(height);
+		//	}
 
-			if(color.isDefined())
-			{
-				if(color.isOpacityDefined()) gl::color(color.toCinderColorA());
-				else gl::color(color.toCinderColor());
-			}
+		//	if(color.isDefined())
+		//	{
+		//		if(color.isOpacityDefined()) gl::color(color.toCinderColorA());
+		//		else gl::color(color.toCinderColor());
+		//	}
 
-			gl::translate(position.toVec2f());	//Translate the screen so the position the triangle is supposed to be drawn at is the origin
-			gl::rotate(rotation);				//Rotate the screen so that the direction the triangle is supposed to face is pointing up
+		//	gl::translate(position.toGlm());	//Translate the screen so the position the triangle is supposed to be drawn at is the origin
+		//	gl::rotate(rotation);				//Rotate the screen so that the direction the triangle is supposed to face is pointing up
 
-			gl::drawStrokedTriangle(			//Draw the triangle (the triangle is drawn centered on the origin, facing right
-				Vec2f((var::coord2(width / 2, 0)).toVec2f()),					//The rightmost point (the tip)
-				Vec2f((var::coord2(-width / 2, -height / 2)).toVec2f()),	//The bottom left point (the left base)
-				Vec2f((var::coord2(-width / 2, height / 2)).toVec2f())		//The top left point (the right base)
-			);
+		//	gl::drawStrokedTriangle(			//Draw the triangle (the triangle is drawn centered on the origin, facing right
+		//		glm::highp_vec2((var::coord2(width / 2, 0)).toGlm()),					//The rightmost point (the tip)
+		//		glm::highp_vec2((var::coord2(-width / 2, -height / 2)).toGlm()),	//The bottom left point (the left base)
+		//		glm::highp_vec2((var::coord2(-width / 2, height / 2)).toGlm())		//The top left point (the right base)
+		//	);
 
-			gl::rotate(-rotation);				//Rotate the screen back so that it is properly oriented, and the triangle is facing the correct direction
-			gl::translate(position.negated().toVec2f());		//Translate the screen so the origin is back at the correct position
-		}
+		//	gl::rotate(-rotation);				//Rotate the screen back so that it is properly oriented, and the triangle is facing the correct direction
+		//	gl::translate(position.negated().toGlm());		//Translate the screen so the origin is back at the correct position
+		//}
 
-		void drawStrokedTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
+		/*void drawStrokedTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
 		{
 			var::coord2 displacement = (preScaled) ? window::getScaledDisplacement() : window::getDisplacement();
 			drawStaticStrokedTriangle(position + displacement, width, height, rotation, preScaled, color);
-		}
+		}*/
 
 
 
@@ -356,7 +358,7 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			gl::drawStringCentered(text, position.toVec2f(), color.toCinderColorA(), Font::Font("Times New Roman", size));
+			gl::drawStringCentered(text, position.toGlm(), color.toCinderColorA(), Font::Font("Times New Roman", size));
 		}
 
 		void drawStringCentered(std::string text, var::coord2 position, bool preScaled, int size, var::color_RGB color)
@@ -377,7 +379,7 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			gl::drawStringRight(text, position.toVec2f(), color.toCinderColorA(), Font::Font("Times New Roman", size));
+			gl::drawStringRight(text, position.toGlm(), color.toCinderColorA(), Font::Font("Times New Roman", size));
 		}
 
 		void drawStringRight(std::string text, var::coord2 position, bool preScaled, int size, var::color_RGB color)
@@ -397,7 +399,7 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			gl::drawString(text, position.toVec2f(), color.toCinderColorA(), Font::Font("Times New Roman", size));
+			gl::drawString(text, position.toGlm(), color.toCinderColorA(), Font::Font("Times New Roman", size));
 		}
 
 		void drawStringLeft(std::string text, var::coord2 position, bool preScaled, int size, var::color_RGB color)

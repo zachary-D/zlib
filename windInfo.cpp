@@ -17,7 +17,7 @@
 #include<vector>
 #include<new>
 
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
 #include "cinder/Text.h"
@@ -194,12 +194,12 @@ namespace zlib
 			float dist = sqrt(pow(coords.x - rotationPointCoords.x, 2) + pow(coords.y - rotationPointCoords.y, 2));
 			if(debug == true) app::console() << "dist: " << dist << endl;
 			if(debug == true) app::console() << "ret " << var::coord2((dist * cos(toRadians(thetaPrime))) + rotationPointCoords.x, (dist * sin(toRadians(thetaPrime))) + rotationPointCoords.y).toString() << endl << "-- -- --" << endl;
-			if(debug == true) gl::drawStrokedCircle(Vec2f(
+			if(debug == true) gl::drawStrokedCircle(glm::highp_vec2(
 				scaleX((dist * cos(toRadians(thetaPrime))) + rotationPointCoords.x),
 				scaleY((dist * sin(toRadians(thetaPrime))) + rotationPointCoords.y)
 			)
 				, 10, 7);
-			if(debug == true) Sleep(250);
+			//if(debug == true) Sleep(250);
 			//Error somewhere to do with dist * cos(...) + rotPtC.x
 			return var::coord2(
 				(

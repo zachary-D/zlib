@@ -17,7 +17,7 @@
 using namespace std;
 
 #ifdef ZLIB_USING_CINDER
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
 #include "cinder/Font.h"
