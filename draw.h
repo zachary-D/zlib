@@ -31,8 +31,8 @@ namespace zlib
 {
 	namespace draw
 	{
-		void drawStaticTexture(gl::Texture _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
-		void drawTexture(gl::Texture _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false);																			//Draws a texture
+		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
+		void drawTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false);																			//Draws a texture
 
 		void drawStaticRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(), float rotation = 0, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB(-1, -1, -1), bool ignoreZoom = true);	//Draws a rectangle, ignoring window::displacement and window::zoom
 		void drawRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(), float rotation = 0, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB(-1, -1, -1));													//Draws a rectangle
