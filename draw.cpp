@@ -46,7 +46,7 @@ using namespace zlib;
 namespace zlib
 {
 	namespace draw
-	{
+	{		
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation, bool _preScaled, bool ignoreZoom)
 		{
 			gl::color(Color(1, 1, 1));	//sets the color to (1, 1, 1) so that the texture appears properly.

@@ -31,6 +31,11 @@ namespace zlib
 {
 	namespace draw
 	{
+		namespace config
+		{
+			string font = "Times New Roman";
+		}
+
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
 		void drawTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false);																			//Draws a texture
 
@@ -72,6 +77,14 @@ namespace zlib
 		void drawStaticStringLeft(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
 		//Draws a string 'text' at 'position' (centered on the top left), with font size 'size' in color 'color'
 		void drawStringLeft(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+
+		//Manages drawing text boxes.  The text box is drawn either when draw() is called, or when the class goes out of scope
+		class tBoxWrapper
+		{
+			std::string text;
+			Font textFont;
+
+		};
 	}
 }
 #endif
