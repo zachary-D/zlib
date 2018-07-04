@@ -60,8 +60,8 @@ namespace zlib
 		void drawStaticTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
 		void drawTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
 
-		/*void drawStaticStrokedTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
-		void drawStrokedTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());*/
+		void drawStaticStrokedTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
+		void drawStrokedTriangle(var::coord2 position, float width, float height, float rotation = 0, bool preScaled = false, var::color_RGB color = var::color_RGB());
 
 		//Draws a string 'text' at 'position' (centered on top middle), with font size 'size' in color 'color'
 		void drawStaticStringCentered(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());

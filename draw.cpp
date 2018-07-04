@@ -49,6 +49,8 @@ namespace zlib
 	{		
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation, bool _preScaled, bool ignoreZoom)
 		{
+			gl::ScopedModelMatrix mod;
+
 			gl::color(Color(1, 1, 1));	//sets the color to (1, 1, 1) so that the texture appears properly.
 			if(_avgRotation == true)
 			{
@@ -67,12 +69,6 @@ namespace zlib
 			}
 
 			gl::draw(_texture, Area(_pointA.x - _rotPt.x, _pointA.y - _rotPt.y, _pointB.x - _rotPt.x, _pointB.y - _rotPt.y));
-
-			if(_rotation != 0)
-			{
-				gl::rotate(_rotation);
-			}
-			gl::translate((-_rotPt.x), (-_rotPt.y));
 		}
 
 		void drawTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation, bool _preScaled)
@@ -85,7 +81,8 @@ namespace zlib
 
 		void drawStaticRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt, float rotation, bool avgRotation, bool preScaled, var::color_RGB color, bool ignoreZoom)
 		{
-			//app::console() << localDisplacement.toString() << endl;
+			gl::ScopedModelMatrix mod;
+
 			if(avgRotation == true)	//Rotates the rectangle about it's center if true
 			{
 				rotPt = (pointA + pointB) / 2;
@@ -103,21 +100,13 @@ namespace zlib
 				else gl::color(color.toCinderColor());
 			}
 
-			//app::console() << (localDisplacement + rotPt).toString() << endl;
-
 			gl::translate(rotPt.toGlm());	//Translates the screen so that the point of rotation is at 0, 0 (pixel coordinates)
 			if(rotation != 0)					//Rotates the screen to the specified amount, if the amount is non-zero
 			{
 				gl::rotate(-rotation);
 			}
+
 			gl::drawSolidRect(Rectf(pointA.x - rotPt.x, pointA.y - rotPt.y, pointB.x - rotPt.x, pointB.y - rotPt.y));	//Draws the rectangle
-			if(rotation != 0)					//Rotates the screen back so that the screen is now level, leaving the rectangle rotated to the specified angle, if the amount is non-zero
-			{
-				gl::rotate(rotation);
-			}
-			//app::console() << (localDisplacement - rotPt).toString() << endl;
-			gl::translate(-rotPt.toGlm());	//Translates the screen back so that the origin is in the correct place again (undoes the above translation)
-			//app::console() << "== == == ==" << endl;
 		}
 
 		void drawRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt, float rotation, bool avgRotation, bool preScaled, var::color_RGB color)
@@ -130,6 +119,8 @@ namespace zlib
 
 		void drawStaticStrokedRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt, float rotation, bool avgRotation, bool preScaled, var::color_RGB color)
 		{
+			gl::ScopedModelMatrix mod;
+
 			if(avgRotation == true)	//Rotates the rectangle about it's center if true
 			{
 				rotPt = (pointA + pointB) / 2;
@@ -154,12 +145,6 @@ namespace zlib
 			}
 
 			gl::drawStrokedRect(Rectf(pointA.x - rotPt.x, pointA.y - rotPt.y, pointB.x - rotPt.x, pointB.y - rotPt.y));	//Draws the rectangle
-
-			if(rotation != 0)					//Rotates the screen back so that the screen is now level, leaving the rectangle rotated to the specified angle, if the amount is non-zero
-			{
-				gl::rotate(rotation);
-			}
-			gl::translate((-rotPt.x), (-rotPt.y));	//Translates the screen back so that the origin is in the correct place again (undoes the above translation)
 		}
 
 		void drawStrokedRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt, float rotation, bool avgRotation, bool preScaled, var::color_RGB color)
@@ -172,6 +157,8 @@ namespace zlib
 
 		void drawStaticHollowRect(var::coord2 pointA, var::coord2 pointB, var::coord2 lineThickness, var::color_RGB color, var::coord2 rotPt, float rotation, bool avgRotation, bool preScaled, bool ignoreZoom)
 		{
+			gl::ScopedModelMatrix mod;
+
 			if(avgRotation == true)	//Rotates the rectangle about it's center if true
 			{
 				rotPt = (pointA + pointB) / 2;
@@ -212,12 +199,6 @@ namespace zlib
 
 			//The right side of the rectangle
 			gl::drawSolidRect(Rectf(right - lineThickness.x, top, right, bottom));
-
-			if(rotation != 0)					//Rotates the screen back so that the screen is now level, leaving the rectangle rotated to the specified angle, if the amount is non-zero
-			{
-				gl::rotate(rotation);
-			}
-			gl::translate((-rotPt.x), (-rotPt.y));	//Translates the screen back so that the origin is in the correct place again (undoes the above translation)
 		}
 
 		void drawHollowRect(var::coord2 pointA, var::coord2 pointB, var::coord2 lineThickness, var::color_RGB color, var::coord2 rotPt, float rotation, bool avgRotation = false, bool preScaled = false)
@@ -278,6 +259,8 @@ namespace zlib
 
 		void drawStaticTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
 		{
+			gl::ScopedModelMatrix mod;
+
 			if(preScaled == false)	//If the values aren't pre scaled, scale them
 			{
 				position = window::scale(position);
@@ -299,9 +282,6 @@ namespace zlib
 				glm::highp_vec2((var::coord2(-width / 2, -height / 2)).toGlm()),	//The bottom left point (the left base)
 				glm::highp_vec2((var::coord2(-width / 2, height / 2)).toGlm())		//The top left point (the right base)
 			);
-
-			gl::rotate(rotation);				//Rotate the screen back so that it is properly oriented, and the triangle is facing the correct direction
-			gl::translate(position.negated().toGlm());		//Translate the screen so the origin is back at the correct position
 		}
 
 		void drawTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
@@ -309,11 +289,6 @@ namespace zlib
 			var::coord2 displacement = (preScaled) ? window::getScaledDisplacement() : window::getDisplacement();
 			drawStaticTriangle(position + displacement, width, height, rotation, preScaled, color);
 		}
-
-
-		//Cinder removed drawStrokedTriangle?
-
-//#ifdef cinder_incompatable
 
 
 		void drawStaticStrokedTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
@@ -336,18 +311,15 @@ namespace zlib
 			gl::translate(position.toGlm());	//Translate the screen so the position the triangle is supposed to be drawn at is the origin
 			gl::rotate(rotation);				//Rotate the screen so that the direction the triangle is supposed to face is pointing up
 
-			//Manually draw a triangle from three line segments here, in place of the gl::drawStrokedTriangle function which seems to be missing
+			gl::begin(GL_LINE_STRIP);
+			
+			gl::vertex(var::coord2(width / 2, 0).toGlm());
+			gl::vertex(var::coord2(-width / 2, -height / 2).toGlm());
+			gl::vertex(var::coord2(-width / 2, height / 2).toGlm());
+			gl::vertex(var::coord2(width / 2, 0).toGlm());
 
-#ifdef cinder_update_broken
-			gl::drawStrokedTriangle(			//Draw the triangle (the triangle is drawn centered on the origin, facing right
-				glm::highp_vec2((var::coord2(width / 2, 0)).toGlm()),					//The rightmost point (the tip)
-				glm::highp_vec2((var::coord2(-width / 2, -height / 2)).toGlm()),	//The bottom left point (the left base)
-				glm::highp_vec2((var::coord2(-width / 2, height / 2)).toGlm())		//The top left point (the right base)
-			);
-#endif
+			gl::end();
 
-			gl::rotate(-rotation);				//Rotate the screen back so that it is properly oriented, and the triangle is facing the correct direction
-			gl::translate(position.negated().toGlm());		//Translate the screen so the origin is back at the correct position
 		}
 
 		void drawStrokedTriangle(var::coord2 position, float width, float height, float rotation, bool preScaled, var::color_RGB color)
@@ -355,7 +327,6 @@ namespace zlib
 			var::coord2 displacement = (preScaled) ? window::getScaledDisplacement() : window::getDisplacement();
 			drawStaticStrokedTriangle(position + displacement, width, height, rotation, preScaled, color);
 		}
-//#endif
 
 
 		void drawStaticStringCentered(std::string text, var::coord2 position, bool preScaled, int size, var::color_RGB color)
