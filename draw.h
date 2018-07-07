@@ -33,7 +33,11 @@ namespace zlib
 	{
 		namespace config
 		{
-			string font = "Times New Roman";
+			//The font and font size used by text boxes, by default
+			extern string font;
+			extern int fontSize;
+
+			extern Font cinderFont;
 		}
 
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
@@ -81,9 +85,21 @@ namespace zlib
 		//Manages drawing text boxes.  The text box is drawn either when draw() is called, or when the class goes out of scope
 		class tBoxWrapper
 		{
-			std::string text;
-			Font textFont;
+		public:
+			tBoxWrapper();
 
+			std::string text = "";
+			Font textFont = Font(config::font, config::fontSize);
+			TextBox::Alignment alignment = TextBox::LEFT;	//Which side the text is aligned to
+			var::coord2 size = var::coord2(200, 200);
+			var::color_RGB bgColor = var::color_RGB(1, 1, 1);	//bgColor = backGroundColor
+			var::color_RGB color = var::color_RGB(0, 0, 0);
+
+			void update();
+			void draw(var::coord2 position);
+			
+		private:
+			gl::Texture2dRef texture;
 		};
 	}
 }

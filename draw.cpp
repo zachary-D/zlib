@@ -37,6 +37,8 @@ using namespace ci::app;
 #include "HUD.h"
 #endif
 
+#include "draw.h"
+
 #include "varConv.h"
 #include "varTypes.h"
 #include "windInfo.h"
@@ -46,7 +48,16 @@ using namespace zlib;
 namespace zlib
 {
 	namespace draw
-	{		
+	{
+		namespace config
+		{
+			//The font and font size used by text boxes, by default
+			string font = "Times New Roman";
+			int fontSize = 32;
+
+			Font cinderFont;// = Font("Times New Roman", 32); //Font(font, fontSize);
+		}
+
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation, bool _preScaled, bool ignoreZoom)
 		{
 			gl::ScopedModelMatrix mod;
@@ -201,7 +212,7 @@ namespace zlib
 			gl::drawSolidRect(Rectf(right - lineThickness.x, top, right, bottom));
 		}
 
-		void drawHollowRect(var::coord2 pointA, var::coord2 pointB, var::coord2 lineThickness, var::color_RGB color, var::coord2 rotPt, float rotation, bool avgRotation = false, bool preScaled = false)
+		void drawHollowRect(var::coord2 pointA, var::coord2 pointB, var::coord2 lineThickness, var::color_RGB color, var::coord2 rotPt, float rotation, bool avgRotation, bool preScaled)
 		{
 			var::coord2 displacement = (preScaled) ? window::getScaledDisplacement() : window::getDisplacement();
 			drawStaticHollowRect(pointA + displacement, pointB + displacement, lineThickness, color, rotPt + displacement, rotation, avgRotation, preScaled, false);
@@ -225,7 +236,7 @@ namespace zlib
 			gl::drawSolidCircle(position.toGlm(), radius);
 		}
 
-		void drawCircle(var::coord2 position, float radius, bool preScaled = false, var::color_RGB color = var::color_RGB())
+		void drawCircle(var::coord2 position, float radius, bool preScaled, var::color_RGB color)
 		{
 			var::coord2 displacement = (preScaled) ? window::getScaledDisplacement() : window::getDisplacement();
 			drawStaticCircle(position + displacement, radius, preScaled, color);
@@ -387,6 +398,30 @@ namespace zlib
 		{
 			var::coord2 displacement = (preScaled) ? window::getScaledDisplacement() : window::getDisplacement();
 			drawStaticStringLeft(text, position + displacement, preScaled, size, color);
+		}
+
+		
+		tBoxWrapper::tBoxWrapper()
+		{
+			update();
+		}
+
+		void tBoxWrapper::update()
+		{
+			TextBox tBox = TextBox().alignment(alignment).font(textFont).size(size.toGlm()).text(text);
+			tBox.setColor(color.toCinderColor());
+			tBox.setBackgroundColor(bgColor.toCinderColor());
+
+			texture = gl::Texture2d::create(tBox.render());
+		}
+
+		void tBoxWrapper::draw(var::coord2 position)
+		{
+			gl::ScopedColor scopeC;
+			gl::color(Color(1, 1, 1));
+			gl::ScopedModelMatrix scopeM;
+			gl::translate(position.toGlm());
+			gl::draw(texture);
 		}
 	}
 }
