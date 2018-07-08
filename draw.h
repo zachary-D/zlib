@@ -36,8 +36,6 @@ namespace zlib
 			//The font and font size used by text boxes, by default
 			extern string font;
 			extern int fontSize;
-
-			extern Font cinderFont;
 		}
 
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
@@ -101,6 +99,10 @@ namespace zlib
 		private:
 			gl::Texture2dRef texture;
 		};
+
+		void drawTextBox(string text, var::coord2 pointA, var::coord2 pointB);
+
+		void drawTextBox(string text, var::coord2 pointA, var::coord2 pointB, Font font);
 	}
 }
 #endif

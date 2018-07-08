@@ -54,8 +54,6 @@ namespace zlib
 			//The font and font size used by text boxes, by default
 			string font = "Times New Roman";
 			int fontSize = 32;
-
-			Font cinderFont;// = Font("Times New Roman", 32); //Font(font, fontSize);
 		}
 
 		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation, bool _preScaled, bool ignoreZoom)
@@ -422,6 +420,25 @@ namespace zlib
 			gl::ScopedModelMatrix scopeM;
 			gl::translate(position.toGlm());
 			gl::draw(texture);
+		}
+
+		void drawTextBox(string text, var::coord2 pointA, var::coord2 pointB)
+		{
+			tBoxWrapper tbox;
+			tbox.text = text;
+			tbox.size = pointB - pointA;
+			tbox.update();
+			tbox.draw(pointA);
+		}
+
+		void drawTextBox(string text, var::coord2 pointA, var::coord2 pointB, Font font)
+		{
+			tBoxWrapper tbox;
+			tbox.text = text;
+			tbox.size = pointB - pointA;
+			tbox.textFont = font;
+			tbox.update();
+			tbox.draw(pointA);
 		}
 	}
 }
