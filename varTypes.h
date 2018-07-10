@@ -570,8 +570,10 @@ namespace zlib
 		public:
 			T & val();
 
-			bool isFirst();
-			bool isLast();
+			inline bool isFirst();	//Returns true when the current element is the first
+			inline bool isLast();	//Returns true when the current element is the last
+
+			inline bool end();		//Returns true when the last element has been passed (the current element is NULL, and therefore the iterator must stop).
 
 			void operator++();
 			void operator--();
@@ -598,18 +600,24 @@ namespace zlib
 		}
 
 		template<class T>
-		bool linkIterator<T>::isFirst()
+		inline bool linkIterator<T>::isFirst()
 		{
 			return curr == NULL || isFirst();
 		}
 
 		template<class T>
-		bool linkIterator<T>::isLast()
+		inline bool linkIterator<T>::isLast()
 		{
 			/*bool test_deleteMe = (curr == NULL);
 			curr->next == NULL;
 			return curr == NULL || isLast();*/
 			return curr == NULL || curr->next == NULL;
+		}
+
+		template<class T>
+		inline bool linkIterator<T>::end()
+		{
+			return curr == NULL;
 		}
 
 		template<class T>
