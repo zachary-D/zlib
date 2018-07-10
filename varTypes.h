@@ -339,6 +339,8 @@ namespace zlib
 			inline bool isLast();
 		};
 
+		//The function definitions and such for the link class are inlcuded here because: templates + compilers = pain.  (they throw a fit otherwise. yay!)
+
 		template<class T>
 		link<T>::link()
 		{
@@ -598,26 +600,29 @@ namespace zlib
 		template<class T>
 		bool linkIterator<T>::isFirst()
 		{
-			return curr == NULL || curr->isFirst();
+			return curr == NULL || isFirst();
 		}
 
 		template<class T>
 		bool linkIterator<T>::isLast()
 		{
-			return curr == NULL || curr->isLast();
+			/*bool test_deleteMe = (curr == NULL);
+			curr->next == NULL;
+			return curr == NULL || isLast();*/
+			return curr == NULL || curr->next == NULL;
 		}
 
 		template<class T>
 		void linkIterator<T>::operator++()
 		{
-			if(curr->isLast()) throw LLERROR::iter_listEnd;
+			if(isLast()) throw LLERROR::iter_listEnd;
 			curr = curr->next;
 		}
 
 		template<class T>
 		void linkIterator<T>::operator--()
 		{
-			if(curr->isFirst()) throw LLERROR::iter_listEnd;
+			if(isFirst()) throw LLERROR::iter_listEnd;
 			curr = _link->previous;
 		}
 
@@ -630,12 +635,12 @@ namespace zlib
 			
 			vector<link<T>*> links;		//Pointers to each link in the list
 
-			void push(T value);
-			void insert(T value, unsigned index);
-			void erase(unsigned index);
-			T & access(unsigned index);
+			void push(T value);						//Add 'value' to the end of the list
+			void insert(T value, unsigned index);	//Insert 'value' at 'index'
+			void erase(unsigned index);				//Erase the elment at 'index'
+			T & access(unsigned index);				//Return a reference to the element at 'index'
 
-			T & operator[](unsigned index);	//Just a wrapper for index, no different than the parent class, but it had to be explicitly defined to prevent bugs (linkedLIst::access() would end up being called instead of arrList::access(), etc.)
+			T & operator[](unsigned index);	//Just a wrapper for access, no different than the parent class, but it had to be explicitly defined to prevent bugs (linkedLIst::access() would end up being called instead of arrList::access(), etc.)
 		};
 
 		template<class T>
@@ -741,18 +746,32 @@ namespace zlib
 		{
 			if(index >= size) throw LLERROR::badIndex;
 
+			//Get the element we're deleting
 			link<T> * target = links[index];
 
+			//Get pointers to the links before and after the element we're deleting
 			link<T> * _prev = target->previous;
 			link<T> * _next = target->next;
 
+			// "Stitch" the elements before and after the element together
+
+			//If the element before the target isn't null, link it to the element after the target
 			if(_prev != NULL) _prev->next = _next;
+			//If the element before the target is null, then the target must be the 'first' pointer.  As such, we must set the 'first' pointer to the element after the target
+			else first = _next;
+
+			//If the element after the target isn't null, link it to the element before the target (link backwards)
 			if(_next != NULL) _next->previous = _prev;
+			//If the element after the target is null, then the target must be the 'last' pointer.  As such, we must set the 'last' pointer to the element before the target
+			else last = _prev;
 
+			//Remove the target from memory
 			delete target;
-
+			
+			//Remove the target from the links vector
 			links.erase(links.begin() + index);
 
+			//Deincriment the size tracker
 			size--;
 		}
 
@@ -769,6 +788,111 @@ namespace zlib
 			return access(index);
 		}
 
+
+#ifdef ZLIB_ENABLE_TESTS
+		//Checks the arrList to make sure everything is as it should be
+		template<class T>
+		void validateArrListStructure(var::arrList<T> & list)
+		{
+			enum class errs
+			{
+				check1,				//General failure on check 1
+				check2,				//General failure on check 2
+				check3,				//General failure on check 3
+				check3_forward,		//An element in the list has no element after it (in check 3)
+				check3_backlink,	//An element in the list does not backlink properly (in check 3)
+				check4,				//General failure on check 4
+				check5,				//General failure on check 5
+				check6,				//General failure on check 6
+				check7,				//General failure on check 7
+				check8,				//General failure on check 8
+				check9,				//General failure on check 9
+			};
+
+			//Checks: (Assuming the list contains at least 1 element; tested using list.size)
+			//1) Checks that the element at list.first has nothing before it
+			//2) Checks that the element at list.last has nothing after it
+			//3) Checks that the list is continuous, forwards and backwards (makes sure that every element links forward and backward correctly)
+			//4) Checks that list.size matches the number of elements in the list
+			//5) Checks that list.access(n) correctly accesses the n'th element of the list  (Can only check the values at each index, not the elements specifically.  Use unique values for best results.)
+			//6) Checks that each element only occurs in the list once
+
+			//Checks 2 - If the list contains no elements
+
+			//7) Checks that the first pointer is NULL
+			//8) Checks that the last pointer is NULL
+			//9) Checks that the size of the list.links array is 0
+
+			if(list.size != 0)
+			{
+				//Check 1
+				if(list.first->previous != NULL) throw errs::check1;
+
+				//Check 2
+				if(list.last->next != NULL) throw errs::check2;
+
+				//Checks 3, 4, 5, and 6
+				var::link<T> * curr = list.first;	//The current element
+				var::link<T> * last = curr;		//The last element
+
+				int count = 0;	//Tracks the number of elements in the list
+
+								//Unless the first element is NULL, we need to include it in the count
+				if(list.first != NULL) count++;
+
+				vector< var::link<T> * > vec;		//Contains pointers to each element in the list
+													//Add the first element to the vector
+				if(curr != NULL) vec.push_back(curr);
+
+				//Check 3 (And prep for checks 4 and 5)
+				//Loop until we reach the end of the list
+				while(curr != list.last)
+				{
+					if(curr->next == NULL) throw errs::check3_forward;
+					curr = curr->next;
+
+					if(curr->previous != last) throw errs::check3_backlink;
+
+					last = curr;
+					count++;
+					vec.push_back(curr);
+				}
+
+				//Check 4
+				if(list.size != count) throw errs::check4;
+
+				//Check 5
+				for(int i = 0; i < count; i++)
+				{
+					if(vec[i]->data != list[i]) throw errs::check5;
+				}
+
+				//Check 6
+				for(int check = 0; check < count; check++)
+				{
+					for(int against = 0; against < count; against++)
+					{
+						if(check == against) continue;
+
+						if(vec[check] == vec[against]) throw errs::check6;
+					}
+				}
+			}
+			else
+			{
+				//Check 7
+				if(list.first != NULL) throw errs::check7;
+
+				//Check 8
+				if(list.last != NULL) throw errs::check8;
+
+				//Check 9
+				if(list.links.size() != 0) throw errs::check9;
+
+				//This part was a lot nicer to code than checks 3->6....
+			}
+		}
+#endif
 
 		namespace geom	//As in geometry
 		{
