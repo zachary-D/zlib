@@ -376,10 +376,6 @@ namespace zlib
 			return next == NULL;
 		}
 
-		
-		template<class T>
-		struct linkIterator;	//Forward declaration for down below
-
 
 		//A simple linked list, with position-tracking in both directions
 		template<class T>
@@ -398,8 +394,6 @@ namespace zlib
 			T & access(unsigned index);
 
 			link<T> * iterateToElement(unsigned index);
-
-			linkIterator<T> & iter();	//Returns an iterator, starting with the first element
 
 			T & operator[](unsigned index);
 		};
@@ -548,82 +542,6 @@ namespace zlib
 		T & linkedList<T>::operator[](unsigned index)
 		{
 			return access(index);
-		}
-		
-		template<class T>
-		linkIterator<T> & linkedList<T>::iter()
-		{
-			return linkIterator<T>(first);
-		}
-
-
-		//An iterator class for linkedLists.  Modifying the values in the iterator will modify the results in the list
-		template<class T>
-		struct linkIterator
-		{
-			linkIterator(link<T> * _lnk);
-			linkIterator(linkedList<T> & list);
-
-		private:
-			link<T> * curr;
-
-		public:
-			T & val();
-
-			bool isFirst();
-			bool isLast();
-
-			void operator++();
-			void operator--();
-		};
-
-		template<class T>
-		linkIterator<T>::linkIterator(link<T> * _lnk)
-		{
-			if(_lnk == NULL) throw LLERROR::iter_badPointer;
-			curr = _lnk;
-		}
-
-		template<class T>
-		linkIterator<T>::linkIterator(linkedList<T> & list)
-		{
-			if(list.first == NULL) throw LLERROR::iter_badPointer;
-			curr = list.first;
-		}
-
-		template<class T>
-		T & linkIterator<T>::val()
-		{
-			return curr->data;
-		}
-
-		template<class T>
-		bool linkIterator<T>::isFirst()
-		{
-			return curr == NULL || isFirst();
-		}
-
-		template<class T>
-		bool linkIterator<T>::isLast()
-		{
-			/*bool test_deleteMe = (curr == NULL);
-			curr->next == NULL;
-			return curr == NULL || isLast();*/
-			return curr == NULL || curr->next == NULL;
-		}
-
-		template<class T>
-		void linkIterator<T>::operator++()
-		{
-			if(isLast()) throw LLERROR::iter_listEnd;
-			curr = curr->next;
-		}
-
-		template<class T>
-		void linkIterator<T>::operator--()
-		{
-			if(isFirst()) throw LLERROR::iter_listEnd;
-			curr = _link->previous;
 		}
 
 
