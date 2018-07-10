@@ -707,6 +707,9 @@ namespace zlib
 				
 				//Allocate space for the new element, and set the appropriate trackers
 				first = new link<T>(value, NULL, first);
+
+				//Looks ugly AF, but backlinks the second link to the new first link
+				first->next->previous = first;
 				
 				//Add the pointer to the tracker and incriment the size tracker
 				links.insert(links.begin() + index, first);
@@ -734,6 +737,11 @@ namespace zlib
 				{	//Link the element after it backwards, if it exists
 					
 					after->previous = previous->next;
+				}
+				//If no element exists after this one, then this is the last element (duh). The 'last' pointer needs to be updated as such.
+				else
+				{
+					last = previous->next;
 				}
 
 				links.insert(links.begin() + index, previous->next);
@@ -822,6 +830,8 @@ namespace zlib
 			//7) Checks that the first pointer is NULL
 			//8) Checks that the last pointer is NULL
 			//9) Checks that the size of the list.links array is 0
+
+			//When the checks fail they are thrown as exceptions.... this probably wasn't a great idea, but what's done is done  (until it's redone, that is)
 
 			if(list.size != 0)
 			{
