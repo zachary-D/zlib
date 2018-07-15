@@ -436,7 +436,6 @@ namespace zlib
 				first = new link<T>(value, NULL, NULL);
 				last = first;
 				size = 1;
-				links.push_back(first);
 				return;
 			}
 			if(index == 0)
@@ -448,8 +447,6 @@ namespace zlib
 				//Looks ugly AF, but backlinks the second link to the new first link
 				first->next->previous = first;
 
-				//Add the pointer to the tracker and incriment the size tracker
-				links.insert(links.begin() + index, first);
 				size++;
 				return;
 			}
@@ -457,7 +454,7 @@ namespace zlib
 			{	//If we're adding an element anywhere else
 
 				//Get a reference to the element we're inserting after
-				link<T> * previous = links[index - 1];
+				link<T> * previous = iterateToElement(index - 1);
 
 				link<T> * after = NULL;
 
@@ -530,7 +527,7 @@ namespace zlib
 			link<T> * current = first;
 
 			//Iterate to reach the correct element in the list
-			for (int i = 0; i < index; i++)
+			for (unsigned i = 0; i < index; i++)
 			{
 				if (current->isLast()) throw LLERROR::badPointer;
 				current = current->next;
