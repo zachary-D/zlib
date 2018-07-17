@@ -429,85 +429,87 @@ namespace zlib
 		template<class T>
 		void linkedList<T>::insert(T value, unsigned index)
 		{
-			if (size == 0)
-			{
+			if(index > size) throw LLERROR::badIndex;
+
+			if(size == 0)
+			{	//If we're adding to and empty list
 				first = new link<T>(value, NULL, NULL);
 				last = first;
 				size = 1;
 				return;
 			}
+			if(index == 0)
+			{	//If we're adding an element at the beginning
 
-			
-			if (index == 0)
-			//If we're adding an element at the beginning
-			{
-				//Get a reference to the element that will be after the first one
-				link<T> * after = first;
+				//Allocate space for the new element, and set the appropriate trackers
+				first = new link<T>(value, NULL, first);
 
-				//Create the new element
-				first = new link<T>(value, NULL, after);
+				//Looks ugly AF, but backlinks the second link to the new first link
+				first->next->previous = first;
 
-				//Link the element after the one begin inserted to the one before it
-				after->previous = first;
+				size++;
+				return;
 			}
 			else
-			{
-				//If we're adding a element anywhere else
+			{	//If we're adding an element anywhere else
 
 				//Get a reference to the element we're inserting after
 				link<T> * previous = iterateToElement(index - 1);
 
 				link<T> * after = NULL;
 
-				if (!previous->isLast())
-				{
-					//If there is an element after the element we're adding
-					//Store a reference to the element that will be after the one we are inserting
+				if(!previous->isLast())
+				{	//If there is an elment after the elemet we're adding, store a reference to the element that will be after the one we are inserting
+
 					after = previous->next;
 				}
 
 				//Insert the element
 				previous->next = new link<T>(value, previous, after);
 
-				if (after != NULL)
-				{
-					//Link the element after it backwards to the new element
+				if(after != NULL)
+				{	//Link the element after it backwards, if it exists
+
 					after->previous = previous->next;
 				}
-			}
+				//If no element exists after this one, then this is the last element (duh). The 'last' pointer needs to be updated as such.
+				else
+				{
+					last = previous->next;
+				}
 
-			size++;
+				size++;
+			}
 		}
 
 		template<class T>
 		void linkedList<T>::erase(unsigned index)
 		{
-			if (index > size) throw LLERROR::badIndex;
+			if(index >= size) throw LLERROR::badIndex;
 
-			//Get a reference to the element being deleted
+			//Get the element we're deleting
 			link<T> * target = iterateToElement(index);
 
-			//Get references to the elements before and after the one being deleted
+			//Get pointers to the links before and after the element we're deleting
 			link<T> * _prev = target->previous;
 			link<T> * _next = target->next;
 
-			//Link the elements before and after the one being deleted to each other
-			if(_prev != NULL) _prev->next = _next;
-			if(_next != NULL) _next->previous = _prev;
+			// "Stitch" the elements before and after the element together
 
-			//Actually delete the element being deleted
+			//If the element before the target isn't null, link it to the element after the target
+			if(_prev != NULL) _prev->next = _next;
+			//If the element before the target is null, then the target must be the 'first' pointer.  As such, we must set the 'first' pointer to the element after the target
+			else first = _next;
+
+			//If the element after the target isn't null, link it to the element before the target (link backwards)
+			if(_next != NULL) _next->previous = _prev;
+			//If the element after the target is null, then the target must be the 'last' pointer.  As such, we must set the 'last' pointer to the element before the target
+			else last = _prev;
+
+			//Remove the target from memory
 			delete target;
 
-			//Handle if the element deleted was the first or last
-			if (index == 0)
-			{
-				first = _next;
-			}
-			if (index == size - 1)
-			{
-				last = _prev;
-			}
-			
+			//Deincriment the size tracker
 			size--;
 		}
 
@@ -525,7 +527,7 @@ namespace zlib
 			link<T> * current = first;
 
 			//Iterate to reach the correct element in the list
-			for (int i = 0; i < index; i++)
+			for (unsigned i = 0; i < index; i++)
 			{
 				if (current->isLast()) throw LLERROR::badPointer;
 				current = current->next;
@@ -712,6 +714,92 @@ namespace zlib
 
 
 #ifdef ZLIB_ENABLE_TESTS
+		template<class T>
+		void validateLinkedListStructure(var::linkedList<T> & list)
+		{
+			enum errs
+			{
+				check1,
+				check2,
+				check3,
+				check4,
+				check5,
+				check6,
+				check7,
+				check8,
+				check9
+			};
+
+			//Checks:
+			//Check 1 - The 'first' element is known (unless size = 0)
+			//Check 2 - The 'last' element is known (unless size = 0)
+			//Check 3 - There are no elements before 'first' (skip if size = 0)
+			//Check 4 - There are no elements after 'last' (skip if size = 0)
+			//Check 5 - The list proceeds continuously from 'first' to 'last'
+			//Check 6 - The list proceeds continuously from 'first' to 'last' in 'size' elements
+			//Check 7 - The list proceeds continuously from 'last' to 'first'
+			//Check 8 - The list proceeds continuously from 'last' to 'first' in 'size' elements
+			//Check 9 - Each element links to the element before it properly
+			
+			//Check 1
+			if(list.first == NULL && list.size != 0) throw check1;
+
+			//Check 2
+			if(list.last == NULL && list.size != 0) throw check2;
+
+			//if size == 0, we can't do any more checks
+			if(list.size == 0) return;
+			
+			//Check3
+			if(list.first->previous != NULL) throw check3;
+
+			//Check 4
+			if(list.last->next != NULL) throw check4;
+
+			//Checks 5 & 6
+			{
+				link<T> * curr = list.first;
+				unsigned count = 1;	//If first exists, there is at least 1 element
+				
+				while(curr != list.last)
+				{
+					curr = curr->next;
+					if(curr == NULL) throw check5;
+					count++;
+				}
+
+				if(list.size != count) throw check6;
+			}
+
+			//Checks 7 & 8
+			{
+				link<T> * curr = list.last;
+				unsigned count = 1;	//If first exists, there is at least 1 element
+
+				while(curr != list.first)
+				{
+					curr = curr->previous;
+					if(curr == NULL) throw check7;
+					count++;
+				}
+
+				if(list.size != count) throw check8;
+			}
+
+			//Check 9
+			{
+				link<T> * curr = list.first;
+				link<T> * prev = curr->previous;
+
+				while(curr != list.last)
+				{
+					if(curr->previous != prev) throw check9;
+					prev = curr;
+					curr = curr->next;
+				}
+			}
+		}
+
 		//Checks the arrList to make sure everything is as it should be
 		template<class T>
 		void validateArrListStructure(var::arrList<T> & list)
