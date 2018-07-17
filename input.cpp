@@ -12,13 +12,13 @@
 using std::string;
 using std::map;
 
-#ifdef USING_CINDER
-#include "cinder/app/AppNative.h"
+#ifdef ZLIB_USING_CINDER
+#include "cinder/app/App.h"
 #endif
 
 #include "input.h"
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #include "draw.h"
 #include "windInfo.h"
 #endif
@@ -27,14 +27,14 @@ using std::map;
 
 using namespace zlib;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 using cinder::app::KeyEvent;
 #endif
 namespace zlib
 {
 	namespace input
 	{
-#ifndef USING_CINDER
+#ifndef ZLIB_USING_CINDER
 		string getLine(char forceCase)	//Returns the user input from the console.  'forceCase' accepts 'u' or 'l', and converts the text to either uppercase or lowercase respectively, the text will be returned as lowercase.
 		{
 			string inp;
@@ -63,7 +63,7 @@ namespace zlib
 				}
 			}
 		}
-#elif USING_CINDER
+#elif ZLIB_USING_CINDER
 		button::button(string _name, var::coord2 _position, var::coord2 _size)
 		{
 			setName(_name);
@@ -119,7 +119,7 @@ namespace zlib
 					getPosition() + var::coord2(
 						getSize().x / 2,
 						getSize().y)
-					).toVec2f(),
+					).toGlm(),
 				ColorA(1, 1, 1, 1),
 				Font("Arial", 50)
 			);
@@ -199,7 +199,7 @@ namespace zlib
 #endif
 	};
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 	namespace keyboard
 	{
 		std::unordered_map< int, bool> keysPressed;		//A map of whether or not the key (on the keyboard) associated with the key 'int' is pressed or not.  This is only available internally

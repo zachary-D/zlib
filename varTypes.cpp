@@ -9,9 +9,9 @@
 
 using namespace std;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #include "cinder\Color.h"
-#include "cinder\app\AppNative.h"
+#include "cinder\app\App.h"
 #endif
 
 #ifdef USING_DEBUG
@@ -39,20 +39,8 @@ namespace zlib
 			x = X;
 			y = Y;
 		}
-#ifdef USING_CINDER
-		coord2::coord2(ci::Vec2i coordinate)
-		{
-			x = coordinate.x;
-			y = coordinate.y;
-		}
-
-		coord2::coord2(ci::Vec2f coordinate)
-		{
-			x = coordinate.x;
-			y = coordinate.y;
-		}
-
-		coord2::coord2(ci::Vec2d coordinate)
+#ifdef ZLIB_USING_CINDER
+		coord2::coord2(glm::highp_vec2 coordinate)
 		{
 			x = coordinate.x;
 			y = coordinate.y;
@@ -268,20 +256,10 @@ namespace zlib
 			y *= -1;
 		}
 
-#ifdef USING_CINDER
-		ci::Vec2i coord2::toVec2i()
+#ifdef ZLIB_USING_CINDER
+		glm::highp_vec2 coord2::toGlm()
 		{
-			return ci::Vec2i(x, y);
-		}
-
-		ci::Vec2f coord2::toVec2f()
-		{
-			return ci::Vec2f(x, y);
-		}
-
-		ci::Vec2d coord2::toVec2d()
-		{
-			return ci::Vec2d(x, y);
+			return glm::highp_vec2(x, y);
 		}
 #endif
 
@@ -469,10 +447,11 @@ namespace zlib
 			else return false;
 		}
 
-#ifdef USING_CINDER
-		ci::Vec3f coord3::toVec3f()
+#ifdef ZLIB_USING_CINDER
+		
+		glm::highp_vec3 coord3::toGlm()
 		{
-			return ci::Vec3f(x, y, z);
+			return glm::highp_vec3(x, y, z);
 		}
 #endif
 
@@ -689,7 +668,7 @@ namespace zlib
 			return R == other.R && G == other.G && B == other.B && A == other.A;
 		}
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 		ci::Color color_RGB::toColor()
 		{
 			return ci::Color(R, G, B);

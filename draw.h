@@ -3,12 +3,12 @@
 //Written by and copyright Zachary Damato
 //draw.h is part of the zlib submodule
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 
 #include <string> 
 
 #include "cinder/gl/Texture.h"
-#include "cinder/app/AppNative.h"
+#include "cinder/app/App.h"
 #include "cinder/gl/gl.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
@@ -31,8 +31,15 @@ namespace zlib
 {
 	namespace draw
 	{
-		void drawStaticTexture(gl::Texture _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
-		void drawTexture(gl::Texture _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false);																			//Draws a texture
+		namespace config
+		{
+			//The font and font size used by text boxes, by default
+			extern string font;
+			extern int fontSize;
+		}
+
+		void drawStaticTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false, bool ignoreZoom = true);											//Draws a texture, ignoring window::displacement and window::zoom
+		void drawTexture(gl::Texture2dRef _texture, var::coord2 _pointA, var::coord2 _pointB, var::coord2 _rotPt, float _rotation, bool _avgRotation = false, bool _preScaled = false);																			//Draws a texture
 
 		void drawStaticRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(), float rotation = 0, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB(-1, -1, -1), bool ignoreZoom = true);	//Draws a rectangle, ignoring window::displacement and window::zoom
 		void drawRect(var::coord2 pointA, var::coord2 pointB, var::coord2 rotPt = var::coord2(), float rotation = 0, bool avgRotation = false, bool preScaled = false, var::color_RGB color = var::color_RGB(-1, -1, -1));													//Draws a rectangle
@@ -72,6 +79,30 @@ namespace zlib
 		void drawStaticStringLeft(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
 		//Draws a string 'text' at 'position' (centered on the top left), with font size 'size' in color 'color'
 		void drawStringLeft(std::string text, var::coord2 position, bool preScaled = false, int size = 14, var::color_RGB color = var::color_RGB());
+
+		//Manages drawing text boxes.  The text box is drawn either when draw() is called, or when the class goes out of scope
+		class tBoxWrapper
+		{
+		public:
+			tBoxWrapper();
+
+			std::string text = "";
+			Font textFont = Font(config::font, config::fontSize);
+			TextBox::Alignment alignment = TextBox::LEFT;	//Which side the text is aligned to
+			var::coord2 size = var::coord2(200, 200);
+			var::color_RGB bgColor = var::color_RGB(1, 1, 1);	//bgColor = backGroundColor
+			var::color_RGB color = var::color_RGB(0, 0, 0);
+
+			void update();
+			void draw(var::coord2 position);
+			
+		private:
+			gl::Texture2dRef texture;
+		};
+
+		void drawTextBox(string text, var::coord2 pointA, var::coord2 pointB);
+
+		void drawTextBox(string text, var::coord2 pointA, var::coord2 pointB, Font font);
 	}
 }
 #endif

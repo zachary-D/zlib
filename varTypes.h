@@ -6,7 +6,7 @@
 
 //Preprocessor directives for enabling different code sections
 //		Directive				Description
-//		USING_CINDER			Enables Cinder-exclusive functions (i.e. conversion from internal color type to Cinder's color type)
+//		ZLIB_USING_CINDER			Enables Cinder-exclusive functions (i.e. conversion from internal color type to Cinder's color type)
 
 #include <string>
 #include <vector>
@@ -14,9 +14,9 @@
 using std::string;
 using std::vector;
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 #include "cinder\Color.h"
-#include "cinder\app\AppNative.h"
+#include "cinder\app\App.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
 #include "cinder/Font.h"
@@ -49,10 +49,8 @@ namespace zlib
 		public:
 			coord2();
 			coord2(double X, double Y);
-#ifdef USING_CINDER
-			coord2(ci::Vec2i coordinate);
-			coord2(ci::Vec2f coordinate);
-			coord2(ci::Vec2d coordinate);
+#ifdef ZLIB_USING_CINDER
+			coord2(glm::highp_vec2 coordinate);
 #endif
 
 			coord2 operator+(const coord2 & other);
@@ -114,10 +112,8 @@ namespace zlib
 			void negateY();			//Negate y
 			void negate();			//Negate x and y
 
-#ifdef USING_CINDER
-			ci::Vec2i toVec2i();
-			ci::Vec2f toVec2f();
-			ci::Vec2d toVec2d();
+#ifdef ZLIB_USING_CINDER
+			glm::highp_vec2 toGlm();
 #endif
 			string toString();
 			int getQuadrant();
@@ -173,8 +169,8 @@ namespace zlib
 			double y;
 			double z;
 
-#ifdef USING_CINDER
-			ci::Vec3f toVec3f();
+#ifdef ZLIB_USING_CINDER
+			glm::highp_vec3 toGlm();
 #endif
 		};
 
@@ -237,7 +233,7 @@ namespace zlib
 			bool isOpacityDefined() { return  A != -1; }						//True when the opacity is defined
 			bool areAllDefined() { return isDefined() && isOpacityDefined(); }	//True when the opacity and color is
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 			ci::Color toColor();			//BEING REMOVED.  use toCinderColor() istead
 			ci::Color toCinderColor();		//Returns the color in Cinder's format, without opacity
 			ci::ColorA toCinderColorA();	//Returns the color in Cinder's format, with opacity
@@ -317,9 +313,13 @@ namespace zlib
 		enum class LLERROR
 		{
 			badIndex,
-			badPointer
+			badPointer,
+			iter_listEnd,
+			iter_badPointer
 		};
 
+
+		//An element in a linked list, containing a single value, and pointers to the elements before and after it
 		template<class T>
 		struct link
 		{
@@ -334,6 +334,8 @@ namespace zlib
 			inline bool isFirst();
 			inline bool isLast();
 		};
+
+		//The function definitions and such for the link class are inlcuded here because: templates + compilers = pain.  (they throw a fit otherwise. yay!)
 
 		template<class T>
 		link<T>::link()
@@ -370,6 +372,8 @@ namespace zlib
 			return next == NULL;
 		}
 
+
+		//A simple linked list, with position-tracking in both directions
 		template<class T>
 		struct linkedList
 		{
@@ -383,11 +387,11 @@ namespace zlib
 			void push(T value);
 			void insert(T value, unsigned index);
 			void erase(unsigned index);
-			T access(unsigned index);
+			T & access(unsigned index);
 
 			link<T> * iterateToElement(unsigned index);
 
-			T operator[](unsigned index);
+			T & operator[](unsigned index);
 		};
 
 		template<class T>
@@ -406,6 +410,8 @@ namespace zlib
 			{
 				first = new link<T>(value, NULL, NULL);
 				last = first;
+				size = 1;
+				return;
 			}
 			else
 			//If at least one element already exists
@@ -415,97 +421,100 @@ namespace zlib
 
 				//Change the pointer to the last element to the new element created
 				last = last->next;
+				size++;
+				return;
 			}
-			size++;
 		}
 
 		template<class T>
 		void linkedList<T>::insert(T value, unsigned index)
 		{
-			if (size == 0)
-			{
+			if(index > size) throw LLERROR::badIndex;
+
+			if(size == 0)
+			{	//If we're adding to and empty list
 				first = new link<T>(value, NULL, NULL);
 				last = first;
 				size = 1;
 				return;
 			}
+			if(index == 0)
+			{	//If we're adding an element at the beginning
 
-			
-			if (index == 0)
-			//If we're adding an element at the beginning
-			{
-				//Get a reference to the element that will be after the first one
-				link<T> * after = first;
+				//Allocate space for the new element, and set the appropriate trackers
+				first = new link<T>(value, NULL, first);
 
-				//Create the new element
-				first = new link<T>(value, NULL, after);
+				//Looks ugly AF, but backlinks the second link to the new first link
+				first->next->previous = first;
 
-				//Link the element after the one begin inserted to the one before it
-				after->previous = first;
+				size++;
+				return;
 			}
 			else
-			{
-				//If we're adding a element anywhere else
+			{	//If we're adding an element anywhere else
 
 				//Get a reference to the element we're inserting after
 				link<T> * previous = iterateToElement(index - 1);
 
 				link<T> * after = NULL;
 
-				if (!previous->isLast())
-				{
-					//If there is an element after the element we're adding
-					//Store a reference to the element that will be after the one we are inserting
+				if(!previous->isLast())
+				{	//If there is an elment after the elemet we're adding, store a reference to the element that will be after the one we are inserting
+
 					after = previous->next;
 				}
 
 				//Insert the element
 				previous->next = new link<T>(value, previous, after);
 
-				if (after != NULL)
-				{
-					//Link the element after it backwards to the new element
+				if(after != NULL)
+				{	//Link the element after it backwards, if it exists
+
 					after->previous = previous->next;
 				}
-			}
+				//If no element exists after this one, then this is the last element (duh). The 'last' pointer needs to be updated as such.
+				else
+				{
+					last = previous->next;
+				}
 
-			size++;
+				size++;
+			}
 		}
 
 		template<class T>
 		void linkedList<T>::erase(unsigned index)
 		{
-			if (index > size) throw LLERROR::badIndex;
+			if(index >= size) throw LLERROR::badIndex;
 
-			//Get a reference to the element being deleted
+			//Get the element we're deleting
 			link<T> * target = iterateToElement(index);
 
-			//Get references to the elements before and after the one being deleted
+			//Get pointers to the links before and after the element we're deleting
 			link<T> * _prev = target->previous;
 			link<T> * _next = target->next;
 
-			//Link the elements before and after the one being deleted to each other
-			if(_prev != NULL) _prev->next = _next;
-			if(_next != NULL) _next->previous = _prev;
+			// "Stitch" the elements before and after the element together
 
-			//Actually delete the element being deleted
+			//If the element before the target isn't null, link it to the element after the target
+			if(_prev != NULL) _prev->next = _next;
+			//If the element before the target is null, then the target must be the 'first' pointer.  As such, we must set the 'first' pointer to the element after the target
+			else first = _next;
+
+			//If the element after the target isn't null, link it to the element before the target (link backwards)
+			if(_next != NULL) _next->previous = _prev;
+			//If the element after the target is null, then the target must be the 'last' pointer.  As such, we must set the 'last' pointer to the element before the target
+			else last = _prev;
+
+			//Remove the target from memory
 			delete target;
 
-			//Handle if the element deleted was the first or last
-			if (index == 0)
-			{
-				first = _next;
-			}
-			if (index == size - 1)
-			{
-				last = _prev;
-			}
-			
+			//Deincriment the size tracker
 			size--;
 		}
 
 		template<class T>
-		T linkedList<T>::access(unsigned index)
+		T & linkedList<T>::access(unsigned index)
 		{
 			return iterateToElement(index)->data;
 		}
@@ -518,7 +527,7 @@ namespace zlib
 			link<T> * current = first;
 
 			//Iterate to reach the correct element in the list
-			for (int i = 0; i < index; i++)
+			for (unsigned i = 0; i < index; i++)
 			{
 				if (current->isLast()) throw LLERROR::badPointer;
 				current = current->next;
@@ -528,10 +537,374 @@ namespace zlib
 		}
 
 		template<class T>
-		T linkedList<T>::operator[](unsigned index)
+		T & linkedList<T>::operator[](unsigned index)
 		{
 			return access(index);
 		}
+
+
+		//A linked list along with a vector containing a reference to each element
+		template<class T>
+		struct arrList : linkedList<T>
+		{
+			arrList();
+			
+			vector<link<T>*> links;		//Pointers to each link in the list
+
+			void push(T value);						//Add 'value' to the end of the list
+			void insert(T value, unsigned index);	//Insert 'value' at 'index'
+			void erase(unsigned index);				//Erase the elment at 'index'
+			T & access(unsigned index);				//Return a reference to the element at 'index'
+
+			T & operator[](unsigned index);	//Just a wrapper for access, no different than the parent class, but it had to be explicitly defined to prevent bugs (linkedLIst::access() would end up being called instead of arrList::access(), etc.)
+		};
+
+		template<class T>
+		arrList<T>::arrList()
+		{
+			size = 0;
+			first = NULL;
+			last = NULL;
+		}
+
+		template<class T>
+		void arrList<T>::push(T value)
+		{
+			if (size == 0)
+			{	//If no other elements exist
+
+				//Allocate the first element
+				first = new link<T>(value, NULL, NULL);
+				
+				//Set the last to the first
+				last = first;
+				
+				//Add a pointer to the new link to the vector, and set the size tracker
+				links.push_back(first);
+				size = 1;
+
+				return;
+			}
+			else
+			{	//If at least one element exists
+
+				//Create the new link
+				last->next = new link<T>(value, last, NULL);
+				
+				//Update the 'last element' pointer
+				last = last->next;
+
+				//Add the link to the tracking vector
+				links.push_back(last);
+
+				//Incriment the size tracker of the list
+				size++;
+
+				return;
+			}
+			
+		}
+
+		template<class T>
+		void arrList<T>::insert(T value, unsigned index)
+		{
+			if(index > size) throw LLERROR::badIndex;
+
+			if(size == 0)
+			{	//If we're adding to and empty list
+				first = new link<T>(value, NULL, NULL);
+				last = first;
+				size = 1;
+				links.push_back(first);
+				return;
+			}
+			if (index == 0)
+			{	//If we're adding an element at the beginning
+				
+				//Allocate space for the new element, and set the appropriate trackers
+				first = new link<T>(value, NULL, first);
+
+				//Looks ugly AF, but backlinks the second link to the new first link
+				first->next->previous = first;
+				
+				//Add the pointer to the tracker and incriment the size tracker
+				links.insert(links.begin() + index, first);
+				size++;
+				return;
+			}
+			else
+			{	//If we're adding an element anywhere else
+
+				//Get a reference to the element we're inserting after
+				link<T> * previous = links[index - 1];
+
+				link<T> * after = NULL;
+
+				if (!previous->isLast())
+				{	//If there is an elment after the elemet we're adding, store a reference to the element that will be after the one we are inserting
+					
+					after = previous->next;
+				}
+				
+				//Insert the element
+				previous->next = new link<T>(value, previous, after);
+
+				if (after != NULL)
+				{	//Link the element after it backwards, if it exists
+					
+					after->previous = previous->next;
+				}
+				//If no element exists after this one, then this is the last element (duh). The 'last' pointer needs to be updated as such.
+				else
+				{
+					last = previous->next;
+				}
+
+				links.insert(links.begin() + index, previous->next);
+				size++;
+			}
+		}
+
+		template<class T>
+		void arrList<T>::erase(unsigned index)
+		{
+			if(index >= size) throw LLERROR::badIndex;
+
+			//Get the element we're deleting
+			link<T> * target = links[index];
+
+			//Get pointers to the links before and after the element we're deleting
+			link<T> * _prev = target->previous;
+			link<T> * _next = target->next;
+
+			// "Stitch" the elements before and after the element together
+
+			//If the element before the target isn't null, link it to the element after the target
+			if(_prev != NULL) _prev->next = _next;
+			//If the element before the target is null, then the target must be the 'first' pointer.  As such, we must set the 'first' pointer to the element after the target
+			else first = _next;
+
+			//If the element after the target isn't null, link it to the element before the target (link backwards)
+			if(_next != NULL) _next->previous = _prev;
+			//If the element after the target is null, then the target must be the 'last' pointer.  As such, we must set the 'last' pointer to the element before the target
+			else last = _prev;
+
+			//Remove the target from memory
+			delete target;
+			
+			//Remove the target from the links vector
+			links.erase(links.begin() + index);
+
+			//Deincriment the size tracker
+			size--;
+		}
+
+		template<class T>
+		T & arrList<T>::access(unsigned index)
+		{
+			if(index >= size) throw LLERROR::badIndex;
+			return links[index]->data;
+		}
+
+		template<class T>
+		T & arrList<T>::operator[](unsigned index)
+		{
+			return access(index);
+		}
+
+
+#ifdef ZLIB_ENABLE_TESTS
+		template<class T>
+		void validateLinkedListStructure(var::linkedList<T> & list)
+		{
+			enum errs
+			{
+				check1,
+				check2,
+				check3,
+				check4,
+				check5,
+				check6,
+				check7,
+				check8,
+				check9
+			};
+
+			//Checks:
+			//Check 1 - The 'first' element is known (unless size = 0)
+			//Check 2 - The 'last' element is known (unless size = 0)
+			//Check 3 - There are no elements before 'first' (skip if size = 0)
+			//Check 4 - There are no elements after 'last' (skip if size = 0)
+			//Check 5 - The list proceeds continuously from 'first' to 'last'
+			//Check 6 - The list proceeds continuously from 'first' to 'last' in 'size' elements
+			//Check 7 - The list proceeds continuously from 'last' to 'first'
+			//Check 8 - The list proceeds continuously from 'last' to 'first' in 'size' elements
+			//Check 9 - Each element links to the element before it properly
+			
+			//Check 1
+			if(list.first == NULL && list.size != 0) throw check1;
+
+			//Check 2
+			if(list.last == NULL && list.size != 0) throw check2;
+
+			//if size == 0, we can't do any more checks
+			if(list.size == 0) return;
+			
+			//Check3
+			if(list.first->previous != NULL) throw check3;
+
+			//Check 4
+			if(list.last->next != NULL) throw check4;
+
+			//Checks 5 & 6
+			{
+				link<T> * curr = list.first;
+				unsigned count = 1;	//If first exists, there is at least 1 element
+				
+				while(curr != list.last)
+				{
+					curr = curr->next;
+					if(curr == NULL) throw check5;
+					count++;
+				}
+
+				if(list.size != count) throw check6;
+			}
+
+			//Checks 7 & 8
+			{
+				link<T> * curr = list.last;
+				unsigned count = 1;	//If first exists, there is at least 1 element
+
+				while(curr != list.first)
+				{
+					curr = curr->previous;
+					if(curr == NULL) throw check7;
+					count++;
+				}
+
+				if(list.size != count) throw check8;
+			}
+
+			//Check 9
+			{
+				link<T> * curr = list.first;
+				link<T> * prev = curr->previous;
+
+				while(curr != list.last)
+				{
+					if(curr->previous != prev) throw check9;
+					prev = curr;
+					curr = curr->next;
+				}
+			}
+		}
+
+		//Checks the arrList to make sure everything is as it should be
+		template<class T>
+		void validateArrListStructure(var::arrList<T> & list)
+		{
+			enum class errs
+			{
+				check1,				//General failure on check 1
+				check2,				//General failure on check 2
+				check3,				//General failure on check 3
+				check3_forward,		//An element in the list has no element after it (in check 3)
+				check3_backlink,	//An element in the list does not backlink properly (in check 3)
+				check4,				//General failure on check 4
+				check5,				//General failure on check 5
+				check6,				//General failure on check 6
+				check7,				//General failure on check 7
+				check8,				//General failure on check 8
+				check9,				//General failure on check 9
+			};
+
+			//Checks: (Assuming the list contains at least 1 element; tested using list.size)
+			//1) Checks that the element at list.first has nothing before it
+			//2) Checks that the element at list.last has nothing after it
+			//3) Checks that the list is continuous, forwards and backwards (makes sure that every element links forward and backward correctly)
+			//4) Checks that list.size matches the number of elements in the list
+			//5) Checks that list.access(n) correctly accesses the n'th element of the list  (Can only check the values at each index, not the elements specifically.  Use unique values for best results.)
+			//6) Checks that each element only occurs in the list once
+
+			//Checks 2 - If the list contains no elements
+
+			//7) Checks that the first pointer is NULL
+			//8) Checks that the last pointer is NULL
+			//9) Checks that the size of the list.links array is 0
+
+			//When the checks fail they are thrown as exceptions.... this probably wasn't a great idea, but what's done is done  (until it's redone, that is)
+
+			if(list.size != 0)
+			{
+				//Check 1
+				if(list.first->previous != NULL) throw errs::check1;
+
+				//Check 2
+				if(list.last->next != NULL) throw errs::check2;
+
+				//Checks 3, 4, 5, and 6
+				var::link<T> * curr = list.first;	//The current element
+				var::link<T> * last = curr;		//The last element
+
+				int count = 0;	//Tracks the number of elements in the list
+
+								//Unless the first element is NULL, we need to include it in the count
+				if(list.first != NULL) count++;
+
+				vector< var::link<T> * > vec;		//Contains pointers to each element in the list
+													//Add the first element to the vector
+				if(curr != NULL) vec.push_back(curr);
+
+				//Check 3 (And prep for checks 4 and 5)
+				//Loop until we reach the end of the list
+				while(curr != list.last)
+				{
+					if(curr->next == NULL) throw errs::check3_forward;
+					curr = curr->next;
+
+					if(curr->previous != last) throw errs::check3_backlink;
+
+					last = curr;
+					count++;
+					vec.push_back(curr);
+				}
+
+				//Check 4
+				if(list.size != count) throw errs::check4;
+
+				//Check 5
+				for(int i = 0; i < count; i++)
+				{
+					if(vec[i]->data != list[i]) throw errs::check5;
+				}
+
+				//Check 6
+				for(int check = 0; check < count; check++)
+				{
+					for(int against = 0; against < count; against++)
+					{
+						if(check == against) continue;
+
+						if(vec[check] == vec[against]) throw errs::check6;
+					}
+				}
+			}
+			else
+			{
+				//Check 7
+				if(list.first != NULL) throw errs::check7;
+
+				//Check 8
+				if(list.last != NULL) throw errs::check8;
+
+				//Check 9
+				if(list.links.size() != 0) throw errs::check9;
+
+				//This part was a lot nicer to code than checks 3->6....
+			}
+		}
+#endif
 
 		namespace geom	//As in geometry
 		{

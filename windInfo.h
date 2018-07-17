@@ -3,7 +3,7 @@
 //Written by and copyright Zachary Damato
 //windInfo.h is part of the zlib submodule
 
-#ifdef USING_CINDER
+#ifdef ZLIB_USING_CINDER
 
 #include<string>
 #include<stdlib.h>
