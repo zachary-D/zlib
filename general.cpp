@@ -2,11 +2,7 @@
 #include <chrono>	//std::chrono::high_resolution_clock
 #include <cmath>
 
-#ifndef makefile
-#include "zlib/general.h"
-#else
 #include "general.h"
-#endif
 
 //So we can assume zlib is the namespace incase we need to pull things from other zlib files
 namespace zlib {}

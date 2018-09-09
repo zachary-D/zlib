@@ -10,6 +10,7 @@
 #include<vector>
 
 #include "varTypes.h"
+
 namespace zlib
 {
 	namespace window

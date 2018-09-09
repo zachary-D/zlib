@@ -11,14 +11,13 @@
 //		ZLIB_USING_MODEL		Enables the model section.  (Requires ZLIB_USING_CINDER as a prerequisite)
 //		ZLIB_ENABLE_TESTS		Enables functions for testing certain features within the library (either automated tests or tests that validate the state of certain classes (i.e. arrList))
 
-
-#include "zlib/cryptography.h"
-#include "zlib/draw.h"
-#include "zlib/fileIO.h"
-#include "zlib/general.h"
-#include "zlib/input.h"
-#include "zlib/math.h"
-#include "zlib/model.h"
-#include "zlib/varConv.h"
-#include "zlib/varTypes.h"
-#include "zlib/windInfo.h"
+#include "cryptography.h"
+#include "draw.h"
+#include "fileIO.h"
+#include "general.h"
+#include "input.h"
+#include "math.h"
+#include "model.h"
+#include "varConv.h"
+#include "varTypes.h"
+#include "windInfo.h"
