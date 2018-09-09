@@ -807,6 +807,119 @@ namespace zlib
 			return seconds >= other.getTotalSeconds();
 		}
 
+
+		binaryString::binaryString(unsigned value, int bit_length)
+		{
+			while (value != 0)
+			{
+				bits.push_back(value % 2);
+				value /= 2;
+			}
+			std::reverse(bits.begin(), bits.end());
+			if(bit_length != -1) pad(bit_length);
+		}
+
+		string binaryString::toString(bool includeSpaces)
+		{
+			string ret;
+			for (unsigned i = 0; i < bits.size(); i++)
+			{
+				if (includeSpaces && i % 5 == 0 && i != 0) ret += ' ';
+				ret += (bits[i]) ? '1' : '0';
+			}
+			return ret;
+		}
+
+		binaryString binaryString::operator+(binaryString other)
+		{
+			unsigned size = bits.size();
+			if (other.bits.size() > size) //If 'other' is longer than ourselves
+			{
+				size = other.bits.size();
+				vector<bool> extension;
+				for (unsigned i = 0; i < size - bits.size(); i++)
+				{
+					extension.push_back(0);
+				}
+				bits.insert(bits.begin(), extension.begin(), extension.end());
+			}
+			else
+			{
+				vector<bool> extension;
+				for (unsigned i = 0; i < size - other.bits.size(); i++)
+				{
+					extension.push_back(0);
+				}
+				other.bits.insert(other.bits.begin(), extension.begin(), extension.end());
+			}
+
+			binaryString ret;
+			for (unsigned i = 0; i < size; i++) ret.bits.push_back(0);
+
+
+			bool carry = false;
+			unsigned sum;
+
+			for (unsigned i = bits.size() - 1; (int)i >= 0; i--)
+			{
+				sum = bits[i] + other.bits[i] + carry;
+				if (sum > 1)
+				{
+					sum -= 2;
+					carry = true;
+				}
+				else carry = false;
+				ret.bits[i] = sum;
+			}
+
+			if (carry) ret.bits.insert(ret.bits.begin(), 1);
+
+			return ret;
+		}
+
+		binaryString binaryString::operator+(unsigned & other)
+		{
+			return operator+(binaryString(other));
+		}
+
+		binaryString binaryString::compliment_1()
+		{
+			binaryString ret(*this);
+
+			for (unsigned i = 0; i < ret.bits.size(); i++)
+			{
+				ret.bits[i] = !ret.bits[i];
+			}
+
+			return ret;
+		}
+
+		binaryString binaryString::compliment_2()
+		{
+			return compliment_1() + binaryString(1);
+		}
+
+		void binaryString::pad(unsigned bit_length)
+		{
+			if (bits.size() > bit_length) return;
+
+			vector<bool> extension;
+			for (unsigned i = 0; i < bit_length - bits.size(); i++)
+			{
+				extension.push_back(0);
+			}
+			bits.insert(bits.begin(), extension.begin(), extension.end());
+		}
+
+		void binaryString::trim(unsigned bit_length, bool force)
+		{
+			while (bits.size() > bit_length)
+			{
+				//if(bits[0])
+			}
+		}
+
+
 		namespace geom	//As in geometry
 		{
 			line::line(coord2 _slope, coord2 _displacement)

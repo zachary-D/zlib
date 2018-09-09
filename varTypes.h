@@ -310,6 +310,39 @@ namespace zlib
 			december = 12,
 		};
 
+		class binaryString
+		{
+		public:
+
+			//bits[0] is the LSB, bits[n] is the MSB
+
+			static enum
+			{
+				too_few_bits,	//The user has specified a bitlength but the value cannot be represented within that many bits
+			};
+
+			binaryString() {}
+
+			binaryString(unsigned value, int bit_length = -1);	//if bit_length <= 0, creates bits until perfectly represented
+			
+
+			std::vector<bool> bits;
+
+			string toString(bool includeSpaces = true);
+
+			binaryString operator+(binaryString other);
+
+			binaryString operator+(unsigned & other);
+
+			binaryString compliment_1();	//Returns the 1's compliment of the binaryString
+
+			binaryString compliment_2();	//Returns the 2's compliment of the binaryString
+
+			void pad(unsigned bit_length);	//Append 0's to the front of the string so that the the string is 'bit_length' long.  If the number of bits is greater than the specified length, the function will do nothing.
+
+			void trim(unsigned bit_length = -1, bool force = false);	//Trims the string to 'bit_length'.  If 'bit_length' = -1, it will trim all the leading 0's.  If 'force' = false and bit_length is shorter than the minimum number of bits to represent the string, an exception will be thrown.  If force is true, the string will be shortened, even if that means losing data
+		};
+
 		enum class LLERROR
 		{
 			badIndex,
