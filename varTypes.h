@@ -310,14 +310,6 @@ namespace zlib
 			december = 12,
 		};
 
-		enum class LLERROR
-		{
-			badIndex,
-			badPointer,
-			iter_listEnd,
-			iter_badPointer
-		};
-
 
 		//An element in a linked list, containing a single value, and pointers to the elements before and after it
 		template<class T>
@@ -377,6 +369,14 @@ namespace zlib
 		template<class T>
 		struct linkedList
 		{
+			static enum
+			{
+				badIndex,
+				badPointer,
+				iter_listEnd,
+				iter_badPointer,
+			};
+
 			linkedList();
 			
 			link<T> * first;
@@ -429,7 +429,7 @@ namespace zlib
 		template<class T>
 		void linkedList<T>::insert(T value, unsigned index)
 		{
-			if(index > size) throw LLERROR::badIndex;
+			if(index > size) throw badIndex;
 
 			if(size == 0)
 			{	//If we're adding to and empty list
@@ -485,7 +485,7 @@ namespace zlib
 		template<class T>
 		void linkedList<T>::erase(unsigned index)
 		{
-			if(index >= size) throw LLERROR::badIndex;
+			if(index >= size) throw badIndex;
 
 			//Get the element we're deleting
 			link<T> * target = iterateToElement(index);
@@ -522,14 +522,14 @@ namespace zlib
 		template<class T>
 		link<T> * linkedList<T>::iterateToElement(unsigned index)
 		{
-			if (index > size) throw LLERROR::badIndex;
+			if (index > size) throw badIndex;
 
 			link<T> * current = first;
 
 			//Iterate to reach the correct element in the list
 			for (unsigned i = 0; i < index; i++)
 			{
-				if (current->isLast()) throw LLERROR::badPointer;
+				if (current->isLast()) throw badPointer;
 				current = current->next;
 			}
 
@@ -608,7 +608,7 @@ namespace zlib
 		template<class T>
 		void arrList<T>::insert(T value, unsigned index)
 		{
-			if(index > size) throw LLERROR::badIndex;
+			if(index > size) throw badIndex;
 
 			if(size == 0)
 			{	//If we're adding to and empty list
@@ -668,7 +668,7 @@ namespace zlib
 		template<class T>
 		void arrList<T>::erase(unsigned index)
 		{
-			if(index >= size) throw LLERROR::badIndex;
+			if(index >= size) throw badIndex;
 
 			//Get the element we're deleting
 			link<T> * target = links[index];
@@ -702,7 +702,7 @@ namespace zlib
 		template<class T>
 		T & arrList<T>::access(unsigned index)
 		{
-			if(index >= size) throw LLERROR::badIndex;
+			if(index >= size) throw badIndex;
 			return links[index]->data;
 		}
 
