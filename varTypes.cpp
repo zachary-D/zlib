@@ -915,7 +915,12 @@ namespace zlib
 		{
 			while (bits.size() > bit_length)
 			{
-				//if(bits[0])
+				if (bits[0] == 0) bits.erase(bits.begin());
+				else
+				{
+					if (force) bits.erase(bits.begin());
+					else throw too_few_bits;
+				}
 			}
 		}
 
