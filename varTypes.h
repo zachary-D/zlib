@@ -240,8 +240,20 @@ namespace zlib
 #endif
 		};
 
-		typedef struct tm longTime;		//A time represented as second/minute/hour/day/month/year, from time.h
+		//typedef struct tm longTime;		//A time represented as second/minute/hour/day/month/year, from time.h
 
+		struct longTime : tm
+		{
+			//Todo: rewrite this so that we use our own variables so we can define them differently (AKA reasonably)
+			longTime() {}
+			longTime(tm * t);
+
+			static longTime now();
+
+			std::string getYMD();
+			std::string getHMS();
+		};
+		
 		struct shortTime
 		{
 			shortTime() {}
