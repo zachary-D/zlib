@@ -6,6 +6,7 @@
 #include <string>
 #include <math.h>
 #include <cmath>
+#include <time.h>
 
 using namespace std;
 
@@ -686,8 +687,51 @@ namespace zlib
 		}
 #endif
 
+		longTime::longTime(tm * t)
+		{
+			tm_sec = t->tm_sec;
+			tm_min = t->tm_min;
+			tm_hour = t->tm_hour;
+			tm_mday = t->tm_mday;
+			tm_mon = t->tm_mon + 1;
+			tm_year = t->tm_year + 1900;	//Convert epoch year to actual year
+			tm_wday = t->tm_wday;
+			tm_yday = t->tm_yday;
+			tm_isdst = t->tm_isdst;
+		}
 
+		longTime longTime::now()
+		{
+			/*time_t rawtime;
+			time_t lTime;
+			tm * t;
+			
+			time(&rawtime);
+			localtime_s(t, &lTime);
+			return longTime(t);*/
 
+			time_t t = time(NULL);
+			tm * formatted = new tm;
+			localtime_s(formatted, &t);
+
+			return longTime(formatted);
+		}
+
+		std::string longTime::getYMD()
+		{
+			return conv::toString(tm_year) + '-' + conv::toString(tm_mon) + '-' + conv::toString(tm_mday);
+		}
+
+		std::string longTime::getHMS()
+		{
+			auto padIfNeeded = [](unsigned value)
+			{
+				if(value < 10) return "0";
+				else return "";
+			};
+
+			return padIfNeeded(tm_hour) + conv::toString(tm_hour) + '-' + padIfNeeded(tm_min) + conv::toString(tm_min) + '-' + padIfNeeded(tm_sec) + conv::toString(tm_sec);
+		}
 
 		shortTime::shortTime(int _seconds, int minutes, int hours, int days)
 		{
