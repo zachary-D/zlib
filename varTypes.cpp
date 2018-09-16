@@ -700,23 +700,21 @@ namespace zlib
 			tm_isdst = t->tm_isdst;
 		}
 
+		longTime::longTime(time_t t)
+		{
+			tm * formatted = new tm;
+#ifndef __linux__
+			localtime_s(formatted, &t);
+#else
+			formatted = localtime(&t);
+#endif
+			(*this) = longTime(formatted);
+		}
+
 		longTime longTime::now()
 		{
-#ifdef __linux__
-
-			time_t rawtime;
-
-			time(&rawtime);
-
-			tm * _tm = localtime(&rawtime);
-
-			return longTime(_tm);
-#else
 			time_t t = time(NULL);
-			tm * formatted = new tm;
-			localtime_s(formatted, &t);
-			return longTime(formatted);
-#endif
+			return longTime(t);
 		}
 
 		std::string longTime::getYMD()

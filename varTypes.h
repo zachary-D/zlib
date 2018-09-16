@@ -247,6 +247,7 @@ namespace zlib
 			//Todo: rewrite this so that we use our own variables so we can define them differently (AKA reasonably)
 			longTime() {}
 			longTime(tm * t);
+			longTime(time_t t);
 
 			static longTime now();
 
