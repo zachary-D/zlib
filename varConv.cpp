@@ -10,7 +10,6 @@
 #include<time.h>
 #include<fstream>
 #include<algorithm>
-#include<windows.h>
 #include<vector>
 #include<new>
 
