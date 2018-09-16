@@ -277,7 +277,7 @@ namespace zlib
 			else if (x >= 0 && y < 0) return 4;
 			else
 			{
-				_DEBUG_ERROR("Error determining quadrant.  Coordinates may be improperly defined.  Defaulting to 1");
+				throw("Error determining quadrant.  Coordinates may be improperly defined.  Defaulting to 1");
 				return 1;
 			}
 		}
