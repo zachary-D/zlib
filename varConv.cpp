@@ -306,12 +306,5 @@ namespace zlib
 		{
 			return degrees * math::pi / 180;
 		}
-
-		var::longTime getFormattedTime(time_t rawTime)
-		{
-			var::longTime _time;
-			localtime_s(&_time, &rawTime);
-			return _time;
-		}
 	}
 }
