@@ -96,7 +96,7 @@ namespace zlib
 			{
 				size = _size;
 			}
-			else throw("Invalid button size!");
+			else _DEBUG_ERROR("Invalid button size!");
 		}
 
 		void button::setFunction(void(*function)())
@@ -185,7 +185,7 @@ namespace zlib
 
 		buttonList::internalButton * buttonList::operator[](int & index)
 		{
-			if(index >= buttons.size()) throw("\nbuttonList::operator[] | Error:\nRequested index does note exist!");
+			if(index >= buttons.size()) _DEBUG_ERROR("\nbuttonList::operator[] | Error:\nRequested index does note exist!");
 			return &buttons[index];
 		}
 
