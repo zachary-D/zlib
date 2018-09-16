@@ -702,7 +702,6 @@ namespace zlib
 
 		longTime longTime::now()
 		{
-#define __linux__
 #ifdef __linux__
 
 			time_t rawtime;
