@@ -150,7 +150,7 @@ namespace zlib
 		string toLowercase(string & inp, bool changeArg = true)		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
 			string ret;
-			if(changeArg)
+			if(false)
 			{
 				transform(inp.begin(), inp.end(), inp.begin(), tolower);
 				ret = inp;
@@ -159,6 +159,7 @@ namespace zlib
 			{
 				ret = inp;
 				transform(ret.begin(), ret.end(), ret.begin(), tolower);
+				inp = ret;
 			}
 			return ret;
 		}
