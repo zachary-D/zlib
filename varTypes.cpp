@@ -702,19 +702,22 @@ namespace zlib
 
 		longTime longTime::now()
 		{
-			/*time_t rawtime;
-			time_t lTime;
-			tm * t;
-			
-			time(&rawtime);
-			localtime_s(t, &lTime);
-			return longTime(t);*/
+#define __linux__
+#ifdef __linux__
 
+			time_t rawtime;
+
+			time(&rawtime);
+
+			tm * _tm = localtime(&rawtime);
+
+			return longTime(_tm);
+#else
 			time_t t = time(NULL);
 			tm * formatted = new tm;
 			localtime_s(formatted, &t);
-
 			return longTime(formatted);
+#endif
 		}
 
 		std::string longTime::getYMD()
