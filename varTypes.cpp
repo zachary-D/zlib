@@ -954,7 +954,7 @@ namespace zlib
 				if(slope.x == 0 && slope.y == 0) return 0;
 				else if((slope.x >= 0 && slope.y >= 0) || (slope.x <= 0 && slope.y <= 0)) return 1;
 				else if((slope.x > 0 && slope.y < 0) || (slope.x < 0 && slope.y > 0)) return -1;
-				throw("Unknown exception.  Returning 0.");
+				_DEBUG_ERROR("Unknown exception.  Returning 0.");
 				return 0;
 			}
 
@@ -963,7 +963,7 @@ namespace zlib
 				if(slope.x != 0) return slope.y / slope.x;
 				else
 				{
-					throw("SLOPE = y / 0");
+					_DEBUG_ERROR("SLOPE = y / 0");
 					return slope.y / (10 ^ -20);
 				}
 			}
@@ -977,7 +977,7 @@ namespace zlib
 			{
 				if(_slope.x == 0 && _slope.y == 0)
 				{
-					throw("Bad slope - slope cannot be 0 / 0.  Defaulting to 1.");
+					_DEBUG_ERROR("Bad slope - slope cannot be 0 / 0.  Defaulting to 1.");
 					slope = coord2(1, 1);
 					return false;
 				}
@@ -1004,12 +1004,12 @@ namespace zlib
 				}
 				else if(_lowxBound == _highxBound)
 				{
-					throw("Bad input, _lowxBound is equal to _highxBound.  Setting xboudns to false.");
+					_DEBUG_ERROR("Bad input, _lowxBound is equal to _highxBound.  Setting xboudns to false.");
 					xBounds = false;
 				}
 				else
 				{
-					throw("Unspecified error.  Setting xBounds to false.");
+					_DEBUG_ERROR("Unspecified error.  Setting xBounds to false.");
 					xBounds = false;
 				}
 				return xBounds;
@@ -1031,12 +1031,12 @@ namespace zlib
 				}
 				else if(_lowyBound == _highyBound)
 				{
-					throw("Bad input, _lowyBound is equal to _highyBound.  Setting yboudns to false.");
+					_DEBUG_ERROR("Bad input, _lowyBound is equal to _highyBound.  Setting yboudns to false.");
 					yBounds = false;
 				}
 				else
 				{
-					throw("Unspecified error.  Setting yBounds to false.");
+					_DEBUG_ERROR("Unspecified error.  Setting yBounds to false.");
 					yBounds = false;
 				}
 				return yBounds;
@@ -1097,7 +1097,7 @@ namespace zlib
 					}
 					return ret;
 				}
-				else throw("Bounds not set!");
+				else _DEBUG_ERROR("Bounds not set!");
 			}
 
 			bool line::isCoordWithinBounds(coord2 _pos)
@@ -1131,7 +1131,7 @@ namespace zlib
 			{
 				if(hasIntercept(_line) == false)
 				{
-					throw("No intercept!");
+					_DEBUG_ERROR("No intercept!");
 					return coord2(0, 0);
 				}
 				else
