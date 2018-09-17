@@ -277,7 +277,7 @@ namespace zlib
 			else if (x >= 0 && y < 0) return 4;
 			else
 			{
-				_DEBUG_ERROR("Error determining quadrant.  Coordinates may be improperly defined.  Defaulting to 1");
+				throw("Error determining quadrant.  Coordinates may be improperly defined.  Defaulting to 1");
 				return 1;
 			}
 		}
@@ -700,21 +700,21 @@ namespace zlib
 			tm_isdst = t->tm_isdst;
 		}
 
+		longTime::longTime(time_t t)
+		{
+			tm * formatted = new tm;
+#ifndef __linux__
+			localtime_s(formatted, &t);
+#else
+			formatted = localtime(&t);
+#endif
+			(*this) = longTime(formatted);
+		}
+
 		longTime longTime::now()
 		{
-			/*time_t rawtime;
-			time_t lTime;
-			tm * t;
-			
-			time(&rawtime);
-			localtime_s(t, &lTime);
-			return longTime(t);*/
-
 			time_t t = time(NULL);
-			tm * formatted = new tm;
-			localtime_s(formatted, &t);
-
-			return longTime(formatted);
+			return longTime(t);
 		}
 
 		std::string longTime::getYMD()
@@ -954,7 +954,7 @@ namespace zlib
 				if(slope.x == 0 && slope.y == 0) return 0;
 				else if((slope.x >= 0 && slope.y >= 0) || (slope.x <= 0 && slope.y <= 0)) return 1;
 				else if((slope.x > 0 && slope.y < 0) || (slope.x < 0 && slope.y > 0)) return -1;
-				_DEBUG_ERROR("Unknown exception.  Returning 0.");
+				throw("Unknown exception.  Returning 0.");
 				return 0;
 			}
 
@@ -963,7 +963,7 @@ namespace zlib
 				if(slope.x != 0) return slope.y / slope.x;
 				else
 				{
-					_DEBUG_ERROR("SLOPE = y / 0");
+					throw("SLOPE = y / 0");
 					return slope.y / (10 ^ -20);
 				}
 			}
@@ -977,7 +977,7 @@ namespace zlib
 			{
 				if(_slope.x == 0 && _slope.y == 0)
 				{
-					_DEBUG_ERROR("Bad slope - slope cannot be 0 / 0.  Defaulting to 1.");
+					throw("Bad slope - slope cannot be 0 / 0.  Defaulting to 1.");
 					slope = coord2(1, 1);
 					return false;
 				}
@@ -1004,12 +1004,12 @@ namespace zlib
 				}
 				else if(_lowxBound == _highxBound)
 				{
-					_DEBUG_ERROR("Bad input, _lowxBound is equal to _highxBound.  Setting xboudns to false.");
+					throw("Bad input, _lowxBound is equal to _highxBound.  Setting xboudns to false.");
 					xBounds = false;
 				}
 				else
 				{
-					_DEBUG_ERROR("Unspecified error.  Setting xBounds to false.");
+					throw("Unspecified error.  Setting xBounds to false.");
 					xBounds = false;
 				}
 				return xBounds;
@@ -1031,12 +1031,12 @@ namespace zlib
 				}
 				else if(_lowyBound == _highyBound)
 				{
-					_DEBUG_ERROR("Bad input, _lowyBound is equal to _highyBound.  Setting yboudns to false.");
+					throw("Bad input, _lowyBound is equal to _highyBound.  Setting yboudns to false.");
 					yBounds = false;
 				}
 				else
 				{
-					_DEBUG_ERROR("Unspecified error.  Setting yBounds to false.");
+					throw("Unspecified error.  Setting yBounds to false.");
 					yBounds = false;
 				}
 				return yBounds;
@@ -1097,7 +1097,7 @@ namespace zlib
 					}
 					return ret;
 				}
-				else _DEBUG_ERROR("Bounds not set!");
+				else throw("Bounds not set!");
 			}
 
 			bool line::isCoordWithinBounds(coord2 _pos)
@@ -1131,7 +1131,7 @@ namespace zlib
 			{
 				if(hasIntercept(_line) == false)
 				{
-					_DEBUG_ERROR("No intercept!");
+					throw("No intercept!");
 					return coord2(0, 0);
 				}
 				else

@@ -50,7 +50,5 @@ namespace zlib
 
 		double toDegrees(double radians);
 		double toRadians(double degrees);
-
-		var::longTime getFormattedTime(time_t rawTime = time(0));	//Returns 'rawTime' divided into seconds/minutes/hours.../years/etc.  If no argument is given, the current time is used
 	}
 }

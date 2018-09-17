@@ -10,7 +10,6 @@
 #include<time.h>
 #include<fstream>
 #include<algorithm>
-#include<windows.h>
 #include<vector>
 #include<new>
 
@@ -150,16 +149,32 @@ namespace zlib
 
 		string toLowercase(string & inp, bool changeArg = true)		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
+#ifdef __linux__
+			auto loop = [](string & value)
+			{
+				for(unsigned i = 0; i < value.length(); i++)
+				{
+					value[i] = tolower(value[i]);
+				}
+			};
+#endif
 			string ret;
 			if(changeArg)
 			{
+#ifndef __linux__
 				transform(inp.begin(), inp.end(), inp.begin(), tolower);
-				ret = inp;
+#else
+				loop(inp);
+#endif
+				return inp;
 			}
 			else
 			{
-				ret = inp;
-				transform(ret.begin(), ret.end(), ret.begin(), tolower);
+#ifndef __linux__
+				transform(inp.begin(), inp.end(), ret.begin(), tolower);
+#else
+				loop(ret);
+#endif
 			}
 			return ret;
 		}
@@ -183,15 +198,34 @@ namespace zlib
 
 		string toUppercase(string & inp, bool changeArg = true)		//Coverts 'inp' to uppercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
+#ifdef __linux__
+				auto loop = [](string & value)
+			{
+				for(unsigned i = 0; i < value.length(); i++)
+				{
+					value[i] = toupper(value[i]);
+				}
+			};
+#endif
 			string ret;
 			if(changeArg)
 			{
+#ifndef __linux__
 				transform(inp.begin(), inp.end(), inp.begin(), toupper);
-				ret = inp;
+#else
+				loop(inp);
+#endif
+				return inp;
 			}
 			else
 			{
+#ifndef __linux__
 				transform(inp.begin(), inp.end(), ret.begin(), toupper);
+#else
+				ret = inp;
+				loop(ret);
+
+#endif
 			}
 			return ret;
 		}
@@ -305,13 +339,6 @@ namespace zlib
 		double toRadians(double degrees)
 		{
 			return degrees * math::pi / 180;
-		}
-
-		var::longTime getFormattedTime(time_t rawTime)
-		{
-			var::longTime _time;
-			localtime_s(&_time, &rawTime);
-			return _time;
 		}
 	}
 }

@@ -247,6 +247,7 @@ namespace zlib
 			//Todo: rewrite this so that we use our own variables so we can define them differently (AKA reasonably)
 			longTime() {}
 			longTime(tm * t);
+			longTime(time_t t);
 
 			static longTime now();
 
@@ -381,7 +382,7 @@ namespace zlib
 		template<class T>
 		struct linkedList
 		{
-			static enum
+			enum
 			{
 				badIndex,
 				badPointer,
@@ -571,29 +572,31 @@ namespace zlib
 			T & operator[](unsigned index);	//Just a wrapper for access, no different than the parent class, but it had to be explicitly defined to prevent bugs (linkedLIst::access() would end up being called instead of arrList::access(), etc.)
 		};
 
+		//All the 'this->' references for items inherited from likedList are there because the compiler can't find them normally when compiled with g++ (see https://stackoverflow.com/questions/7076169/not-declared-in-this-scope-error-with-templates-and-inheritance)
+
 		template<class T>
 		arrList<T>::arrList()
 		{
-			size = 0;
-			first = NULL;
-			last = NULL;
+			this->size = 0;
+			this->first = NULL;
+			this->last = NULL;
 		}
 
 		template<class T>
 		void arrList<T>::push(T value)
 		{
-			if (size == 0)
+			if (this->size == 0)
 			{	//If no other elements exist
 
 				//Allocate the first element
-				first = new link<T>(value, NULL, NULL);
+				this->first = new link<T>(value, NULL, NULL);
 				
 				//Set the last to the first
-				last = first;
+				this->last = this->first;
 				
 				//Add a pointer to the new link to the vector, and set the size tracker
-				links.push_back(first);
-				size = 1;
+				links.push_back(this->first);
+				this->size = 1;
 
 				return;
 			}
@@ -601,16 +604,16 @@ namespace zlib
 			{	//If at least one element exists
 
 				//Create the new link
-				last->next = new link<T>(value, last, NULL);
+				this->last->next = new link<T>(value, this->last, NULL);
 				
 				//Update the 'last element' pointer
-				last = last->next;
+				this->last = this->last->next;
 
 				//Add the link to the tracking vector
-				links.push_back(last);
+				links.push_back(this->last);
 
 				//Incriment the size tracker of the list
-				size++;
+				this->size++;
 
 				return;
 			}
@@ -620,28 +623,28 @@ namespace zlib
 		template<class T>
 		void arrList<T>::insert(T value, unsigned index)
 		{
-			if(index > size) throw badIndex;
+			if(index > this->size) throw this->badIndex;
 
-			if(size == 0)
+			if(this->size == 0)
 			{	//If we're adding to and empty list
-				first = new link<T>(value, NULL, NULL);
-				last = first;
-				size = 1;
-				links.push_back(first);
+				this->first = new link<T>(value, NULL, NULL);
+				this->last = this->first;
+				this->size = 1;
+				links.push_back(this->first);
 				return;
 			}
 			if (index == 0)
 			{	//If we're adding an element at the beginning
 				
 				//Allocate space for the new element, and set the appropriate trackers
-				first = new link<T>(value, NULL, first);
+				this->first = new link<T>(value, NULL, this->first);
 
 				//Looks ugly AF, but backlinks the second link to the new first link
-				first->next->previous = first;
+				this->first->next->previous = this->first;
 				
 				//Add the pointer to the tracker and incriment the size tracker
-				links.insert(links.begin() + index, first);
-				size++;
+				links.insert(links.begin() + index, this->first);
+				this->size++;
 				return;
 			}
 			else
@@ -669,18 +672,18 @@ namespace zlib
 				//If no element exists after this one, then this is the last element (duh). The 'last' pointer needs to be updated as such.
 				else
 				{
-					last = previous->next;
+					this->last = previous->next;
 				}
 
 				links.insert(links.begin() + index, previous->next);
-				size++;
+				this->size++;
 			}
 		}
 
 		template<class T>
 		void arrList<T>::erase(unsigned index)
 		{
-			if(index >= size) throw badIndex;
+			if(index >= this->size) throw this->badIndex;
 
 			//Get the element we're deleting
 			link<T> * target = links[index];
@@ -694,12 +697,12 @@ namespace zlib
 			//If the element before the target isn't null, link it to the element after the target
 			if(_prev != NULL) _prev->next = _next;
 			//If the element before the target is null, then the target must be the 'first' pointer.  As such, we must set the 'first' pointer to the element after the target
-			else first = _next;
+			else this->first = _next;
 
 			//If the element after the target isn't null, link it to the element before the target (link backwards)
 			if(_next != NULL) _next->previous = _prev;
 			//If the element after the target is null, then the target must be the 'last' pointer.  As such, we must set the 'last' pointer to the element before the target
-			else last = _prev;
+			else this->last = _prev;
 
 			//Remove the target from memory
 			delete target;
@@ -708,13 +711,13 @@ namespace zlib
 			links.erase(links.begin() + index);
 
 			//Deincriment the size tracker
-			size--;
+			this->size--;
 		}
 
 		template<class T>
 		T & arrList<T>::access(unsigned index)
 		{
-			if(index >= size) throw badIndex;
+			if(index >= this->size) throw this->badIndex;
 			return links[index]->data;
 		}
 
