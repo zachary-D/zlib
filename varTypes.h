@@ -238,6 +238,23 @@ namespace zlib
 			ci::Color toCinderColor();		//Returns the color in Cinder's format, without opacity
 			ci::ColorA toCinderColorA();	//Returns the color in Cinder's format, with opacity
 #endif
+
+			color_RGB operator*(double v)
+			{
+				return color_RGB(R * v, G * v, B * v, A * v);
+			}
+
+			static color_RGB RED() {
+				return color_RGB(1, 0, 0);
+			}
+
+			static color_RGB GREEN() {
+				return color_RGB(0, 1, 0);
+			}
+			
+			static color_RGB BLUE() {
+				return color_RGB(0, 0, 1);
+			}
 		};
 
 		//typedef struct tm longTime;		//A time represented as second/minute/hour/day/month/year, from time.h
