@@ -303,7 +303,7 @@ namespace zlib
 			assert(!(number > sizeBelow()));
 			if(number > sizeBelow())
 			{
-				_DEBUG_ERROR("Returned NULL!");
+				throw("Returned NULL!");
 				return NULL;
 			}
 			else return &childrenBelow[number];
@@ -376,7 +376,7 @@ namespace zlib
 			assert(!(number > sizeAbove()));
 			if(number > sizeAbove())
 			{
-				_DEBUG_ERROR("Returned NULL!");
+				throw("Returned NULL!");
 				return NULL;
 			}
 			else return &childrenAbove[number];

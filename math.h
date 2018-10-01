@@ -2,7 +2,9 @@
 
 //Written by and copyright Zachary Damato
 //math.h is part of the zlib submodule
-
+#ifdef __linux__
+#include <math.h>	//Hopefully won't conflict with the name of this file, required for atan() on linux
+#endif
 #include <vector>
 
 namespace zlib

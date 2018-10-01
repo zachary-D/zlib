@@ -1,0 +1,59 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Polaris1/Linux/G++ programs
+*.prog
+
+# VS files that break things
+*.sdf
+*.log
+*.tlog
+*.idb
+*.pdb
+*.res
+*.ilk
+*.suo
+*.opensdf
+*.db
+*.opendb
+**/vc2013/Debug/
+**/vc2013/Release/
+**/.vs/**
+*.ipch
+
+# VS 2017 files
+/*/Debug
+/*/*/Debug
+/*/Release
+
+# Command-line files
+*~
+*.o
+*.out
+*.h.gch
