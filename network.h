@@ -44,10 +44,18 @@ namespace zlib
 			addressError,
 			socketCreationError,
 			connectionError,
+			bindError,
 			sendError,
 			receiveError,
 			closed,
 			shutdownError,
+			badType,			//The socket type specified to the constructor was invalid
+		};
+
+		enum t_sockType
+		{
+			client,
+			server,
 		};
 
 		class zSocket
@@ -58,8 +66,10 @@ namespace zlib
 			unsigned buffer_size = 512;
 
 			sockError state;
-
 			int errorDetails;
+
+			t_sockType sockType;
+			
 
 		public:
 
@@ -68,8 +78,13 @@ namespace zlib
 				error(closed);
 			}
 
-			zSocket(std::string address, unsigned port)
+		private:
+			zSocket(std::string address, unsigned port, t_sockType type)
 			{
+				if(type != client && type != server) throw badType;
+
+				sockType = type;
+
 				initWinSock();
 
 				//Swap "localhost" for the actual loopback IP we want to connect to that
@@ -83,13 +98,26 @@ namespace zlib
 
 				ZeroMemory(&hints, sizeof(hints));
 
-				hints.ai_family = AF_UNSPEC;		//Internet address family = unspecified ("What?")
+				if(type == client)
+				{
+					hints.ai_family = AF_UNSPEC;
+				}
+				else if(type == server)
+				{
+					hints.ai_family = AF_INET;
+					hints.ai_flags = AI_PASSIVE;
+				}
+
 				hints.ai_socktype = SOCK_STREAM;	//Socket type = stream
 				hints.ai_protocol = IPPROTO_TCP;	//Protocol = TCP
 
-													//Get server address and port
+				//Get server address and port
 				{
-					int fnResult = getaddrinfo(address.c_str(), conv::toString(port).c_str(), &hints, &result);
+					int fnResult;
+
+					if(type == client) fnResult = getaddrinfo(address.c_str(), conv::toString(port).c_str(), &hints, &result);
+					else if(type == server) fnResult = getaddrinfo(NULL, conv::toString(port).c_str(), &hints, &result);
+					else throw badType;
 
 					if(fnResult != 0)
 					{
@@ -116,6 +144,7 @@ namespace zlib
 
 
 				//Connect to a server
+				if(type == client)
 				{
 					int err = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 
@@ -136,7 +165,33 @@ namespace zlib
 					}
 
 				}
+				else if(type == server)
+				{
+					int err = bind(ConnectSocket, result->ai_addr, (int)result->ai_addrlen);
+
+					if(err == SOCKET_ERROR)
+					{
+						error(bindError);
+						freeaddrinfo(result);
+						closesocket(ConnectSocket);
+						WSACleanup();
+						return;
+					}
+
+					freeaddrinfo(result);
+				}
 				isUsable = true;
+			}
+
+		public:
+			static zSocket createClient(string address, unsigned remotePort)
+			{
+				return zSocket(address, remotePort, client);
+			}
+
+			static zSocket createServer(unsigned localPort)
+			{
+				return zSocket(NULL, localPort, server);
 			}
 
 		private:
