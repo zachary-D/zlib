@@ -24,11 +24,17 @@ namespace zlib
 		//Initialize WsaData & check for errors
 		void initWinSock()
 		{
-			int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-			if(initResult != 0)
+			static bool isInitialized;
+			
+			if(isInitialized != true)
 			{
-				throw "Unable to initialize WinSock2";
+				int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+				if(initResult != 0)
+				{
+					throw "Unable to initialize WinSock2";
+				}
+				isInitialized = true;
 			}
 		}
 
@@ -44,7 +50,7 @@ namespace zlib
 			shutdownError,
 		};
 
-		struct zSocket
+		class zSocket
 		{
 		private:
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called
@@ -64,8 +70,10 @@ namespace zlib
 
 			zSocket(std::string address, unsigned port)
 			{
+				initWinSock();
+
 				//Swap "localhost" for the actual loopback IP we want to connect to that
-				//Add auto-lowercase support here later
+				//Add auto-lowercase conversion here later (so LOCALHOST and LocalHost work, etc.)
 				if(address == "localhost") address = "127.0.0.1";
 
 				//Create 3 addrinfo structs, just rolled into one 'line'
