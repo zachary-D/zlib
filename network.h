@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef _WIN32
+
 #include <iostream>
 
 #include <WinSock2.h>
@@ -226,3 +228,4 @@ namespace zlib
 		}
 	}
 }
+#endif
