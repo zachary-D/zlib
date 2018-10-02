@@ -26,37 +26,46 @@ namespace zlib
 
 			if(initResult != 0)
 			{
-				std::cout << "An error was encountered!  Code: " << initResult << std::endl;
-				std::cin.get();	//pause
-				exit(1);
+				throw "Unable to initialize WinSock2";
 			}
 		}
 
-		struct socket_out
+		enum sockError
+		{
+			open,
+			addressError,
+			socketCreationError,
+			connectionError,
+			sendError,
+			receiveError,
+			closed,
+			shutdownError,
+		};
+
+		struct zSocket
 		{
 		private:
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called
+			
+			unsigned buffer_size = 512;
 
-			enum sockError
-			{
-				open,
-				addressError,
-				socketCreationError,
-				connectionError,
-				sendError,
-				closed,
-				shutdownError,
-			} state;
+			sockError state;
+
+			int errorDetails;
 
 		public:
 
-			socket_out()
+			zSocket()
 			{
 				error(closed);
 			}
 
-			socket_out(std::string address, unsigned port)
+			zSocket(std::string address, unsigned port)
 			{
+				//Swap "localhost" for the actual loopback IP we want to connect to that
+				//Add auto-lowercase support here later
+				if(address == "localhost") address = "127.0.0.1";
+
 				//Create 3 addrinfo structs, just rolled into one 'line'
 				struct addrinfo * result = NULL,
 					*ptr = NULL,
@@ -129,14 +138,36 @@ namespace zlib
 
 			void error(sockError errorState, int details)
 			{
-
+				state = errorState;
+				isUsable = false;
+				errorDetails = details;
 			}
 
 		public:
 
+			bool usable()
+			{
+				return isUsable;
+			}
+
+			std::pair<sockError, int> getDetails()
+			{
+				return {state, errorDetails};
+			}
+
+			//Sets the size of the send/receive buffers.  Must be > 0, if not no action will be taken
+			void setBufferSize(unsigned length)
+			{
+				if(length <= 0) return;
+				buffer_size = length;
+			}
+
+			//Send data through the socket
 			void transmit(std::string data)
 			{
-				int err = send(ConnectSocket, data.c_str(), (int)strlen(data.c_str()), 0);
+				const char * dat = data.c_str();
+
+				int err = send(ConnectSocket, dat, (int)strlen(dat), 0);
 
 				if(err == SOCKET_ERROR)
 				{
@@ -145,6 +176,19 @@ namespace zlib
 					WSACleanup();
 					return;
 				}
+			}
+
+			//Receive data through the socket
+			string receive()
+			{
+				char * buffer = new char[buffer_length];
+
+				int err = recv(ConnectSocket, buffer, buffer_length, 0);
+
+				if(err == 0) close();
+				else error(receiveError, WSAGetLastError());
+
+				return string(buffer);
 			}
 
 			void close()
@@ -157,20 +201,17 @@ namespace zlib
 					error(shutdownError);
 					closesocket(ConnectSocket);
 					WSACleanup();
-					std::cin.get();	//pause
-					exit(1);
 				}
+
+				closesocket(ConnectSocket);
+				WSACleanup();
+				error(closed);
 			}
 
-			~socket_out()
+			~zSocket()
 			{
 				close();
 			}
-		};
-
-		struct socket_in
-		{
-
 		};
 
 
