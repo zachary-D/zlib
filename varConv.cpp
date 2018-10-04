@@ -51,6 +51,15 @@ namespace zlib
 			return strOut;
 		}
 
+		string toString(unsigned inp)
+		{
+			convert.clear();
+			convert << inp;
+			convert >> strOut;
+			convert.clear();
+			return strOut;
+		}
+
 		string toString(float inp)
 		{
 			convert.clear();
