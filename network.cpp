@@ -1,5 +1,7 @@
 #ifdef _WIN32
 
+#include <string>
+
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -165,9 +167,7 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
-			const char * dat = data.c_str();
-
-			int err = send(ConnectSocket, dat, (int)strlen(dat), 0);
+			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
 
 			if(err == SOCKET_ERROR)
 			{
@@ -243,7 +243,8 @@ namespace zlib
 
 		void socketServer::transmit(string data)
 		{
-			int errSend = send(ClientSocket, data.c_str(), data.length(), 0);
+			int errSend = send(ClientSocket, data.c_str(), data.length() + 1, 0);
+
 			if(errSend == SOCKET_ERROR)
 			{
 				error(sendError, WSAGetLastError());
