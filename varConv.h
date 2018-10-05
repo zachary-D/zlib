@@ -17,6 +17,7 @@ namespace zlib
 	namespace conv
 	{
 		string toString(int inp);
+		string toString(unsigned inp);
 		string toString(float inp);
 		string toString(double inp);
 		string toString(time_t inp);
