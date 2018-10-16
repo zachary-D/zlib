@@ -15,8 +15,8 @@ using std::string;
 using std::vector;
 
 #ifdef ZLIB_USING_CINDER
-#include "cinder\Color.h"
-#include "cinder\app\App.h"
+#include "cinder/Color.h"
+#include "cinder/app/App.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
 #include "cinder/Font.h"

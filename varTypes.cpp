@@ -11,8 +11,8 @@
 using namespace std;
 
 #ifdef ZLIB_USING_CINDER
-#include "cinder\Color.h"
-#include "cinder\app\App.h"
+#include "cinder/Color.h"
+#include "cinder/app/bigAddApp.h"
 #endif
 
 #ifdef USING_DEBUG
