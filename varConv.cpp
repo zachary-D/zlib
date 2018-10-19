@@ -88,7 +88,7 @@ namespace zlib
 			return strOut;
 		}
 
-		string toString(size_t inp)
+		/*string toString(size_t inp)
 		{
 			convert.clear();
 			convert << inp;
@@ -96,7 +96,7 @@ namespace zlib
 			convert >> strOut;
 			convert.clear();
 			return strOut;
-		}
+		}*/
 
 		string toString(var::coord2 inp, bool multiLine = true)
 		{
