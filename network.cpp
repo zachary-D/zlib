@@ -187,7 +187,8 @@ namespace zlib
 			if(err == 0) close();
 			else error(receiveError, WSAGetLastError());
 
-			return string(buffer);
+			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
+			return string(buffer).substr(0, err);
 		}
 
 		void socketBase::close()
@@ -275,7 +276,8 @@ namespace zlib
 				return "";
 			}
 
-			return string(recvbuf);
+			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
+			return string(recvbuf).substr(0, err);
 		}
 
 		void socketServer::close()
