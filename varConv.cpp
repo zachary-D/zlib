@@ -43,53 +43,6 @@ namespace zlib
 {
 	namespace conv
 	{
-		string toString(int inp)
-		{
-			convert.clear();
-			convert << inp;
-			convert >> strOut;
-			convert.clear();
-			return strOut;
-		}
-
-		string toString(float inp)
-		{
-			convert.clear();
-			convert << inp;
-			convert >> strOut;
-			convert.clear();
-			return strOut;
-		}
-
-		string toString(double inp)
-		{
-			convert.clear();
-			convert << inp;
-			convert >> strOut;
-			convert.clear();
-			return strOut;
-		}
-
-		string toString(time_t inp)
-		{
-			convert.clear();
-			convert << inp;
-			strOut = "";
-			convert >> strOut;
-			convert.clear();
-			return strOut;
-		}
-
-		string toString(size_t inp)
-		{
-			convert.clear();
-			convert << inp;
-			strOut = "";
-			convert >> strOut;
-			convert.clear();
-			return strOut;
-		}
-
 		string toString(var::coord2 inp, bool multiLine)
 		{
 			if(multiLine == false)
