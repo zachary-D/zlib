@@ -388,7 +388,7 @@ namespace zlib
 			//@ Requires: 'clock' is a valid timer
 			//@ Ensures:  'beginning' is equal to the duration of 'clock' at the time begin() is called
 			//@ Ensures:  The internal clock ('this->clock') is a copy of 'clock', and 'clockSet' is true
-			void begin(zlib::timer clock);
+			void begin(zlib::timer & clock);
 
 			//>>Sets the end point in time as the current time of the INTERNAL CLOCK.  Requires that the timePeriod was created using the timePeriod(zlib::timer) constructor, or an execption will be thrown
 			//@ Modifies: 'ending'

@@ -860,12 +860,7 @@ namespace zlib
 
 		timePeriod::timePeriod(zlib::timer & clock)
 		{
-			//Store the current time as the beginning of the clock first-thing, as it's ovb. time dependent
-			beginning = clock.getTime();
-
-			//Store a copy of the clock internally
-			this->clock = clock;
-			clockSet = true;
+			begin(clock);
 		}
 
 		timePeriod::timePeriod(double beginning, double ending)
@@ -905,14 +900,14 @@ namespace zlib
 
 		void timePeriod::begin()
 		{
-			beginning = clock.getTime();
+			beginning = clock.getRaw();
 		}
 
 
-		void timePeriod::begin(zlib::timer clock)
+		void timePeriod::begin(zlib::timer & clock)
 		{
 			//Store the current time as the beginning of the clock first-thing, as it's ovb. time dependent
-			beginning = clock.getTime();
+			beginning = clock.getRaw();
 
 			//Set our internal clock to the clock we're given
 			this->clock = clock;
@@ -921,7 +916,7 @@ namespace zlib
 
 		void timePeriod::end()
 		{
-			ending = clock.getTime();
+			ending = clock.getRaw();
 		}
 
 		string timePeriod::encode()
