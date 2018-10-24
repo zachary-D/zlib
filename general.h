@@ -19,5 +19,6 @@ namespace zlib
 
 	public:
 		double getTime();	//Returns the time in seconds since the creation of the timer
+		long long int getRaw();	//Returns the time in ns
 	};
 }

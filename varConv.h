@@ -5,6 +5,7 @@
 
 #include<string>
 #include<time.h>
+#include<sstream>
 
 using namespace std;
 
@@ -16,17 +17,30 @@ namespace zlib
 {
 	namespace conv
 	{
-		string toString(int inp);
-		string toString(unsigned inp);
-		string toString(float inp);
-		string toString(double inp);
-		string toString(time_t inp);
-		string toString(size_t inp);
+		enum class convertError
+		{
+			convertFailed,
+		};
+
+		template<class T>
+		string toString(T inp)
+		{
+			stringstream convert;
+			string out;
+			
+			convert.clear();
+			convert << inp;
+
+			convert >> out;
+			if(convert.fail()) throw convertError::convertFailed;
+			return out;
+		}
+
 		string toString(var::coord2 inp, bool multiLine = true);
 		string toString(var::color_RGB inp, bool multiLine = true);
 		string toString(bool inp);
 		string toString(var::longTime time);	//Leaves off values if they are 0, starting from years down to the smallest value that is not 0.  (At minimum, 0 seconds will be returned)
-
+		
 		string toLowercase(string & inp, bool changeArg = true);	//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		char toLowercase(char & inp, bool changeArg = false);		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 

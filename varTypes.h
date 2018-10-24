@@ -10,13 +10,18 @@
 
 #include <string>
 #include <vector>
+#ifdef __linux__
+#include <math.h>	//Needed for pow() on linux
+#endif
 
 using std::string;
 using std::vector;
 
+#include "general.h"
+
 #ifdef ZLIB_USING_CINDER
-#include "cinder\Color.h"
-#include "cinder\app\App.h"
+#include "cinder/Color.h"
+#include "cinder/app/App.h"
 #include "cinder/Text.h"
 #include "cinder/app/App.h"
 #include "cinder/Font.h"
@@ -315,6 +320,98 @@ namespace zlib
 			bool operator<=(shortTime & other);
 			bool operator>(shortTime & other);
 			bool operator>=(shortTime & other);
+		};
+
+		//A pair of points in time.  The maximum time that can be stored in the beginning or the end is 9223372036854775807ns ( or 292 years)
+		struct timePeriod
+		{
+			//Overview: Stores a duration of time as a beginning and endpoint in time
+
+			enum class timePeriodError
+			{
+				//If the encoded string used to construct the timePeriod is formatted correctly
+				malformedString,
+			};
+
+			//>>Creates a empty timePeriod instance with no defined time points (both are -1)
+			//@ Modifies: 'beginning', 'ending', 'clockSet'
+			//@ Requires: nothing
+			//@ Ensures:  'begining' and 'end' both are '-1'
+			//@ Ensures:  'clockSet' = 'false'
+			timePeriod();
+
+			//>>Creates a timePeriod that begins at the current time relative to 'clock', with no defind endpoint.  A copy of 'clock' is stored internally, which is used to set the endpoint when end() is called
+			//@ Modifies: 'begining', 'ending', 'clock', 'clockSet'
+			//@ Requires: nothing
+			//@ Ensures:  'beginning' is the duration of 'clock' at the time the constructor is called
+			//@ Ensures:  'ending' = '-1'
+			//@ Ensuers:  'this->clock' = 'clock'
+			//@ Ensures:  'clockSet' = 'true'
+			timePeriod(zlib::timer & clock);
+
+			//>>Creates a timePeriod that begins at 'beginning' and ends at 'ending', when they are both indicated in SECONDS
+			//@ Modifies: 'beginning', 'ending', 'clockSet'
+			//@ Requires: nothing
+			//@ Ensures:  'this->beginning' and 'this->ending' are set to the values in the constructor
+			//@ Ensures:  'clockSet = 'false'
+			timePeriod(double beginning, double ending = -1);
+
+			//>>Decodes a timePeriod from an string, must be in proper encoded format or else an exception will be thrown (unless noExcept is true, in which case -1, -1 will be set for the values)
+			//@ Modifies: 'beginning', 'end', 'clockSet'
+			//@ Requires: 'encodedForm' is a properly formatted string representing timePeriod
+			//@ Ensures:  if 'encodedForm' is properly formatted, the beginning and ending points will be extracted and stored in 'beginning' and 'ending', respectively
+			//@ Ensures:  if 'encodedForm' is malformed and 'noExcept' is false, a 'timePeriodError::malformedString' exception is thrown
+			//@ Ensures:  if 'encodedForm' is malformed and 'noExcept' is true, 'beginning' and 'end' are both set to -1
+			//@ Exceptions: timePeriodError::malformedString - thrown if 'encodedForm' is improperly formatted and 'noExcept' is false
+			timePeriod(string encodedForm, bool noExcept = false);
+
+			//Returns a instantiation of 'timePeriod' with the internal clock already set (to the time this function is called)
+			static timePeriod internalClock();
+
+		private:
+			//A copy of the clock used in the timePeriod(zlib::timer &) constructor.  Used to set the endpoint when end() is called
+			timer clock;
+			bool clockSet;	//If the clock was ever set
+
+			//The beginning of the period of time (in ns)
+			long long int beginning;
+			//The ending of the period of time (in ns)
+			long long int ending;
+
+		public:
+
+			//>>Set the beginning point in time as the current duation of 'clock'
+			//@ Modifies: 'beginning'
+			//@ Requires: 'clock' has been set
+			//@ Ensures:  'beginning' is set to the duration of 'clock' at the time begin() is called
+			void begin();
+
+			//>>Set the beginning point in time as the current duration of 'clock'
+			//@ Modifies: 'clock', 'beginning', 'clockSet'
+			//@ Requires: 'clock' is a valid timer
+			//@ Ensures:  'beginning' is equal to the duration of 'clock' at the time begin() is called
+			//@ Ensures:  The internal clock ('this->clock') is a copy of 'clock', and 'clockSet' is true
+			void begin(zlib::timer & clock);
+
+			//>>Sets the end point in time as the current time of the INTERNAL CLOCK.  Requires that the timePeriod was created using the timePeriod(zlib::timer) constructor, or an execption will be thrown
+			//@ Modifies: 'ending'
+			//@ Requires: 'clock' is defined
+			//@ Ensures:  'ending' is set to the duration of 'clock' at the time end() is called
+			void end();
+
+			//NOTE: I've removed this method as it wouldn't make sense to set a different timer to end the timePeriod, as the same timer would already be stored internally after begin(timer) was called.
+			//Sets the end point in time as the current time of 'clock'
+			//void end(zlib::timer clock);
+
+			//Returns the beginning of the time period (in seconds)
+			double getBeginning() { return (double) beginning / pow(10, 9); }
+			//Returns the end of the time period (in seconds)
+			double getEnding() { return (double) ending / pow(10, 9); }
+
+			//>> Encodes the timePeriod into a string format (can be used as a constructor value to convert back into a timePeriod)
+			//Requires: none
+			//Ensures:  Returns a properly-formatted string represnetation of this timePeriod
+			string encode();
 		};
 
 		enum day {
