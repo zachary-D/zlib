@@ -20,4 +20,9 @@ namespace zlib
 		//The result is divided by 10^9 to convert from ns to s
 		return (std::chrono::high_resolution_clock::now() - begin).count() / std::pow(10, 9);
 	}
+
+	long long int timer::getRaw()
+	{
+		return (std::chrono::high_resolution_clock::now() - begin).count();
+	}
 }
