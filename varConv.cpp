@@ -29,6 +29,7 @@ using namespace std;
 
 #include "math.h"
 #include "varTypes.h"
+#include "varConv.h"
 
 using namespace zlib;
 
@@ -89,7 +90,7 @@ namespace zlib
 			return strOut;
 		}
 
-		string toString(var::coord2 inp, bool multiLine = true)
+		string toString(var::coord2 inp, bool multiLine)
 		{
 			if(multiLine == false)
 			{
@@ -101,7 +102,7 @@ namespace zlib
 			}
 		}
 
-		string toString(var::color_RGB inp, bool multiLine = true)
+		string toString(var::color_RGB inp, bool multiLine)
 		{
 			if(multiLine == false)
 			{
@@ -147,7 +148,7 @@ namespace zlib
 		}
 
 
-		string toLowercase(string & inp, bool changeArg = true)		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
+		string toLowercase(string & inp, bool changeArg)		//Coverts 'inp' to lowercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
 #ifdef __linux__
 			auto loop = [](string & value)
@@ -196,7 +197,7 @@ namespace zlib
 		}
 
 
-		string toUppercase(string & inp, bool changeArg = true)		//Coverts 'inp' to uppercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
+		string toUppercase(string & inp, bool changeArg)		//Coverts 'inp' to uppercase.  USES POINTERS TO CHANGE ARGUMENT VALUES WHEN 'changeArg' IS TRUE
 		{
 #ifdef __linux__
 				auto loop = [](string & value)
