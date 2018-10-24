@@ -319,7 +319,7 @@ namespace zlib
 			bool operator>=(shortTime & other);
 		};
 
-		//A pair of points in time
+		//A pair of points in time.  The maximum time that can be stored in the beginning or the end is 9223372036854775807ns ( or 292 years)
 		struct timePeriod
 		{
 			//Overview: Stores a duration of time as a beginning and endpoint in time
@@ -328,8 +328,6 @@ namespace zlib
 			{
 				//If the encoded string used to construct the timePeriod is formatted correctly
 				malformedString,
-				//If the encoded string is formatted properly but has invalid data (end occurs before begin, begin or end is less than 0 but NOT -1 {which would be fine bc -1 is the 'not set' value})
-				invalidStringData
 			};
 
 			//>>Creates a empty timePeriod instance with no defined time points (both are -1)
@@ -348,7 +346,7 @@ namespace zlib
 			//@ Ensures:  'clockSet' = 'true'
 			timePeriod(zlib::timer & clock);
 
-			//>>Creates a timePeriod that begins at 'beginning' and ends at 'ending'
+			//>>Creates a timePeriod that begins at 'beginning' and ends at 'ending', when they are both indicated in SECONDS
 			//@ Modifies: 'beginning', 'ending', 'clockSet'
 			//@ Requires: nothing
 			//@ Ensures:  'this->beginning' and 'this->ending' are set to the values in the constructor
@@ -369,10 +367,10 @@ namespace zlib
 			timer clock;
 			bool clockSet;	//If the clock was ever set
 
-			//The beginning of the period of time
-			double beginning;
-			//The ending of the period of time
-			double ending;
+			//The beginning of the period of time (in ns)
+			long long int beginning;
+			//The ending of the period of time (in ns)
+			long long int ending;
 
 		public:
 
@@ -399,10 +397,15 @@ namespace zlib
 			//Sets the end point in time as the current time of 'clock'
 			//void end(zlib::timer clock);
 
-			//Returns the beginning of the time period
-			double getBeginning() { return beginning; }
-			//Returns the end of the time period
-			double getEnding() { return ending; }
+			//Returns the beginning of the time period (in seconds)
+			double getBeginning() { return (double) beginning / pow(10, 9); }
+			//Returns the end of the time period (in seconds)
+			double getEnding() { return (double) ending / pow(10, 9); }
+
+			//>> Encodes the timePeriod into a string format (can be used as a constructor value to convert back into a timePeriod)
+			//Requires: none
+			//Ensures:  Returns a properly-formatted string represnetation of this timePeriod
+			string encode();
 		};
 
 		enum day {

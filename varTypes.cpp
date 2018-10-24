@@ -870,14 +870,15 @@ namespace zlib
 
 		timePeriod::timePeriod(double beginning, double ending)
 		{
-			this->beginning = beginning;
-			this->ending = ending;
+			//The * pow(10, 9) is to convert from s to ns
+			this->beginning = beginning * pow(10, 9);
+			this->ending = ending * pow(10, 9);
 			clockSet = false;
 		}
 
 		timePeriod::timePeriod(string encodedForm, bool noExcept)
 		{
-			//Proper format is: "b<beginning>e<ending>"
+			//Proper format is: "b<beginning>e<ending>", when the time values are in ns
 			clockSet = false;
 
 			//Set default conditions (For error states)
@@ -921,6 +922,11 @@ namespace zlib
 		void timePeriod::end()
 		{
 			ending = clock.getTime();
+		}
+
+		string timePeriod::encode()
+		{
+			return "b" + conv::toString(beginning) + "e" + conv::toString(ending);
 		}
 
 		namespace geom	//As in geometry
