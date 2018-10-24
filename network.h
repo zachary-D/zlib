@@ -1,12 +1,15 @@
 #pragma once
 
 #ifdef _WIN32
-
 //#include <iostream>
-
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 //#include <stdlib.h>
+#elif __linux__
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#endif
 
 #include "zlib/varConv.h"
 
@@ -14,8 +17,10 @@ namespace zlib
 {
 	namespace network
 	{
+#ifdef __WIN32
 		//Initialize WsaData & check for errors
 		void initWinSock();
+#endif
 
 		enum sockError
 		{
@@ -117,4 +122,3 @@ namespace zlib
 		};
 	}
 }
-#endif
