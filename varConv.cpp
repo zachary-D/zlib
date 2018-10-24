@@ -287,6 +287,7 @@ namespace zlib
 			convert.clear();
 			convert << inp;
 			convert >> doubleOut;
+			if(convert.fail()) throw convertError::convertFailed;
 			convert.clear();
 			return doubleOut;
 		}
@@ -296,6 +297,7 @@ namespace zlib
 			convert.clear();
 			convert << inp;
 			convert >> doubleOut;
+			if(convert.fail()) throw convertError::convertFailed;
 			convert.clear();
 			return doubleOut;
 		}

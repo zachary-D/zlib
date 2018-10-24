@@ -851,6 +851,78 @@ namespace zlib
 			return seconds >= other.getTotalSeconds();
 		}
 
+		timePeriod::timePeriod()
+		{
+			beginning = -1;
+			ending = -1;
+			clockSet = false;
+		}
+
+		timePeriod::timePeriod(zlib::timer & clock)
+		{
+			//Store the current time as the beginning of the clock first-thing, as it's ovb. time dependent
+			beginning = clock.getTime();
+
+			//Store a copy of the clock internally
+			this->clock = clock;
+			clockSet = true;
+		}
+
+		timePeriod::timePeriod(double beginning, double ending)
+		{
+			this->beginning = beginning;
+			this->ending = ending;
+			clockSet = false;
+		}
+
+		timePeriod::timePeriod(string encodedForm, bool noExcept)
+		{
+			//Proper format is: "b<beginning>e<ending>"
+			clockSet = false;
+
+			//Set default conditions (For error states)
+			beginning = -1;
+			ending = -1;
+
+			try
+			{
+				string bgn = encodedForm.substr(1, encodedForm.find('e') - 1);
+				string end = encodedForm.substr(1 + encodedForm.find('e'));
+				beginning = conv::toNum(bgn);
+				ending = conv::toNum(end);
+			}
+			catch(std::out_of_range e)
+			{
+				if(!noExcept) throw timePeriodError::malformedString;
+			}
+			catch(conv::convertError e)
+			{
+				if(!noExcept)throw timePeriodError::malformedString;
+			}
+			
+		}
+
+		void timePeriod::begin()
+		{
+			beginning = clock.getTime();
+		}
+
+
+		void timePeriod::begin(zlib::timer clock)
+		{
+			//Store the current time as the beginning of the clock first-thing, as it's ovb. time dependent
+			beginning = clock.getTime();
+
+			//Set our internal clock to the clock we're given
+			this->clock = clock;
+			clockSet = true;
+		}
+
+		void timePeriod::end()
+		{
+			ending = clock.getTime();
+		}
+
 		namespace geom	//As in geometry
 		{
 			line::line(coord2 _slope, coord2 _displacement)

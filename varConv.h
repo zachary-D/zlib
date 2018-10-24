@@ -16,6 +16,11 @@ namespace zlib
 {
 	namespace conv
 	{
+		enum class convertError
+		{
+			convertFailed,
+		};
+
 		string toString(int inp);
 		string toString(float inp);
 		string toString(double inp);
