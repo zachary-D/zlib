@@ -11,7 +11,7 @@
 
 #endif
 
-#include "zlib/varConv.h"
+#include "varConv.h"
 
 namespace zlib
 {
