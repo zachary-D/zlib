@@ -10,6 +10,9 @@
 
 #include <string>
 #include <vector>
+#ifdef __linux__
+#include <math.h>	//Needed for pow() on linux
+#endif
 
 using std::string;
 using std::vector;
