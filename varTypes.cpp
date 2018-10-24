@@ -898,6 +898,12 @@ namespace zlib
 			
 		}
 
+		timePeriod timePeriod::internalClock()
+		{
+			zlib::timer clock;
+			return timePeriod(clock);
+		}
+
 		void timePeriod::begin()
 		{
 			beginning = clock.getRaw();

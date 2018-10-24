@@ -365,6 +365,9 @@ namespace zlib
 			//@ Exceptions: timePeriodError::malformedString - thrown if 'encodedForm' is improperly formatted and 'noExcept' is false
 			timePeriod(string encodedForm, bool noExcept = false);
 
+			//Returns a instantiation of 'timePeriod' with the internal clock already set (to the time this function is called)
+			static timePeriod internalClock();
+
 		private:
 			//A copy of the clock used in the timePeriod(zlib::timer &) constructor.  Used to set the endpoint when end() is called
 			timer clock;
