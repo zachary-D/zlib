@@ -1,21 +1,27 @@
 #pragma once
 
 #ifdef _WIN32
-
 //#include <iostream>
-
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 //#include <stdlib.h>
+#elif __linux__
+#include <sys/socket.h>
+#include <netinet/in.h>
+#else
+#error "Platform not supported!"
+#endif
 
-#include "zlib/varConv.h"
+#include "varConv.h"
 
 namespace zlib
 {
 	namespace network
 	{
+#ifdef __WIN32
 		//Initialize WsaData & check for errors
 		void initWinSock();
+#endif
 
 		enum sockError
 		{
@@ -52,7 +58,11 @@ namespace zlib
 			int errorDetails;
 
 		protected:
+#ifdef _WIN32
 			SOCKET ConnectSocket = INVALID_SOCKET;
+#elif __linux__
+			int ConnectSocket;
+#endif
 
 		public:
 			socketBase();
@@ -60,7 +70,14 @@ namespace zlib
 			virtual ~socketBase() = 0;
 
 		protected:
-			void initializeSocket(string address, unsigned port, t_sockType type);
+			void initializeSocket(
+				string address,
+				unsigned port,
+				t_sockType type
+#ifdef __linux__
+				, int clientLocalPort = -1 //The port the client should connect from (linux, client side only).  If -1, it will default to a random port 25000->30,000
+#endif
+			);
 
 		protected:
 			void error(sockError errorState);
@@ -86,13 +103,17 @@ namespace zlib
 			//Receive data through the socket
 			string receive();
 
-			void close();
+			void closeSocket();
 		};
 
 		class socketServer : public socketBase
 		{
 			//Todo: merge ConnectScoket with ClientSocket, or make it so ClientSocket is scalable, and is potentially its own object?
+#ifdef _WIN32
 			SOCKET ClientSocket;
+#elif __linux__
+			int ClientSocket;
+#endif
 
 		public:
 			socketServer();
@@ -101,9 +122,9 @@ namespace zlib
 			void transmit(string data);
 			
 			string receive();
-			void close();
+			void closeSocket();
 
-			~socketServer() override  { close(); }
+			~socketServer() override  { closeSocket(); }
 		};
 
 		class socketClient : public socketBase
@@ -111,10 +132,14 @@ namespace zlib
 
 		public:
 			socketClient();
-			socketClient(string remoteAddress, unsigned remotePort);
 
-			~socketClient() override { close(); }
+			socketClient(string remoteAddress, unsigned remotePort
+#ifdef __linux__
+			, int localPort = -1	//The port the client should connect from (linux, client side only).  If -1, it will default to a random port 25000->30,000
+#endif
+			);
+
+			~socketClient() override { closeSocket(); }
 		};
 	}
 }
-#endif
