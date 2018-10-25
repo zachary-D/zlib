@@ -131,6 +131,8 @@ namespace zlib
 		{
 
 		public:
+			socketClient();
+
 			socketClient(string remoteAddress, unsigned remotePort
 #ifdef __linux__
 			, int localPort = -1	//The port the client should connect from (linux, client side only).  If -1, it will default to a random port 25000->30,000
