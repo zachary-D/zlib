@@ -437,9 +437,9 @@ namespace zlib
 #endif
 		)
 		{
-			initializeSocket(remoteAddress, remotePort, client,
+			initializeSocket(remoteAddress, remotePort, client
 #ifdef __linux__
-			localPort
+			, localPort
 #endif
 			);
 		}
