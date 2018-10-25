@@ -56,7 +56,7 @@ namespace zlib
 
 		socketBase::~socketBase() 
 		{
-			close();
+			closeSocket();
 		}
 
 		void socketBase::initializeSocket(
@@ -269,7 +269,7 @@ namespace zlib
 
 			int err = recv(ConnectSocket, buffer, buffer_length, 0);
 
-			if(err == 0) close();
+			if(err == 0) closeSocket();
 			else
 #ifdef _WIN32 
 				error(receiveError, WSAGetLastError());
@@ -281,7 +281,7 @@ namespace zlib
 			return string(buffer).substr(0, err);
 		}
 
-		void socketBase::close()
+		void socketBase::closeSocket()
 		{
 			if(!usable()) return;
 			int err = shutdown(ConnectSocket, 
@@ -375,7 +375,7 @@ namespace zlib
 			{
 #ifdef _WIN32
 				int errCode = WSAGetLastError();
-				close();
+				closeSocket();
 				error(terminated, errCode);	//Override the 'closed' error set in close()
 #elif __linux__
 				error(terminate);
@@ -398,7 +398,7 @@ namespace zlib
 			return string(recvbuf).substr(0, err);
 		}
 
-		void socketServer::close()
+		void socketServer::closeSocket()
 		{
 			if(!usable()) return;
 

@@ -103,7 +103,7 @@ namespace zlib
 			//Receive data through the socket
 			string receive();
 
-			void close();
+			void closeSocket();
 		};
 
 		class socketServer : public socketBase
@@ -122,9 +122,9 @@ namespace zlib
 			void transmit(string data);
 			
 			string receive();
-			void close();
+			void closeSocket();
 
-			~socketServer() override  { close(); }
+			~socketServer() override  { closeSocket(); }
 		};
 
 		class socketClient : public socketBase
@@ -137,7 +137,7 @@ namespace zlib
 #endif
 			);
 
-			~socketClient() override { close(); }
+			~socketClient() override { closeSocket(); }
 		};
 	}
 }
