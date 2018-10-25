@@ -1,7 +1,6 @@
-#ifdef _WIN32
-
 #include <string>
 
+#ifdef _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -10,12 +9,22 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
+#elif __linux__
+#include<stdlib.h>
+#include<time.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#else
+#error "Platform not supported!"
+#endif
+
 #include "network.h"
 
 namespace zlib
 {
 	namespace network
 	{
+#ifdef _WIN32
 		WSADATA wsaData;
 
 		void initWinSock()
@@ -33,6 +42,7 @@ namespace zlib
 				isInitialized = true;
 			}
 		}
+#endif
 		
 		socketBase::socketBase()
 		{
@@ -44,16 +54,32 @@ namespace zlib
 			close();
 		}
 
-		void socketBase::initializeSocket(std::string address, unsigned port, t_sockType type)
+		void socketBase::initializeSocket(
+			std::string address,
+			unsigned port,
+			t_sockType type
+#ifdef __linux__
+			, int clientLocalPort	//The port the client should connect from (linux, client side only).  If -1, it will default to a random port 25000->30,000
+#endif
+		)
 		{
 			if(type != client && type != server) throw badType;
 
+#ifdef _WIN32
 			initWinSock();
+#elif __linux__
+			//If this is -1, we need to assign it a random port (within 25000 and 30000)
+			if(clientLocalPort == -1)
+			{
+				srand(time(NULL));
+				clientLocalPort = rand() % 5000 + 25001;
+			}
+#endif
 
 			//Swap "localhost" for the actual loopback IP we want to connect to that
-			//Add auto-lowercase conversion here later (so LOCALHOST and LocalHost work, etc.)
-			if(address == "localhost") address = "127.0.0.1";
+			if(toLowercase(address, false) == "localhost") address = "127.0.0.1";
 
+#ifdef _WIN32
 			//Create 3 addrinfo structs, just rolled into one 'line'
 			struct addrinfo * result = NULL,
 				*ptr = NULL,
@@ -74,7 +100,7 @@ namespace zlib
 			hints.ai_socktype = SOCK_STREAM;	//Socket type = stream
 			hints.ai_protocol = IPPROTO_TCP;	//Protocol = TCP
 
-												//Get server address and port
+			//Get server address and port
 			{
 				int fnResult;
 
@@ -104,11 +130,37 @@ namespace zlib
 					return;
 				}
 			}
+#elif __linux__
+			//Create the socket
+			{
+				ConnectSocket = socket(PF_INET, SOCK_STREAM, 0);
 
+				if(ConnectSocket < 0) error(socketCreationError);
+			}
+
+			//Get server address and port
+			{
+				struct hostent * target;
+
+				target = gethostbyname(address.c_str());
+
+				if(target == NULL) error(addressError);
+
+
+
+				struct sockaddr_in serv_addr;
+
+				bzero((char*)& serv_addr, sizeof(serv_addr));
+				serv_addr.sin_family = AF_INET;
+				bcopy(target->h_addr, (char*)& serv_addr.sin_addr.s_addr, target->h_length);
+				serv_addr.sin_port = htons(port);
+			}
+#endif
 
 			//Connect to a server
 			if(type == client)
 			{
+#ifdef _WIN32
 				int err = connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 
 				if(err == SOCKET_ERROR)
@@ -126,10 +178,16 @@ namespace zlib
 					WSACleanup();
 					return;
 				}
-
+#elif __linux__
+				if(connect(connectSocket, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0)
+				{
+					error(connectionError);
+				}
+#endif
 			}
 			else if(type == server)
 			{
+#ifdef _WIN32
 				int err = bind(ConnectSocket, result->ai_addr, (int)result->ai_addrlen);
 
 				if(err == SOCKET_ERROR)
@@ -142,6 +200,18 @@ namespace zlib
 				}
 
 				freeaddrinfo(result);
+
+#elif __linux__
+				ConnectSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+				struct sockaddr_in servaddr;
+
+				servaddr.sin_family = AF_INET;
+				servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+				servaddr.sin_port = htons(port);
+
+				bind(ConnectSocket, (struct sockaddr *) & servaddr, sizeof(servaddr));
+#endif
 			}
 			isUsable = true;
 		}
@@ -150,6 +220,9 @@ namespace zlib
 		{
 			state = errorState;
 			isUsable = false;
+#ifdef __linux__ //On linux we only close the connection in this one way/place
+			close(ConnectSocket);
+#endif
 		}
 
 		void socketBase::error(sockError errorState, int details)
@@ -157,6 +230,9 @@ namespace zlib
 			state = errorState;
 			isUsable = false;
 			errorDetails = details;
+#ifdef __linux__ //On linux we only close the connection in this one way/place
+			close(ConnectSocket);
+#endif
 		}
 
 		void socketBase::setBufferSize(unsigned length)
@@ -167,8 +243,11 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
+			//For once, this is the same on Windows and Linux
 			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
 
+			//But of course this isn't
+#ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
 				error(sendError);
@@ -176,6 +255,9 @@ namespace zlib
 				WSACleanup();
 				return;
 			}
+#elif __linux__
+			if(err < 0) error(sendError);
+#endif
 		}
 
 		string socketBase::receive()
@@ -185,7 +267,12 @@ namespace zlib
 			int err = recv(ConnectSocket, buffer, buffer_length, 0);
 
 			if(err == 0) close();
-			else error(receiveError, WSAGetLastError());
+			else
+#ifdef _WIN32 
+				error(receiveError, WSAGetLastError());
+#elif __linux__
+				error(receiveError);
+#endif
 
 			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
 			return string(buffer).substr(0, err);
@@ -194,8 +281,15 @@ namespace zlib
 		void socketBase::close()
 		{
 			if(!usable()) return;
-			int err = shutdown(ConnectSocket, SD_SEND);
+			int err = shutdown(ConnectSocket, 
+#ifdef _WIN32
+				SD_SEND
+#elif __linux__
+				SHUT_RDWR
+#endif	
+			);
 
+#ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
 				error(shutdownError);
@@ -205,6 +299,7 @@ namespace zlib
 
 			closesocket(ConnectSocket);
 			WSACleanup();
+#endif
 			error(closed);
 		}
 
@@ -220,7 +315,8 @@ namespace zlib
 			initializeSocket("", localPort, server);
 			if(!usable()) return;
 
-			//Start listneing
+			//Start listening
+#ifdef _WIN32
 			if(listen(ConnectSocket, SOMAXCONN) == SOCKET_ERROR)
 			{
 				error(listenError, WSAGetLastError());
@@ -240,12 +336,20 @@ namespace zlib
 				WSACleanup();
 				return;
 			}
+#elif __linux__
+			listen(ConnectSocket, 0);
+
+			ClientSocket = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
+
+			if(ClientSocket < 0) error(acceptFailed);
+#endif
 		}
 
 		void socketServer::transmit(string data)
 		{
 			int errSend = send(ClientSocket, data.c_str(), data.length() + 1, 0);
 
+#ifdef _WIN32
 			if(errSend == SOCKET_ERROR)
 			{
 				error(sendError, WSAGetLastError());
@@ -253,6 +357,9 @@ namespace zlib
 				WSACleanup();
 				return;
 			}
+#elif __linux__
+			if(errSend < 0) error(sendError);
+#endif
 		}
 
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
@@ -263,16 +370,24 @@ namespace zlib
 
 			if(err == 0)
 			{
+#ifdef _WIN32
 				int errCode = WSAGetLastError();
 				close();
 				error(terminated, errCode);	//Override the 'closed' error set in close()
+#elif __linux__
+				error(terminate);
+#endif
 				return "";
 			}
 			else if(err < 0)
 			{
+#ifdef __linux__
+				error(receiveError);
+#elif _WIN32
 				error(receiveError, WSAGetLastError());
 				closesocket(ClientSocket);
 				WSACleanup();
+#endif
 				return "";
 			}
 
@@ -284,7 +399,15 @@ namespace zlib
 		{
 			if(!usable()) return;
 
-			int err = shutdown(ClientSocket, SD_SEND);
+			int err = shutdown(ClientSocket,
+#ifdef _WIN32
+				SD_SEND
+#elif __linux__
+				SHUT_RDWR
+#endif	
+			);
+
+#ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
 				error(shutdownError, WSAGetLastError());
@@ -295,7 +418,7 @@ namespace zlib
 
 			closesocket(ClientSocket);
 			WSACleanup();
-
+#endif
 			error(closed);
 		}
 
@@ -305,11 +428,16 @@ namespace zlib
 			error(notOpened);
 		}
 
-		socketClient::socketClient(string remoteAddress, unsigned remotePort)
+		socketClient::socketClient(string remoteAddress, unsigned remotePort
+#ifdef  __linux__
+		, int localPort
+#endif)
 		{
-			initializeSocket(remoteAddress, remotePort, client);
+			initializeSocket(remoteAddress, remotePort, client,
+#ifdef __linux__
+			localPort
+#endif
+			);
 		}
 	}
 }
-
-#endif
