@@ -14,11 +14,14 @@
 #include<time.h>
 #include<sys/types.h>
 #include<sys/socket.h>
+#include<netdb.h>
+#include<strings.h>
 #else
 #error "Platform not supported!"
 #endif
 
 #include "network.h"
+#include "varConv.h"
 
 namespace zlib
 {
@@ -77,7 +80,7 @@ namespace zlib
 #endif
 
 			//Swap "localhost" for the actual loopback IP we want to connect to that
-			if(toLowercase(address, false) == "localhost") address = "127.0.0.1";
+			if(conv::toLowercase(address, false) == "localhost") address = "127.0.0.1";
 
 #ifdef _WIN32
 			//Create 3 addrinfo structs, just rolled into one 'line'
