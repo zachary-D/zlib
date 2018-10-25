@@ -29,6 +29,8 @@
 
 # Polaris1/Linux/G++ programs
 *.prog
+#Used to indicate that zlib was compiled in debug mode
+debug_made.txt
 
 # VS files that break things
 *.sdf
