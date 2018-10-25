@@ -378,7 +378,7 @@ namespace zlib
 				closeSocket();
 				error(terminated, errCode);	//Override the 'closed' error set in close()
 #elif __linux__
-				error(terminate);
+				error(sockError::terminate);
 #endif
 				return "";
 			}
@@ -434,7 +434,8 @@ namespace zlib
 		socketClient::socketClient(string remoteAddress, unsigned remotePort
 #ifdef  __linux__
 		, int localPort
-#endif)
+#endif
+		)
 		{
 			initializeSocket(remoteAddress, remotePort, client,
 #ifdef __linux__
