@@ -16,6 +16,8 @@
 #include<sys/socket.h>
 #include<netdb.h>
 #include<strings.h>
+#include<unistd.h>
+#include<netinet/in.h>
 #else
 #error "Platform not supported!"
 #endif
