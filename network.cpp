@@ -378,7 +378,7 @@ namespace zlib
 				closeSocket();
 				error(terminated, errCode);	//Override the 'closed' error set in close()
 #elif __linux__
-				error(sockError::terminate);
+				error(terminated);
 #endif
 				return "";
 			}
