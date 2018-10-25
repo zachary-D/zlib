@@ -1,6 +1,6 @@
 .PHONY: clean
 
-all_files = cryptography.cpp draw.cpp fileIO.cpp general.cpp input.cpp math.cpp model.cpp varConv.h varTypes.h windInfo.h cryptography.h draw.h fileIO.h general.h input.h math.h model.h varConv.cpp varTypes.cpp windInfo.cpp zlib.h
+all_files = cryptography.cpp cryptography.h draw.cpp draw.h fileIO.cpp fileIO.h general.cpp general.h input.cpp input.h math.cpp math.h model.cpp model.h network.cpp network.h varConv.cpp varConv.h varTypes.cpp varTypes.h windInfo.cpp windInfo.h zlib.h
 
 all: $(all_files)
 	g++ -c $(all_files) -std=c++11
