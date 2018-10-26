@@ -155,7 +155,11 @@ namespace zlib
 
 				bzero((char*)& serv_addr, sizeof(serv_addr));
 				serv_addr.sin_family = AF_INET;
-				bcopy(target->h_addr, (char*)& serv_addr.sin_addr.s_addr, target->h_length);
+				bcopy(
+					(char*)target->h_addr, 
+					(char*)& serv_addr.sin_addr.s_addr, 
+					target->h_length
+				);
 				serv_addr.sin_port = htons(port);
 			}
 #endif
