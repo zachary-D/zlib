@@ -230,6 +230,7 @@ namespace zlib
 #ifdef __linux__ //On linux we only close the connection in this one way/place
 			close(ConnectSocket);
 #endif
+			if(errorState != notOpened && errorState != closed) throw errorState;
 		}
 
 		void socketBase::error(sockError errorState, int details)
@@ -240,6 +241,7 @@ namespace zlib
 #ifdef __linux__ //On linux we only close the connection in this one way/place
 			close(ConnectSocket);
 #endif
+			if(errorState != notOpened &&  errorState != closed) throw errorState;
 		}
 
 		void socketBase::setBufferSize(unsigned length)
