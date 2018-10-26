@@ -276,7 +276,7 @@ namespace zlib
 			int err = recv(ConnectSocket, buffer, buffer_length, 0);
 
 			if(err == 0) closeSocket();
-			else
+			else if(err < 0)
 #ifdef _WIN32 
 				error(receiveError, WSAGetLastError());
 #elif __linux__
