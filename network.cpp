@@ -36,7 +36,7 @@ namespace zlib
 		{
 			static bool isInitialized;
 
-			if(isInitialized != true)
+			//if(isInitialized != true)
 			{
 				int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -82,7 +82,9 @@ namespace zlib
 #endif
 
 			//Swap "localhost" for the actual loopback IP we want to connect to that
-			if(conv::toLowercase(address, false) == "localhost") address = "127.0.0.1";
+			//Add auto-lowercase for localhost back again later
+			if(address == "localhost") address = "127.0.0.1";
+			//if(conv::toLowercase(address, false) == "localhost") address = "127.0.0.1";
 
 #ifdef _WIN32
 			//Create 3 addrinfo structs, just rolled into one 'line'
