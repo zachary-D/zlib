@@ -142,26 +142,6 @@ namespace zlib
 
 				if(ConnectSocket < 0) error(socketCreationError);
 			}
-
-			struct sockaddr_in serv_addr;
-
-			//Get server address and port
-			{
-				struct hostent * target;
-
-				target = gethostbyname(address.c_str());
-
-				if(target == NULL) error(addressError);
-
-				bzero((char*)& serv_addr, sizeof(serv_addr));
-				serv_addr.sin_family = AF_INET;
-				bcopy(
-					(char*)target->h_addr, 
-					(char*)& serv_addr.sin_addr.s_addr, 
-					target->h_length
-				);
-				serv_addr.sin_port = htons(port);
-			}
 #endif
 
 			//Connect to a server
@@ -186,6 +166,26 @@ namespace zlib
 					return;
 				}
 #elif __linux__
+				struct sockaddr_in serv_addr;
+
+				//Get server address and port
+				{
+					struct hostent * target;
+
+					target = gethostbyname(address.c_str());
+
+					if(target == NULL) error(addressError);
+
+					bzero((char*)& serv_addr, sizeof(serv_addr));
+					serv_addr.sin_family = AF_INET;
+					bcopy(
+						target->h_addr,
+						(char*)& serv_addr.sin_addr.s_addr,
+						target->h_length
+					);
+					serv_addr.sin_port = htons(port);
+				}
+
 				if(connect(ConnectSocket, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0)
 				{
 					error(connectionError);
