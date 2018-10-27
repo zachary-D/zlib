@@ -52,7 +52,7 @@ namespace zlib
 		{
 		private:
 			unsigned buffer_length = 512;
-		protected:
+		public:
 			char * recvbuf = new char[buffer_length];
 		private:
 
