@@ -275,7 +275,18 @@ namespace zlib
 			{
 				for (unsigned i = 0; i <= getBufferSize(); i++)
 				{
-					if (recvbuf[i] == '\000') return string(recvbuf).substr(0, i - 1);
+					if (recvbuf[i] == '\000')
+					{
+						string outbound = string(recvbuf).substr(0, i - 1);
+
+						for (unsigned i = 0; i < getBufferSize(); i++)
+						{
+							if (recvbuf[i] == '\000') break;
+							recvbuf[i] = '\000';
+						}
+
+						return outbound;
+					}
 				}
 			}
 			
@@ -288,9 +299,17 @@ namespace zlib
 #elif __linux__
 				error(receiveError);
 #endif
-
 			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
-			return string(recvbuf).substr(0, err);
+			string outbound = string(recvbuf).substr(0, err);
+			
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				if (recvbuf[i] == '\000') break;
+				recvbuf[i] = '\000';
+			}
+
+			
+			return outbound;
 		}
 
 		void socketBase::closeSocket()
@@ -384,7 +403,15 @@ namespace zlib
 			{
 				for (unsigned i = 0; i <= getBufferSize(); i++)
 				{
-					if (recvbuf[i] == '\000') return string(recvbuf).substr(0, i - 1);
+					string outbound = string(recvbuf).substr(0, i - 1);
+
+					for (unsigned i = 0; i < getBufferSize(); i++)
+					{
+						if (recvbuf[i] == '\000') break;
+						recvbuf[i] = '\000';
+					}
+
+					return outbound;
 				}
 			}
 
@@ -413,8 +440,16 @@ namespace zlib
 				return "";
 			}
 
+			string outbound = string(recvbuf).substr(0, err);
+
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				if (recvbuf[i] == '\000') break;
+				recvbuf[i] = '\000';
+			}
+
 			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
-			return string(recvbuf).substr(0, err);
+			return outbound;
 		}
 
 		void socketServer::closeSocket()
