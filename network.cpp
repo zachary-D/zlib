@@ -302,12 +302,15 @@ namespace zlib
 			pBuff();
 
 			if(err == 0) closeSocket();
-			else if(err < 0)
+			else if (err < 0)
+			{
 #ifdef _WIN32 
 				error(receiveError, WSAGetLastError());
 #elif __linux__
 				error(receiveError);
 #endif
+				throw receiveError;
+			}
 			string msg = "";
 			for (unsigned i = 0; i < getBufferSize(); i++)
 			{
@@ -467,7 +470,7 @@ namespace zlib
 				closesocket(ClientSocket);
 				WSACleanup();
 #endif
-				return "";
+				throw receiveError;
 			}
 
 			string msg = "";
