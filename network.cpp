@@ -268,6 +268,7 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
+			cout << "outbound:" << data << endl;
 			//For once, this is the same on Windows and Linux
 			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
 
@@ -403,6 +404,7 @@ namespace zlib
 
 		void socketServer::transmit(string data)
 		{
+			cout << "outbound:" << data << endl;
 			int errSend = send(ClientSocket, data.c_str(), data.length() + 1, 0);
 
 #ifdef _WIN32
