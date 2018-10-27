@@ -61,7 +61,7 @@ namespace zlib
 		}
 
 		void socketBase::pBuff()
-		{
+		{/*
 			for (unsigned i = 0; i < getBufferSize(); i++)
 			{
 				std::cout << '<' << i << '>';
@@ -72,7 +72,7 @@ namespace zlib
 			for (unsigned i = 0; i < vBuff.size(); i++)
 			{
 				cout << i << '>' << vBuff[i] << endl;
-			}
+			}*/
 		}
 
 		void socketBase::initializeSocket(
