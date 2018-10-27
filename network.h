@@ -108,6 +108,10 @@ namespace zlib
 			//Receive data through the socket
 			string receive();
 
+		protected:
+			void clearCharBuffer();
+		public:
+
 			void closeSocket();
 		};
 

@@ -325,6 +325,8 @@ namespace zlib
 
 			}
 
+			clearCharBuffer();
+
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
@@ -333,6 +335,14 @@ namespace zlib
 			}
 			else throw "No data received?";
 
+		}
+
+		void socketBase::clearCharBuffer()
+		{
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				recvbuf[i] = '\000';
+			}
 		}
 
 		void socketBase::closeSocket()
@@ -476,6 +486,8 @@ namespace zlib
 				else msg += recvbuf[i];
 
 			}
+
+			clearCharBuffer();
 
 			if (vBuff.size() != 0)
 			{
