@@ -271,6 +271,14 @@ namespace zlib
 
 		string socketBase::receive()
 		{
+			if (recvbuf[0] != NULL)
+			{
+				for (unsigned i = 0; i < getBufferSize(); i++)
+				{
+					if (recvbuf[i] == NULL) return string(recvbuf).substr(0, i - 1);
+				}
+			}
+			
 			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
 
 			if(err == 0) closeSocket();
