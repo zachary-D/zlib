@@ -54,7 +54,6 @@ namespace zlib
 			unsigned buffer_length = 512;
 		public:
 			char * recvbuf = new char[buffer_length];
-			void pBuff();
 		private:
 
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called

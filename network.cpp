@@ -1,5 +1,4 @@
 #include <string>
-#include <iostream>
 
 #ifdef _WIN32
 #include <WinSock2.h>
@@ -58,15 +57,6 @@ namespace zlib
 		socketBase::~socketBase() 
 		{
 			closeSocket();
-		}
-
-		void socketBase::pBuff()
-		{
-			for (unsigned i = 0; i < getBufferSize(); i++)
-			{
-				std::cout << recvbuf[i];
-			}
-			std::cout << endl;
 		}
 
 		void socketBase::initializeSocket(
@@ -281,8 +271,6 @@ namespace zlib
 
 		string socketBase::receive()
 		{
-			cout << "preBuff:";
-			pBuff();
 			if (recvbuf[0] != '\000')
 			{
 				for (unsigned i = 0; i <= getBufferSize(); i++)
@@ -303,9 +291,6 @@ namespace zlib
 			}
 			
 			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
-
-			cout << "postBuff:";
-			pBuff();
 
 			if(err == 0) closeSocket();
 			else if(err < 0)
@@ -414,8 +399,6 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{
-			cout << "preBuf:";
-			pBuff();
 			if (recvbuf[0] != '\000')
 			{
 				for (unsigned i = 0; i <= getBufferSize(); i++)
@@ -433,9 +416,6 @@ namespace zlib
 			}
 
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
-
-			cout << "postBuff:";
-			pBuff();
 
 			if(err == 0)
 			{
