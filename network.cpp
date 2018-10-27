@@ -133,7 +133,7 @@ namespace zlib
 
 				if(fnResult != 0)
 				{
-					error(addressError);
+					error(addressError, false);
 					WSACleanup();
 					throw addressError;
 				}
@@ -147,7 +147,7 @@ namespace zlib
 
 				if(ConnectSocket == INVALID_SOCKET)
 				{
-					error(socketCreationError);
+					error(socketCreationError, false);
 					freeaddrinfo(result);
 					WSACleanup();
 					throw socketCreationError;
@@ -178,7 +178,7 @@ namespace zlib
 
 				if(ConnectSocket == INVALID_SOCKET)
 				{
-					error(connectionError);
+					error(connectionError, false);
 					closesocket(ConnectSocket);
 					WSACleanup();
 					throw connectionError;
