@@ -52,6 +52,9 @@ namespace zlib
 		{
 		private:
 			unsigned buffer_length = 512;
+		protected:
+			char * recvbuf = new char[buffer_length];
+		private:
 
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called
 			sockError state;

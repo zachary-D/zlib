@@ -271,9 +271,7 @@ namespace zlib
 
 		string socketBase::receive()
 		{
-			char * buffer = new char[getBufferSize()];
-
-			int err = recv(ConnectSocket, buffer, buffer_length, 0);
+			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
 
 			if(err == 0) closeSocket();
 			else if(err < 0)
@@ -284,7 +282,7 @@ namespace zlib
 #endif
 
 			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
-			return string(buffer).substr(0, err);
+			return string(recvbuf).substr(0, err);
 		}
 
 		void socketBase::closeSocket()
@@ -374,7 +372,6 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{
-			char * recvbuf = new char[getBufferSize()];
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
 
 			if(err == 0)
