@@ -85,9 +85,9 @@ namespace zlib
 			);
 
 		protected:
-			void error(sockError errorState);
+			void error(sockError errorState, bool noExcept = false);
 
-			void error(sockError errorState, int details);
+			void error(sockError errorState, int details, bool noExcept = false);
 
 		public:
 

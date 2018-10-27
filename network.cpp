@@ -135,7 +135,7 @@ namespace zlib
 				{
 					error(addressError);
 					WSACleanup();
-					return;
+					throw addressError;
 				}
 			}
 
@@ -150,7 +150,7 @@ namespace zlib
 					error(socketCreationError);
 					freeaddrinfo(result);
 					WSACleanup();
-					return;
+					throw socketCreationError;
 				}
 			}
 #elif __linux__
@@ -181,7 +181,7 @@ namespace zlib
 					error(connectionError);
 					closesocket(ConnectSocket);
 					WSACleanup();
-					return;
+					throw connectionError;
 				}
 #elif __linux__
 				struct sockaddr_in serv_addr;
@@ -207,6 +207,7 @@ namespace zlib
 				if(connect(ConnectSocket, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0)
 				{
 					error(connectionError);
+					throw connectionError;
 				}
 #endif
 			}
@@ -221,7 +222,7 @@ namespace zlib
 					freeaddrinfo(result);
 					closesocket(ConnectSocket);
 					WSACleanup();
-					return;
+					throw bindError;
 				}
 
 				freeaddrinfo(result);
@@ -241,16 +242,17 @@ namespace zlib
 			isUsable = true;
 		}
 
-		void socketBase::error(sockError errorState)
+		void socketBase::error(sockError errorState, bool noExcept)
 		{
 			state = errorState;
 			isUsable = false;
-#ifdef __linux__ //On linux we only close the connection in this one way/place
+#ifdef __linux__ //On linux we only close the connect	ion in this one way/place
 			close(ConnectSocket);
 #endif
+			if (!noExcept && errorState != closed && errorState != notOpened && errorState != open) throw errorState;
 		}
 
-		void socketBase::error(sockError errorState, int details)
+		void socketBase::error(sockError errorState, int details, bool noExcept)
 		{
 			state = errorState;
 			isUsable = false;
@@ -258,6 +260,7 @@ namespace zlib
 #ifdef __linux__ //On linux we only close the connection in this one way/place
 			close(ConnectSocket);
 #endif
+			if (!noExcept && errorState != closed && errorState != notOpened && errorState != open) throw errorState;
 		}
 
 		void socketBase::setBufferSize(unsigned length)
