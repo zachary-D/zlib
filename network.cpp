@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 #ifdef _WIN32
 #include <WinSock2.h>
@@ -57,6 +58,21 @@ namespace zlib
 		socketBase::~socketBase() 
 		{
 			closeSocket();
+		}
+
+		void socketBase::pBuff()
+		{
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				std::cout << '<' << i << '>';
+				if (recvbuf[i] == '\000') cout << "\\000";
+				else cout << recvbuf[i];
+			}
+			std::cout << endl;
+			for (unsigned i = 0; i < vBuff.size(); i++)
+			{
+				cout << i << '>' << vBuff[i] << endl;
+			}
 		}
 
 		void socketBase::initializeSocket(
@@ -271,6 +287,8 @@ namespace zlib
 
 		string socketBase::receive()
 		{
+			cout << "preBuff:";
+			pBuff();
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
@@ -278,6 +296,9 @@ namespace zlib
 				return ret;
 			}
 			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
+
+			cout << "postBuff:";
+			pBuff();
 
 			if(err == 0) closeSocket();
 			else if(err < 0)
@@ -400,23 +421,19 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{
-			if (recvbuf[0] != '\000')
+			cout << "preBuff:";
+			pBuff();
+			if (vBuff.size() != 0)
 			{
-				for (unsigned i = 0; i <= getBufferSize(); i++)
-				{
-					string outbound = string(recvbuf).substr(0, i - 1);
-
-					for (unsigned i = 0; i < getBufferSize(); i++)
-					{
-						if (recvbuf[i] == '\000') break;
-						recvbuf[i] = '\000';
-					}
-
-					return outbound;
-				}
+				string ret = vBuff[0];
+				vBuff.erase(vBuff.begin());
+				return ret;
 			}
 
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
+
+			cout << "postBuff:";
+			pBuff();
 
 			if(err == 0)
 			{
@@ -441,16 +458,30 @@ namespace zlib
 				return "";
 			}
 
-			string outbound = string(recvbuf).substr(0, err);
-
+			string msg = "";
 			for (unsigned i = 0; i < getBufferSize(); i++)
 			{
-				if (recvbuf[i] == '\000') break;
-				recvbuf[i] = '\000';
+				//If we hit a terminator push the message to the string-buffer
+				if (recvbuf[i] == '\000')
+				{
+					if (msg != "")//As long as it's not empty
+					{
+						vBuff.push_back(msg);
+						msg = "";
+					}
+				}
+				//Otherwise if it's any other character add it to the current message we're extracting
+				else msg += recvbuf[i];
+
 			}
 
-			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
-			return outbound;
+			if (vBuff.size() != 0)
+			{
+				string ret = vBuff[0];
+				vBuff.erase(vBuff.begin());
+				return ret;
+			}
+			else throw "No data received?";
 		}
 
 		void socketServer::closeSocket()
