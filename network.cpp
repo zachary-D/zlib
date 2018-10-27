@@ -271,11 +271,11 @@ namespace zlib
 
 		string socketBase::receive()
 		{
-			if (recvbuf[0] != NULL)
+			if (recvbuf[0] != '\000')
 			{
-				for (unsigned i = 0; i < getBufferSize(); i++)
+				for (unsigned i = 0; i <= getBufferSize(); i++)
 				{
-					if (recvbuf[i] == NULL) return string(recvbuf).substr(0, i - 1);
+					if (recvbuf[i] == '\000') return string(recvbuf).substr(0, i - 1);
 				}
 			}
 			
@@ -380,6 +380,14 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{
+			if (recvbuf[0] != '\000')
+			{
+				for (unsigned i = 0; i <= getBufferSize(); i++)
+				{
+					if (recvbuf[i] == '\000') return string(recvbuf).substr(0, i - 1);
+				}
+			}
+
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
 
 			if(err == 0)
