@@ -60,21 +60,6 @@ namespace zlib
 			closeSocket();
 		}
 
-		void socketBase::pBuff()
-		{/*
-			for (unsigned i = 0; i < getBufferSize(); i++)
-			{
-				std::cout << '<' << i << '>';
-				if (recvbuf[i] == '\000') cout << "\\000";
-				else cout << recvbuf[i];
-			}
-			std::cout << endl;
-			for (unsigned i = 0; i < vBuff.size(); i++)
-			{
-				cout << i << '>' << vBuff[i] << endl;
-			}*/
-		}
-
 		void socketBase::initializeSocket(
 			std::string address,
 			unsigned port,
@@ -291,18 +276,14 @@ namespace zlib
 
 		string socketBase::receive()
 		{
-			cout << "preBuff:";
-			pBuff();
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
+				cout << "Inbound:" << ret << endl;
 				return ret;
 			}
 			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
-
-			cout << "postBuff:";
-			pBuff();
 
 			if(err == 0) closeSocket();
 			else if (err < 0)
@@ -337,6 +318,7 @@ namespace zlib
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
+				cout << "Inbound:" << ret << endl;
 				return ret;
 			}
 			else throw "No data received?";
@@ -439,19 +421,15 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{
-			cout << "preBuff:";
-			pBuff();
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
+				cout << "inbound:" << ret << endl;
 				return ret;
 			}
 
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
-
-			cout << "postBuff:";
-			pBuff();
 
 			if(err == 0)
 			{
@@ -499,6 +477,7 @@ namespace zlib
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
+				cout << "Inbound:" << ret << endl;
 				return ret;
 			}
 			else throw "No data received?";

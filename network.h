@@ -55,7 +55,6 @@ namespace zlib
 		public:
 			char * recvbuf = new char[buffer_length];
 			vector<string> vBuff;
-			void pBuff();
 		private:
 
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called
