@@ -203,7 +203,7 @@ namespace zlib
 
 				if(err == SOCKET_ERROR)
 				{
-					error(bindError);
+					error(bindError, true);
 					freeaddrinfo(result);
 					closesocket(ConnectSocket);
 					WSACleanup();
@@ -264,10 +264,10 @@ namespace zlib
 #ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
-				error(sendError);
+				error(sendError, true);
 				closesocket(ConnectSocket);
 				WSACleanup();
-				return;
+				throw sendError;
 			}
 #elif __linux__
 			if(err < 0) error(sendError);
@@ -293,7 +293,6 @@ namespace zlib
 #elif __linux__
 				error(receiveError);
 #endif
-				throw receiveError;
 			}
 			string msg = "";
 			for (unsigned i = 0; i < getBufferSize(); i++)
@@ -347,9 +346,10 @@ namespace zlib
 #ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
-				error(shutdownError);
+				error(shutdownError, true);
 				closesocket(ConnectSocket);
 				WSACleanup();
+				throw shutdownError;
 			}
 
 			closesocket(ConnectSocket);
@@ -371,6 +371,8 @@ namespace zlib
 			case socketCreationError:
 				return "socketCreationError";
 			case connectionError:
+				return "connectionError";
+			case bindError:
 				return "bindError";
 			case listenError:
 				return "listenError";
@@ -409,7 +411,7 @@ namespace zlib
 #ifdef _WIN32
 			if(listen(ConnectSocket, SOMAXCONN) == SOCKET_ERROR)
 			{
-				error(listenError, WSAGetLastError());
+				error(listenError, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
 				WSACleanup();
 				return;
@@ -421,10 +423,10 @@ namespace zlib
 			if(ClientSocket == INVALID_SOCKET)
 			{
 
-				error(acceptFailed, WSAGetLastError());
+				error(acceptFailed, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
 				WSACleanup();
-				return;
+				throw acceptFailed;
 			}
 #elif __linux__
 			listen(ConnectSocket, 0);
@@ -455,7 +457,7 @@ namespace zlib
 
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
-		{
+		{	
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
@@ -465,6 +467,13 @@ namespace zlib
 			}
 
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
+
+			cout << "Buffdump:";
+			for(unsigned i = 0; i < getBufferSize(); i++)
+			{
+				cout << recvbuf[i];
+			}
+			cout << endl;
 
 			if(err == 0)
 			{
