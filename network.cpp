@@ -321,7 +321,7 @@ namespace zlib
 				cout << "Inbound:" << ret << endl;
 				return ret;
 			}
-			else throw "No data received?";
+			else return ""; 
 
 		}
 
@@ -480,7 +480,7 @@ namespace zlib
 				cout << "Inbound:" << ret << endl;
 				return ret;
 			}
-			else throw "No data received?";
+			else return "";
 		}
 
 		void socketServer::closeSocket()
