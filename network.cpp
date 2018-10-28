@@ -358,6 +358,41 @@ namespace zlib
 			error(closed);
 		}
 
+		string socketBase::getErrorName(sockError e)
+		{
+			switch(e)
+			{
+			case notOpened:
+				return "notOpened";
+			case open:
+				return "open";
+			case addressError:
+				return "addressError";
+			case socketCreationError:
+				return "socketCreationError";
+			case connectionError:
+				return "bindError";
+			case listenError:
+				return "listenError";
+			case acceptFailed:
+				return "acceptFailed";
+			case sendError:
+				return "sendError";
+			case receiveError:
+				return "receiveError";
+			case shutdownError:
+				return "shutdownError";
+			case badType:
+				return "badType";
+			case terminated:
+				return "terminated"; 
+			case closed:
+				return "closed";
+			default:
+				return "sockError \"" + conv::toString(e) + "\" does not have a plaintext equivalent set!";
+			}
+		}
+
 
 
 		socketServer::socketServer()

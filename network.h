@@ -112,6 +112,9 @@ namespace zlib
 		public:
 
 			void closeSocket();
+
+			//Returns the plaintext version of 'e'
+			static string getErrorName(sockError e);
 		};
 
 		class socketServer : public socketBase
