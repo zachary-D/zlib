@@ -458,6 +458,17 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{	
+			cout << "Buffdump:";
+			for(unsigned i = 0; i < getBufferSize(); i++)
+			{
+				cout << recvbuf[i];
+			}
+			cout << endl;
+			cout << "vBuff:" << endl;
+			for(unsigned i = 0; i < vBuff.size(); i++)
+			{
+				cout << "<" << i << ">" << vBuff[i] << endl;
+			}
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
@@ -468,12 +479,7 @@ namespace zlib
 
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
 
-			cout << "Buffdump:";
-			for(unsigned i = 0; i < getBufferSize(); i++)
-			{
-				cout << recvbuf[i];
-			}
-			cout << endl;
+			
 
 			if(err == 0)
 			{
