@@ -256,6 +256,41 @@ namespace zlib
 			return doubleOut;
 		}
 
+		string toHex(unsigned value)
+		{
+			//Borrowed in part from https://proprogramming.org/program-to-convert-decimal-to-hexadecimal-c/
+			long int decimalNumber, remainder, quotient;
+			int i = 1, j, temp;
+			char hexadecimalNumber[100];
+
+			quotient = value;
+
+			while(quotient != 0)
+			{
+				temp = quotient % 16;
+
+				//To convert integer into character
+				if(temp < 10)
+					temp = temp + 48;
+				else
+					temp = temp + 55;
+
+				hexadecimalNumber[i++] = temp;
+				quotient = quotient / 16;
+			}
+
+			//End of borrowed code
+
+			//Convert the hex to a string
+			string ret = "";
+			//q starts at 1 because the array of 'hex' characters starts at 1, for unknown reasons.  I assume it's just a mistake on the original coder's part?
+			for(unsigned q = 1; q < i; q++)
+			{
+				ret += char(hexadecimalNumber[q]);
+			}
+			return ret;
+		}
+
 
 		bool isBool(string inp)
 		{

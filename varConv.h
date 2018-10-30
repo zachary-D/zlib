@@ -53,6 +53,7 @@ namespace zlib
 		double toNum(string inp);
 		double toNum(char inp);
 
+		string toHex(unsigned value);
 
 		bool isBool(string inp);
 
