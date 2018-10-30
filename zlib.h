@@ -18,6 +18,7 @@
 #include "input.h"
 #include "math.h"
 #include "model.h"
+#include "network.h"
 #include "varConv.h"
 #include "varTypes.h"
 #include "windInfo.h"

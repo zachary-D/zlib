@@ -11,8 +11,8 @@
 using namespace std;
 
 #ifdef ZLIB_USING_CINDER
-#include "cinder\Color.h"
-#include "cinder\app\App.h"
+#include "cinder/Color.h"
+#include "cinder/app/bigAddApp.h"
 #endif
 
 #ifdef USING_DEBUG
@@ -849,6 +849,85 @@ namespace zlib
 		bool shortTime::operator>=(shortTime & other)
 		{
 			return seconds >= other.getTotalSeconds();
+		}
+
+		timePeriod::timePeriod()
+		{
+			beginning = -1;
+			ending = -1;
+			clockSet = false;
+		}
+
+		timePeriod::timePeriod(zlib::timer & clock)
+		{
+			begin(clock);
+		}
+
+		timePeriod::timePeriod(double beginning, double ending)
+		{
+			//The * pow(10, 9) is to convert from s to ns
+			this->beginning = beginning * pow(10, 9);
+			this->ending = ending * pow(10, 9);
+			clockSet = false;
+		}
+
+		timePeriod::timePeriod(string encodedForm, bool noExcept)
+		{
+			//Proper format is: "b<beginning>e<ending>", when the time values are in ns
+			clockSet = false;
+
+			//Set default conditions (For error states)
+			beginning = -1;
+			ending = -1;
+
+			try
+			{
+				string bgn = encodedForm.substr(1, encodedForm.find('e') - 1);
+				string end = encodedForm.substr(1 + encodedForm.find('e'));
+				beginning = conv::toNum(bgn);
+				ending = conv::toNum(end);
+			}
+			catch(std::out_of_range e)
+			{
+				if(!noExcept) throw timePeriodError::malformedString;
+			}
+			catch(conv::convertError e)
+			{
+				if(!noExcept)throw timePeriodError::malformedString;
+			}
+			
+		}
+
+		timePeriod timePeriod::internalClock()
+		{
+			zlib::timer clock;
+			return timePeriod(clock);
+		}
+
+		void timePeriod::begin()
+		{
+			beginning = clock.getRaw();
+		}
+
+
+		void timePeriod::begin(zlib::timer & clock)
+		{
+			//Store the current time as the beginning of the clock first-thing, as it's ovb. time dependent
+			beginning = clock.getRaw();
+
+			//Set our internal clock to the clock we're given
+			this->clock = clock;
+			clockSet = true;
+		}
+
+		void timePeriod::end()
+		{
+			ending = clock.getRaw();
+		}
+
+		string timePeriod::encode()
+		{
+			return "b" + conv::toString(beginning) + "e" + conv::toString(ending);
 		}
 
 		namespace geom	//As in geometry
