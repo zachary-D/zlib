@@ -280,7 +280,7 @@ namespace zlib
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
-				cout << "Inbound:" << ret << endl;
+				//cout << "Inbound:" << ret << endl;
 				return ret;
 			}
 			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
@@ -317,7 +317,7 @@ namespace zlib
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
-				cout << "Inbound:" << ret << endl;
+				//cout << "Inbound:" << ret << endl;
 				return ret;
 			}
 			else return ""; 
@@ -439,7 +439,7 @@ namespace zlib
 
 		void socketServer::transmit(string data)
 		{
-			cout << "outbound:" << data << endl;
+			//cout << "outbound:" << data << endl;
 			int errSend = send(ClientSocket, data.c_str(), data.length() + 1, 0);
 
 #ifdef _WIN32
@@ -458,6 +458,7 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{	
+			/*
 			cout << "Buffdump:";
 			for(unsigned i = 0; i < getBufferSize(); i++)
 			{
@@ -468,19 +469,17 @@ namespace zlib
 			for(unsigned i = 0; i < vBuff.size(); i++)
 			{
 				cout << "<" << i << ">" << vBuff[i] << endl;
-			}
+			}*/
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
-				cout << "inbound:" << ret << endl;
+				//cout << "inbound:" << ret << endl;
 				return ret;
 			}
 
 			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
-
 			
-
 			if(err == 0)
 			{
 #ifdef _WIN32
@@ -490,14 +489,13 @@ namespace zlib
 #elif __linux__
 				error(terminated);
 #endif
-				return "";
 			}
 			else if(err < 0)
 			{
 #ifdef __linux__
 				error(receiveError);
 #elif _WIN32
-				error(receiveError, WSAGetLastError());
+				error(receiveError, WSAGetLastError(), false);
 				closesocket(ClientSocket);
 				WSACleanup();
 #endif
@@ -527,7 +525,7 @@ namespace zlib
 			{
 				string ret = vBuff[0];
 				vBuff.erase(vBuff.begin());
-				cout << "Inbound:" << ret << endl;
+				//cout << "Inbound:" << ret << endl;
 				return ret;
 			}
 			else return "";
