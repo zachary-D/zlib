@@ -256,7 +256,7 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
-			cout << "outbound:" << data << endl;
+			//cout << "outbound:" << data << endl;
 			//For once, this is the same on Windows and Linux
 			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
 
