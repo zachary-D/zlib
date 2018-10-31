@@ -51,7 +51,7 @@ namespace zlib
 		class socketBase
 		{
 		private:
-			unsigned buffer_length = 512;
+			unsigned buffer_length = 2048;
 		public:
 			char * recvbuf = new char[buffer_length];
 			vector<string> vBuff;
