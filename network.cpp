@@ -2,6 +2,8 @@
 #include <iostream>
 
 #ifdef _WIN32
+//Behind another #if to prevent conflicts with windows.h
+#ifndef _WINDOWS_
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -9,6 +11,7 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
+#endif
 
 #elif __linux__
 #include<stdlib.h>
