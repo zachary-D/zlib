@@ -1,10 +1,11 @@
 #pragma once
 
 #ifdef _WIN32
-//#include <iostream>
+//Behind another #if to prevent conflicts with windows.h
+#ifndef _WINDOWS_
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-//#include <stdlib.h>
+#endif
 #elif __linux__
 #include <sys/socket.h>
 #include <netinet/in.h>
