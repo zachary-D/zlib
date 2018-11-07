@@ -33,25 +33,12 @@ namespace zlib
 {
 	namespace network
 	{
+
 #ifdef _WIN32
 		WSADATA wsaData;
-
-		void initWinSock()
-		{
-			static bool isInitialized;
-
-			//if(isInitialized != true)
-			{
-				int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-				if(initResult != 0)
-				{
-					throw "Unable to initialize WinSock2";
-				}
-				isInitialized = true;
-			}
-		}
 #endif
+		
+		int socketBase::numSockets = 0;
 		
 		socketBase::socketBase()
 		{
@@ -75,7 +62,15 @@ namespace zlib
 			if(type != client && type != server) throw badType;
 
 #ifdef _WIN32
-			initWinSock();
+			if(numSockets == 0)
+			{
+				int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+				if(initResult != 0)
+				{
+					throw WSAStartupFailed;
+				}
+			}
 #elif __linux__
 			//If this is -1, we need to assign it a random port (within 25000 and 30000)
 			if(clientLocalPort == -1)
@@ -234,7 +229,7 @@ namespace zlib
 		{
 			state = errorState;
 			isUsable = false;
-#ifdef __linux__ //On linux we only close the connect	ion in this one way/place
+#ifdef __linux__ //On linux we only close the connect	in in this one way/place
 			close(ConnectSocket);
 #endif
 			if (!noExcept && errorState != closed && errorState != notOpened && errorState != open) throw errorState;
@@ -259,7 +254,6 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
-			//cout << "outbound:" << data << endl;
 			//For once, this is the same on Windows and Linux
 			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
 
@@ -351,12 +345,10 @@ namespace zlib
 			{
 				error(shutdownError, true);
 				closesocket(ConnectSocket);
-				WSACleanup();
 				throw shutdownError;
 			}
 
 			closesocket(ConnectSocket);
-			WSACleanup();
 #endif
 			error(closed);
 		}

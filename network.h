@@ -19,13 +19,9 @@ namespace zlib
 {
 	namespace network
 	{
-#ifdef __WIN32
-		//Initialize WsaData & check for errors
-		void initWinSock();
-#endif
-
 		enum sockError
 		{
+			WSAStartupFailed,		//[WIN-Only] WSAStartup() failed
 			notOpened,				//The socket was never opened
 			open,					//The socket is operating normally
 			addressError,
@@ -51,6 +47,10 @@ namespace zlib
 		//Virtual class containing the base code to open and operate a socket
 		class socketBase
 		{
+		protected:
+#ifdef _WIN32
+			static int numSockets;	//The number of active sockets, used to track how many sockets are open 'globally' and to track if WinSock has been initialized, and if other sockets need it, or if we can shutdown winSock
+#endif
 		private:
 			unsigned buffer_length = 2048;
 		public:
@@ -100,11 +100,9 @@ namespace zlib
 			//Sets the size of the send/receive buffers.  Must be > 0, if not no action will be taken
 			void setBufferSize(unsigned length);
 
-			//TODO - make specific versions of this for each child-class?
 			//Send data through the socket
 			void transmit(std::string data);
 
-			//TODO - make specific versions of this for each child-class?
 			//Receive data through the socket
 			string receive();
 
@@ -120,7 +118,6 @@ namespace zlib
 
 		class socketServer : public socketBase
 		{
-			//Todo: merge ConnectScoket with ClientSocket, or make it so ClientSocket is scalable, and is potentially its own object?
 #ifdef _WIN32
 			SOCKET ClientSocket;
 #elif __linux__
@@ -136,7 +133,7 @@ namespace zlib
 			string receive();
 			void closeSocket();
 
-			~socketServer() override  { closeSocket(); }
+			~socketServer() override { closeSocket(); numSockets--; }
 		};
 
 		class socketClient : public socketBase
@@ -151,7 +148,7 @@ namespace zlib
 #endif
 			);
 
-			~socketClient() override { closeSocket(); }
+			~socketClient() override { closeSocket(); numSockets--; }
 		};
 	}
 }
