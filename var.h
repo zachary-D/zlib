@@ -1095,12 +1095,12 @@ namespace zlib
 			T & operator[](unsigned index);
 
 			//Returns the size of the array
-			int size() { return arrSize; }
+			inline int size() { return arrSize; }
 
 			//Returns a pointer to the first element in the array
-			T * begin() { return arr; }
+			inline T * begin() { return arr; }
 			//Returns a poinrer to the element that would be *IMMEDIATELY AFTER* the last element in the array
-			T * end() { return arr + size; }
+			T * end() { return arr + size(); }
 
 		};
 
