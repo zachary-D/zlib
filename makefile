@@ -15,4 +15,5 @@ debug: $(all_files)
 	echo "Zlib compiled in debug mode" > $(debug_indicator_file)
 
 clean:
+	rm $(debug_indicator_file) -rf
 	rm *.o *.gch -r -f
