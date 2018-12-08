@@ -40,7 +40,8 @@ int main(int argc, char * argv[])
 
 			if (result != "")
 			{
-				cout << "Test " << i << " failed with message: " << result << endl;
+				cout << "FAILED-" << i << ": " << result << endl;
+				numFailed++;
 			}
 		}
 		catch (var::Exception e)
@@ -58,6 +59,16 @@ int main(int argc, char * argv[])
 
 	
 	cout << "Ending tests." << endl;
+	cout << "Total tests : " << tests.size() << endl;
+	cout << "Tests failed: " << numFailed << endl;
+	cout << "Tests passed: " << (tests.size() - numFailed) << endl;
+
+	if(numFailed > 0)
+	{
+		cout << "<<TESTS FAILED!>>" << endl;
+		return 1;
+	}	
+
 	return 0;
 }
 
