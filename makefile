@@ -1,25 +1,35 @@
 .PHONY: clean
 .PHONY: removeDebugFlag
-
+.PHONY: cleanIfNoDebug
 g_flags = $(*.o) $(*.h) --std=c++11 -c
 debug_indicator_file = debug_made.txt
 
 #Compile the library
-all: removeDebugFlag zlib.h.gch
+all: cleanIfDebug zlib.h.gch
+	
+#Clean out the repo (of compile files)
+clean:
+	rm $(debug_indicator_file) -rf
+	rm *.o *.gch -r -f
 
 #Removes the debug indicator
 removeDebugFlag:
 	rm -rf $(debug_indicator_file)
 
+#Cleans out temp files if the debug indicator is present
+cleanIfDebug:
+ifeq ($(debug_indicator_file), $(wildcard $(debug_indicator_file)))
+	$(MAKE) clean
+endif
+	
+#Cleans out temp files if the debug indicaotr is missing
+cleanIfNoDebug:
+	(test -s $(debug_indicator_file)) || $(MAKE) clean
+
 #Build in debug mode
 debug: g_flags += -g
-debug: removeDebugFlag zlib.h.gch
-	echo "Zlib compiled in debug mode" > $(debug_indicator_file)
-
-#Clean out the repo (of compile files)
-clean:
-	rm $(debug_indicator_file) -rf
-	rm *.o *.gch -r -f
+debug: cleanIfNoDebug removeDebugFlag zlib.h.gch
+	echo "zlib compiled in debug mode" > $(debug_indicator_file)
 
 #Compile the tests without running them
 tests: all tests.prog
@@ -31,7 +41,7 @@ runTests: tests.prog
 tests.prog: tests.cpp zlib.h.gch
 	g++ -o tests.prog *.o *.h -std=c++11
 
-zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o varConv.o varTypes.o windInfo.o
+zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o var.o windInfo.o
 	g++ zlib.h $(g_flags)
 
 cryptography.o: cryptography.cpp cryptography.h
@@ -58,11 +68,8 @@ model.o: model.cpp model.h
 network.o: network.cpp network.h
 	g++ network.cpp network.h $(g_flags)
 
-varConv.o: varConv.cpp varConv.h
-	g++ varConv.cpp varConv.h $(g_flags)
-
-varTypes.o: varTypes.cpp varTypes.h
-	g++ varTypes.cpp varTypes.h $(g_flags)
+var.o: var.cpp var.h
+	g++ var.cpp var.h $(g_flags)
 
 windInfo.o: windInfo.cpp windInfo.h
 	g++ windInfo.cpp windInfo.h $(g_flags)
