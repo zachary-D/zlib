@@ -15,7 +15,7 @@ all: cleanIfDebug zlib.h.gch
 #Clean out the repo (of compile files)
 clean:
 	rm $(debug_indicator_file) -rf
-	rm *.o *.gch -r -f
+	rm *.o *.gch *.prog -r -f
 
 #Removes the debug indicator
 removeDebugFlag:
