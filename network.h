@@ -1,5 +1,10 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
+using std::string;
+
 #ifdef _WIN32
 //Behind another #if to prevent conflicts with windows.h
 #ifndef _WINDOWS_
@@ -12,8 +17,6 @@
 #else
 #error "Platform not supported!"
 #endif
-
-#include "varConv.h"
 
 namespace zlib
 {
@@ -55,7 +58,7 @@ namespace zlib
 			unsigned buffer_length = 2048;
 		public:
 			char * recvbuf = new char[buffer_length];
-			vector<string> vBuff;
+			std::vector<string> vBuff;
 		private:
 
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called

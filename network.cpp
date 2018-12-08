@@ -27,7 +27,7 @@
 #endif
 
 #include "network.h"
-#include "varConv.h"
+#include "var.h"
 
 namespace zlib
 {

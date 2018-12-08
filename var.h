@@ -55,7 +55,7 @@ namespace zlib
 		template<class T>
 		string toString(T inp)
 		{
-			stringstream convert;
+			std::stringstream convert;
 			string out;
 
 			convert.clear();
