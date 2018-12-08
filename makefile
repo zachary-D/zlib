@@ -1,7 +1,12 @@
 .PHONY: clean
 .PHONY: removeDebugFlag
 .PHONY: cleanIfNoDebug
-g_flags = $(*.o) $(*.h) --std=c++11 -c
+.PHONY: cleanIfDebug
+.PHONY: debug
+.PHONY: runTests
+.PHONY: gdbTests
+
+g_flags = $(*.o) --std=c++11 -c
 debug_indicator_file = debug_made.txt
 
 #Compile the library
@@ -26,20 +31,25 @@ endif
 cleanIfNoDebug:
 	(test -s $(debug_indicator_file)) || $(MAKE) clean
 
+$(debug_indicator): debug
+	echo "zlib compiled with debugging symbols" > $(debug_indicator_file)
+
 #Build in debug mode
 debug: g_flags += -g
 debug: cleanIfNoDebug removeDebugFlag zlib.h.gch
-	echo "zlib compiled in debug mode" > $(debug_indicator_file)
 
 #Compile the tests without running them
-tests: all tests.prog
+tests: tests.prog
 
 #Compile and run the tests
 runTests: tests.prog
+	./tests.prog
+
+gdbTests: tests.prog
 	gdb -ex run --args tests.prog
 
-tests.prog: tests.cpp zlib.h.gch
-	g++ -o tests.prog *.o *.h -std=c++11
+tests.prog: zlib.h.gch tests.cpp
+	g++ -o tests.prog tests.cpp *.o -std=c++11
 
 zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o var.o windInfo.o
 	g++ zlib.h $(g_flags)
