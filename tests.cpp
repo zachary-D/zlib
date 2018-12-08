@@ -18,11 +18,12 @@ vector<fn> test_var_smartArray = {
 
 		return ""; 
 	},
-
+	
+	//Makes sure that the begin() and end() pointers refer to the correct positions
 	[]{
 		var::smartArray<int> arr;
 
-		if (arr.begin() + arr.size() + 1 != arr.end()) return "smartArray.end() does not return the proper position (relative to smartArray.begin()) - arr.begin() + arr.size() + 1 should equal arr.end())";
+		if (arr.begin() + arr.size() != arr.end()) return "smartArray.end() does not return the proper position (relative to smartArray.begin()) - arr.begin() + arr.size() + 1 should equal arr.end())";
 
 		return "";
 	}
@@ -38,25 +39,22 @@ vector<vector<fn> * > tests =
 int main(int argc, char * argv[])
 {
 	cout << "Beginning tests." << endl;
-
-	vector<std::function<string()>> tests =
-	{
 	
-	};
-	
+	int numTests = 0;	
 	int numFailed = 0;
 	//Launch the tests
 	for (int testSet = 0; testSet < tests.size(); testSet++)
 	{
-		for(int i = 0; i < *(tests[testSet]).size(); i++)
+		for(int i = 0; i < tests[testSet]->size(); i++)
 		{
 			try
 			{
-				string result = *(tests[testSet]).[i]();
+				numTests++;
+				string result = tests[testSet]->operator[](i)();
 
 				if (result != "")
 				{
-					cout << "FAILED-" << i << ": " << result << endl;
+					cout << "FAILED-" << "<" << testSet << ',' << i << ">: " << result << endl;
 					numFailed++;
 				}
 			}
@@ -76,9 +74,9 @@ int main(int argc, char * argv[])
 
 
 	cout << "Ending tests." << endl;
-	cout << "Total tests : " << tests.size() << endl;
+	cout << "Total tests : " << numTests << endl;
 	cout << "Tests failed: " << numFailed << endl;
-	cout << "Tests passed: " << (tests.size() - numFailed) << endl;
+	cout << "Tests passed: " << (numTests - numFailed) << endl;
 
 	if(numFailed > 0)
 	{

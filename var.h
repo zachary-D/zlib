@@ -15,6 +15,7 @@
 #endif
 #include<time.h>
 #include<sstream>
+#include<iterator>
 #ifdef ZLIB_ENABLE_TESTS
 #include <iostream>
 #include <functional>
@@ -1071,6 +1072,27 @@ namespace zlib
 		}
 #endif
 
+		//http://www.cplusplus.com/reference/iterator/iterator/ was heavily referenced for this section
+		template<class T>
+		class smartArrayIterator : public std::iterator<std::input_iterator_tag, T>
+		{
+			T * ptr;
+
+		public:
+			smartArrayIterator(T * nPtr) : ptr(nPtr) {}
+			smartArrayIterator(const smartArrayIterator& copy) : ptr(copy.ptr) {}
+
+			smartArrayIterator & operator++() { ptr++; return *this; }
+			smartArrayIterator & operator+(int other) { ptr += other; return * this; }
+			
+			bool operator==(const smartArrayIterator & other) const { return ptr == other.ptr; }
+			bool operator!=(const smartArrayIterator & other) const { return ptr != other.ptr; }
+
+			T & operator*() { return *ptr; }
+
+
+		};
+
 		struct smArrException : Exception {};
 
 		struct smArrOutOfBoundsException : smArrException {};
@@ -1098,9 +1120,9 @@ namespace zlib
 			inline int size() { return arrSize; }
 
 			//Returns a pointer to the first element in the array
-			inline T * begin() { return arr; }
+			smartArrayIterator<T> begin() { return smartArrayIterator<T>(arr); }
 			//Returns a poinrer to the element that would be *IMMEDIATELY AFTER* the last element in the array
-			T * end() { return arr + size(); }
+			smartArrayIterator<T> end() { return smartArrayIterator<T>(arr + size()); }
 
 		};
 
