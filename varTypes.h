@@ -45,6 +45,28 @@ using namespace zlib;
 //Note: Unless otherwise specified, all angles are assumed to be in degrees
 namespace zlib
 {
+	namespace conv
+	{
+		enum class convertError
+		{
+			convertFailed,
+		};
+
+		template<class T>
+		string toString(T inp)
+		{
+			stringstream convert;
+			string out;
+
+			convert.clear();
+			convert << inp;
+
+			convert >> out;
+			if (convert.fail()) throw convertError::convertFailed;
+			return out;
+		}
+	}
+
 	namespace var
 	{
 		struct Exception
@@ -1222,25 +1244,6 @@ namespace zlib
 
 	namespace conv
 	{
-		enum class convertError
-		{
-			convertFailed,
-		};
-
-		template<class T>
-		string toString(T inp)
-		{
-			stringstream convert;
-			string out;
-
-			convert.clear();
-			convert << inp;
-
-			convert >> out;
-			if (convert.fail()) throw convertError::convertFailed;
-			return out;
-		}
-
 		string toString(var::coord2 inp, bool multiLine = true);
 		string toString(var::color_RGB inp, bool multiLine = true);
 		string toString(bool inp);

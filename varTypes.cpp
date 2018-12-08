@@ -37,7 +37,6 @@ using namespace std;
 
 #include "math.h"
 #include "varTypes.h"
-#include "varConv.h"
 
 using namespace zlib;
 
