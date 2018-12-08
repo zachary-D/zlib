@@ -13,6 +13,10 @@
 #ifdef __linux__
 #include <math.h>	//Needed for pow() on linux
 #endif
+#ifdef ZLIB_ENABLE_TESTS
+#include <iostream>
+#include <functional>
+#endif
 
 using std::string;
 using std::vector;
@@ -41,6 +45,14 @@ namespace zlib
 {
 	namespace var
 	{
+		struct Exception
+		{
+			Exception() {}
+			Exception(string details) { this->details = details; }
+
+			string details;
+		};
+
 		enum class varExceptions
 		{
 			fraction_denom0,	//The denominator is 0.  This is a math no-no (divide by 0)
@@ -203,7 +215,7 @@ namespace zlib
 			fraction operator-(fraction const & other);
 			fraction operator*(fraction const & other);
 			fraction operator/(fraction const & other);
-			
+
 			void operator+=(fraction const & other);
 			void operator-=(fraction const & other);
 			void operator*=(fraction const & other);
@@ -256,7 +268,7 @@ namespace zlib
 			static color_RGB GREEN() {
 				return color_RGB(0, 1, 0);
 			}
-			
+
 			static color_RGB BLUE() {
 				return color_RGB(0, 0, 1);
 			}
@@ -276,7 +288,7 @@ namespace zlib
 			std::string getYMD();
 			std::string getHMS();
 		};
-		
+
 		struct shortTime
 		{
 			shortTime() {}
@@ -287,7 +299,7 @@ namespace zlib
 
 		public:
 			int getTotalSeconds();
-			
+
 			int getSeconds();
 			int getMinutes();
 			int getHours();
@@ -404,9 +416,9 @@ namespace zlib
 			//void end(zlib::timer clock);
 
 			//Returns the beginning of the time period (in seconds)
-			double getBeginning() { return (double) beginning / pow(10, 9); }
+			double getBeginning() { return (double)beginning / pow(10, 9); }
 			//Returns the end of the time period (in seconds)
-			double getEnding() { return (double) ending / pow(10, 9); }
+			double getEnding() { return (double)ending / pow(10, 9); }
 
 			//>> Encodes the timePeriod into a string format (can be used as a constructor value to convert back into a timePeriod)
 			//Requires: none
@@ -505,7 +517,7 @@ namespace zlib
 			};
 
 			linkedList();
-			
+
 			link<T> * first;
 			link<T> * last;
 
@@ -532,7 +544,7 @@ namespace zlib
 		template<class T>
 		void linkedList<T>::push(T value)
 		{
-			if (size == 0)
+			if(size == 0)
 			//If no other elements exist
 			{
 				first = new link<T>(value, NULL, NULL);
@@ -649,14 +661,14 @@ namespace zlib
 		template<class T>
 		link<T> * linkedList<T>::iterateToElement(unsigned index)
 		{
-			if (index > size) throw badIndex;
+			if(index > size) throw badIndex;
 
 			link<T> * current = first;
 
 			//Iterate to reach the correct element in the list
-			for (unsigned i = 0; i < index; i++)
+			for(unsigned i = 0; i < index; i++)
 			{
-				if (current->isLast()) throw badPointer;
+				if(current->isLast()) throw badPointer;
 				current = current->next;
 			}
 
@@ -675,7 +687,7 @@ namespace zlib
 		struct arrList : linkedList<T>
 		{
 			arrList();
-			
+
 			vector<link<T>*> links;		//Pointers to each link in the list
 
 			void push(T value);						//Add 'value' to the end of the list
@@ -699,15 +711,15 @@ namespace zlib
 		template<class T>
 		void arrList<T>::push(T value)
 		{
-			if (this->size == 0)
+			if(this->size == 0)
 			{	//If no other elements exist
 
 				//Allocate the first element
 				this->first = new link<T>(value, NULL, NULL);
-				
+
 				//Set the last to the first
 				this->last = this->first;
-				
+
 				//Add a pointer to the new link to the vector, and set the size tracker
 				links.push_back(this->first);
 				this->size = 1;
@@ -719,7 +731,7 @@ namespace zlib
 
 				//Create the new link
 				this->last->next = new link<T>(value, this->last, NULL);
-				
+
 				//Update the 'last element' pointer
 				this->last = this->last->next;
 
@@ -731,7 +743,7 @@ namespace zlib
 
 				return;
 			}
-			
+
 		}
 
 		template<class T>
@@ -747,15 +759,15 @@ namespace zlib
 				links.push_back(this->first);
 				return;
 			}
-			if (index == 0)
+			if(index == 0)
 			{	//If we're adding an element at the beginning
-				
+
 				//Allocate space for the new element, and set the appropriate trackers
 				this->first = new link<T>(value, NULL, this->first);
 
 				//Looks ugly AF, but backlinks the second link to the new first link
 				this->first->next->previous = this->first;
-				
+
 				//Add the pointer to the tracker and incriment the size tracker
 				links.insert(links.begin() + index, this->first);
 				this->size++;
@@ -769,18 +781,18 @@ namespace zlib
 
 				link<T> * after = NULL;
 
-				if (!previous->isLast())
+				if(!previous->isLast())
 				{	//If there is an elment after the elemet we're adding, store a reference to the element that will be after the one we are inserting
-					
+
 					after = previous->next;
 				}
-				
+
 				//Insert the element
 				previous->next = new link<T>(value, previous, after);
 
-				if (after != NULL)
+				if(after != NULL)
 				{	//Link the element after it backwards, if it exists
-					
+
 					after->previous = previous->next;
 				}
 				//If no element exists after this one, then this is the last element (duh). The 'last' pointer needs to be updated as such.
@@ -820,7 +832,7 @@ namespace zlib
 
 			//Remove the target from memory
 			delete target;
-			
+
 			//Remove the target from the links vector
 			links.erase(links.begin() + index);
 
@@ -869,7 +881,7 @@ namespace zlib
 			//Check 7 - The list proceeds continuously from 'last' to 'first'
 			//Check 8 - The list proceeds continuously from 'last' to 'first' in 'size' elements
 			//Check 9 - Each element links to the element before it properly
-			
+
 			//Check 1
 			if(list.first == NULL && list.size != 0) throw check1;
 
@@ -878,7 +890,7 @@ namespace zlib
 
 			//if size == 0, we can't do any more checks
 			if(list.size == 0) return;
-			
+
 			//Check3
 			if(list.first->previous != NULL) throw check3;
 
@@ -889,7 +901,7 @@ namespace zlib
 			{
 				link<T> * curr = list.first;
 				unsigned count = 1;	//If first exists, there is at least 1 element
-				
+
 				while(curr != list.last)
 				{
 					curr = curr->next;
@@ -1035,6 +1047,65 @@ namespace zlib
 		}
 #endif
 
+		struct smArrException : Exception {};
+
+		struct smArrOutOfBoundsException : smArrException {};
+
+		//An array with a thin  wrapper around it to give it the begin(), end(), and size() functionality of the vector class, along with access-protection (don't allow arr[N+1])
+		template<class T>
+		struct smartArray
+		{
+			//Constructs an empty array
+			smartArray() {}
+			//Constructs an 
+			smartArray(unsigned size);
+			smartArray(T * arr, unsigned size);
+
+		private:
+			T * arr = NULL;
+			unsigned arrSize = 0;
+
+		public:
+			//Returns (by reference) the item at 'index', provided 'index' is a valid position within the array.
+			//@ EXCEPTION: throws smArrOutOfBoundsException if 'iter >= size' (if iter is beyond the array)
+			T & operator[](unsigned index);
+
+			//Returns the size of the array
+			int size() { return arrSize; }
+
+			//Returns a pointer to the first element in the array
+			T * begin() { return arr; }
+			//Returns a poinrer to the element that would be *IMMEDIATELY AFTER* the last element in the array
+			T * end() { return arr + size; }
+
+		};
+
+		template<class T>
+		smartArray<T>::smartArray(unsigned size)
+		{
+			this->arrSize = size;
+		}
+
+		template<class T>
+		smartArray<T>::smartArray(T * arr, unsigned size)
+		{
+			this->arrSize = size;
+
+			this->arr = new T[size];
+
+			for(int i = 0; i < size; i++)
+			{
+				this->arr[i] = arr[i];
+			}
+		}
+
+		template<class T>
+		T & smartArray<T>::operator[](unsigned index)
+		{
+			if(index >= size) throw smArrOutOfBoundsException(conv::toString(index) + " is outside " + conv::toString(size));
+			return arr[index];
+		}
+
 		namespace geom	//As in geometry
 		{
 			class line
@@ -1146,4 +1217,65 @@ namespace zlib
 		};
 
 	};
+
+#ifdef ZLIB_ENABLE_TESTS
+	namespace tests
+	{
+		namespace test_smartArray
+		{
+			void run()
+			{
+				vector<string> result;
+				auto exec = [&result](string testResult)
+				{
+					result.push_back(testResult);
+				};
+
+				vector<std::function<string>> tests = 
+				{
+					[exec]() {
+
+
+
+					};
+
+
+				}
+
+				exec(test1());
+				exec(test2());
+
+
+
+
+				for(int i = 0; i < result.size(); i++)
+				{
+					if(result[i] == "") std::cout << "Test " << i << " passed" << std::endl;
+				}
+			}
+
+
+			//Makes sure that a smartArrays' internal size is zero when using the default constructor
+			string test1() {
+
+				var::smartArray<int> arr;
+
+				if(arr.size() != 0) return "smartArray.size() is not 0 when created using the default constructor!";
+
+				return "";
+			}
+
+			string test2() {
+
+				var::smartArray<int> arr;
+
+				if(arr.begin() + arr.size() + 1 != arr.end()) return "smartArray.end() does not return the proper position (relative to smartArray.begin()) - arr.begin() + arr.size() + 1 should equal arr.end())";
+
+				return "";
+			}
+
+
+		}
+	}
+#endif
 }
