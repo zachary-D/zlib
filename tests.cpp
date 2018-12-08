@@ -11,7 +11,7 @@ int main(int argc, char * argv[])
 {
 	cout << "Beginning tests." << endl;
 
-	vector<std::function<string>> tests =
+	vector<std::function<string()>> tests =
 	{
 		[]{
 			var::smartArray<int> arr;
@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
 	};
 	
 	int numFailed = 0;
-
+	//Launch the tests
 	for (int i = 0; i < tests.size(); i++)
 	{
 		try
@@ -60,39 +60,6 @@ int main(int argc, char * argv[])
 	cout << "Ending tests." << endl;
 	return 0;
 }
-
-
-		void test_smartArray()
-		{
-			cout << "Starting test for smartArray"
-			vector<string> result;
-			auto exec = [&result](string testResult)
-			{
-				result.push_back(testResult);
-			};
-
-			vector<std::function<string>> tests =
-			{
-				[exec]() {
-
-
-
-				};
-
-
-			}
-
-			exec(test1());
-			exec(test2());
-
-
-
-
-			for (int i = 0; i < result.size(); i++)
-			{
-				if (result[i] == "") std::cout << "Test " << i << " passed" << std::endl;
-			}
-		}
 
 
 		//Makes sure that a smartArrays' internal size is zero when using the default constructor
