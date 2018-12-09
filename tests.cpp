@@ -124,21 +124,141 @@ vector<testBlock> blocks =
 		{
 
 			//Makes sure that a smartArrays' internal size is zero when using the default constructor
-			[]{
+			test([]{
 				var::smartArray<int> arr;
 				if (arr.size() != 0) return "smartArray.size() is not 0 when created using the default constructor!";
 
 				return ""; 
-			},
+			}),
 
-			//Makes sure that the begin() and end() pointers refer to the correct positions
-			[]{
+			//Makes sure that the begin() and end() iterators refer to the correct positions
+			test([]{
 				var::smartArray<int> arr;
 
-				if (arr.begin() + arr.size() != arr.end()) return "smartArray.end() does not return the proper position (relative to smartArray.begin()) - arr.begin() + arr.size() + 1 should equal arr.end())";
+				if (arr.begin() + arr.size() != arr.end()) return "smartArray.end() does not return the proper position (relative to smartArray.begin()) -- arr.begin() + arr.size() should equal arr.end())";
 
 				return "";
-			}
+			}),
+
+			//Makes sure the size constructor works properly
+			test(
+				"Size constructor testing",
+				[] {
+					var::smartArray<int> arr(5);
+
+					if(arr.size() != 5) return "smartArray.size() does not equal the size of the input array!";
+
+					return "";
+				}
+			),
+
+			//Makes sure the size constructor allocates memory properly
+			test(
+				"Size constuctor testing - memory allocation testing",
+				[] {
+					var::smartArray<int> arr(5);
+					
+					arr[0] = 1;
+					arr[4] = 7;
+
+					try
+					{
+						arr[5] = 8;
+						return "smartArray::operator[] allowed access to elements past the end of the array!";
+					}
+					catch(var::smArrOutOfBoundsException e)
+					{
+						//We expect this exception
+					}
+					catch(...)
+					{
+						return "smartArray::operator[] (for an index outside of bounds) threw an unknown exception!";
+					}
+
+					return "";
+				}
+			),
+
+			//Makes sure the array constructor does not throw exceptions
+			test(
+				"Array constructor testing - no-exception testing",
+				[] {
+					int normal[] = { 1, 2, 3, 4, 5 };
+
+					try
+					{
+						var::smartArray<int> arr(normal, sizeof(normal));
+					}
+					catch(var::Exception e)
+					{
+						return "smartArray::smartArray(array) threw a zlib exception with details:" + e.details;
+					}
+					catch(...)
+					{
+						return string("smartArray::smartArray(array) threw an unknown exception!");
+					}
+
+					return string("");
+				}
+			),
+
+			//Makes sure the array constructor copies the source array, and doesn't get a reference to it
+			test(
+				"Array constructor testing - argument copy testing",
+				[]{				
+					int * source = new int[5] {0, 1, 2, 3, 4};
+
+					var::smartArray<int> arr(source, sizeof(source));
+
+					for(int i = 0; i < 5; i++)
+					{
+						if(arr[i] != i) return "Values were not copied into the array correctly!";
+					}
+					
+					delete source;
+
+					for(int i = 0; i < 5; i++)
+					{
+						if(arr[i] != i) return "The array in the constructor were not copied!";
+					}
+										
+					return "";
+				}
+			),
+
+			//Makes sure the iterator starts at the beginning
+			test(
+				"smartArray::smartArray(initializer_list)",
+				[]{
+					var::smartArray<int> arr = {0, 1, 2, 3, 4};
+					
+					for(int i = 0; i < 5; i++)
+					{
+						if(arr[i] != i) return "smartArray values incorrect";
+					}
+					
+					return "";
+				}
+			),
+			
+			//Tests smartArray iterators
+			test(
+				"smartArray iterator test",
+				[]{
+					var::smartArray<int> arr = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+
+					if( *arr.begin() != 0) return "Iterator starts at incorrect location!";
+					int expected = 0;
+					for(auto iter = arr.begin(); iter != arr.end(); iter++)
+					{
+						if(expected == 9) return "Iterator error - iterator went too far!";
+						if(*iter != expected) return "Iterator error - unexpected value!";
+						expected++;
+					}
+
+					return "";
+				}
+			)
 		}
 	)
 };
@@ -154,7 +274,7 @@ int main(int argc, char * argv[])
 	}
 
 
-	cout << "Ending tests." << endl;
+	cout << "Tests complete." << endl;
 	cout << "Total tests : " << numTests << endl;
 	cout << "Tests failed: " << numFailed << " (" << gPerc(numFailed, numTests) << ")" << endl;
 	cout << "Tests passed: " << (numTests - numFailed) << " (" << gPerc(numTests - numFailed, numTests) << ")" << endl;

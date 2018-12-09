@@ -1083,6 +1083,7 @@ namespace zlib
 			smartArrayIterator(const smartArrayIterator& copy) : ptr(copy.ptr) {}
 
 			smartArrayIterator & operator++() { ptr++; return *this; }
+			smartArrayIterator & operator++(int) { return operator++(); }
 			smartArrayIterator & operator+(int other) { ptr += other; return * this; }
 			
 			bool operator==(const smartArrayIterator & other) const { return ptr == other.ptr; }
@@ -1095,7 +1096,10 @@ namespace zlib
 
 		struct smArrException : Exception {};
 
-		struct smArrOutOfBoundsException : smArrException {};
+		struct smArrOutOfBoundsException : smArrException {
+			smArrOutOfBoundsException() {}
+			smArrOutOfBoundsException(string details) { this->details = details; }
+		};
 
 		//An array with a thin  wrapper around it to give it the begin(), end(), and size() functionality of the vector class, along with access-protection (don't allow arr[N+1])
 		template<class T>
@@ -1103,9 +1107,12 @@ namespace zlib
 		{
 			//Constructs an empty array
 			smartArray() {}
-			//Constructs an 
+			//Constructs an array of length 'size'
 			smartArray(unsigned size);
+			//Constructs a smartArray containing 'arr'
 			smartArray(T * arr, unsigned size);
+			//Constructs a smartArray containign 'arr'
+			smartArray(std::initializer_list<T> arr);
 
 		private:
 			T * arr = NULL;
@@ -1130,6 +1137,7 @@ namespace zlib
 		smartArray<T>::smartArray(unsigned size)
 		{
 			this->arrSize = size;
+			this->arr = new T[size];
 		}
 
 		template<class T>
@@ -1146,9 +1154,23 @@ namespace zlib
 		}
 
 		template<class T>
+		smartArray<T>::smartArray(std::initializer_list<T> arr)
+		{
+			this->arrSize = arr.size();
+			this->arr = new T[arrSize];
+
+			auto iter = arr.begin();
+			for(int i = 0; i < arrSize; i++)
+			{
+				this->arr[i] = *iter;
+				iter++;
+			}
+		}
+
+		template<class T>
 		T & smartArray<T>::operator[](unsigned index)
 		{
-			if(index >= size) throw smArrOutOfBoundsException(conv::toString(index) + " is outside " + conv::toString(size));
+			if(index >= size()) throw smArrOutOfBoundsException(conv::toString(index) + " is outside " + conv::toString(size()));
 			return arr[index];
 		}
 
