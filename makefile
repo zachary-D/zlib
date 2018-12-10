@@ -48,8 +48,8 @@ runTests: tests.prog
 gdbTests: tests.prog
 	gdb -ex run --args tests.prog
 
-tests.prog: zlib.h.gch tests.cpp
-	g++ -o tests.prog tests.cpp *.o -std=c++11
+tests.prog: debug tests.cpp
+	g++ -o tests.prog tests.cpp *.o -std=c++11 -g
 
 zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o var.o windInfo.o
 	g++ zlib.h $(g_flags)
