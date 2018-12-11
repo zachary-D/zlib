@@ -91,7 +91,7 @@ struct test
 //A set of tests (related by topic, class, etc.)
 struct testBlock
 {
-	testBlock(string title, std::initializer_list<test> tests)
+	testBlock(string title, std::initializer_list<test*> tests)
 	{
 		this->title = title;
 		this->tests = tests;
@@ -101,30 +101,30 @@ struct testBlock
 		this->title = title;
 		for(auto iter = tests.begin(); iter != tests.end(); iter++)
 		{
-			this->tests.push_back(*iter);
+			this->tests.push_back(new test(*iter));
 		}
 	}
 
 	string title;
-	vector<test> tests;
+	vector<test*> tests;
 
 	void run(int position)
 	{
 		for(int i = 0; i < tests.size(); i++)
 		{
-			tests[i].run(title, position, i);
+			tests[i]->run(title, position, i);
 		}
 
 	}
 };
 
-vector<testBlock> blocks = 
+vector<testBlock*> blocks = 
 {
-	testBlock("smartArrays class tests",
+	new testBlock("smartArrays class tests",
 		{
 
 			//Makes sure that a smartArrays' internal size is zero when using the default constructor
-			test([]{
+			new test([]{
 				var::smartArray<int> arr;
 				if (arr.size() != 0) return "smartArray.size() is not 0 when created using the default constructor!";
 
@@ -132,7 +132,7 @@ vector<testBlock> blocks =
 			}),
 
 			//Makes sure that the begin() and end() iterators refer to the correct positions
-			test([]{
+			new test([]{
 				var::smartArray<int> arr;
 
 				if (arr.begin() + arr.size() != arr.end()) return "smartArray.end() does not return the proper position (relative to smartArray.begin()) -- arr.begin() + arr.size() should equal arr.end())";
@@ -141,7 +141,7 @@ vector<testBlock> blocks =
 			}),
 
 			//Makes sure the size constructor works properly
-			test(
+			new test(
 				"Size constructor testing",
 				[] {
 					var::smartArray<int> arr(5);
@@ -153,7 +153,7 @@ vector<testBlock> blocks =
 			),
 
 			//Makes sure the size constructor allocates memory properly
-			test(
+			new test(
 				"Size constuctor testing - memory allocation testing",
 				[] {
 					var::smartArray<int> arr(5);
@@ -180,7 +180,7 @@ vector<testBlock> blocks =
 			),
 
 			//Makes sure the array constructor does not throw exceptions
-			test(
+			new test(
 				"Array constructor testing - no-exception testing",
 				[] {
 					int normal[] = { 1, 2, 3, 4, 5 };
@@ -203,7 +203,7 @@ vector<testBlock> blocks =
 			),
 
 			//Makes sure the array constructor copies the source array, and doesn't get a reference to it
-			test(
+			new test(
 				"Array constructor testing - argument copy testing",
 				[]{				
 					int * source = new int[5] {0, 1, 2, 3, 4};
@@ -227,7 +227,7 @@ vector<testBlock> blocks =
 			),
 
 			//Makes sure the iterator starts at the beginning
-			test(
+			new test(
 				"smartArray::smartArray(initializer_list)",
 				[]{
 					var::smartArray<int> arr = {0, 1, 2, 3, 4};
@@ -242,7 +242,7 @@ vector<testBlock> blocks =
 			),
 			
 			//Tests smartArray iterators
-			test(
+			new test(
 				"smartArray iterator test",
 				[]{
 					var::smartArray<int> arr = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -270,7 +270,7 @@ int main(int argc, char * argv[])
 	//Launch the tests
 	for (int i = 0; i < blocks.size(); i++)
 	{
-		blocks[i].run(i);
+		blocks[i]->run(i);
 	}
 
 
