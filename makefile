@@ -19,10 +19,6 @@ clean:
 	rm $(debug_indicator_file) -rf
 	rm *.o *.gch *.prog -r -f
 
-#Removes the debug indicator
-removeDebugFlag:
-	rm -rf $(debug_indicator_file)
-
 #Cleans out temp files if the debug indicator is present
 cleanIfDebug:
 ifeq ($(debug_indicator_file), $(wildcard $(debug_indicator_file)))
@@ -39,10 +35,8 @@ debug: $(debug_indicator_file)
 #Build in debug mode
 $(debug_indicator_file): g_flags += -g
 $(debug_indicator_file): | cleanIfNoDebug
-	$(MAKE) buildAsDebug
-
-buildAsDebug: g_flags += -g
-buildAsDebug: zlib.h.gch
+$(debug_indicator_file): zlib.h.gch
+$(debug_indicator_file):
 	echo "zlib compiled with debugging symbols" > $(debug_indicator_file)
 
 #Compile and run the tests
