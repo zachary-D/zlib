@@ -27,8 +27,10 @@
 *.out
 *.app
 
-# Polaris1/Linux/G++ programs
+#Linux
 *.prog
+*.swp
+
 #Used to indicate that zlib was compiled in debug mode
 debug_made.txt
 
