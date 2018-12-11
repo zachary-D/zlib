@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := all
+.PHONY: all
 .PHONY: clean
 .PHONY: removeDebugFlag
 .PHONY: cleanIfNoDebug
@@ -31,12 +33,17 @@ endif
 cleanIfNoDebug:
 	(test -s $(debug_indicator_file)) || $(MAKE) clean
 
-$(debug_indicator): debug
-	echo "zlib compiled with debugging symbols" > $(debug_indicator_file)
+#Defines 'debug' as a ""shortcut"" to $(debug_indicator_file)
+debug: $(debug_indicator_file)
 
 #Build in debug mode
-debug: g_flags += -g
-debug: cleanIfNoDebug removeDebugFlag zlib.h.gch
+$(debug_indicator_file): g_flags += -g
+$(debug_indicator_file): | cleanIfNoDebug
+	$(MAKE) buildAsDebug
+
+buildAsDebug: g_flags += -g
+buildAsDebug: zlib.h.gch
+	echo "zlib compiled with debugging symbols" > $(debug_indicator_file)
 
 #Compile the tests without running them
 tests: tests.prog
