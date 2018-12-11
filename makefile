@@ -29,8 +29,12 @@ endif
 cleanIfNoDebug:
 	(test -s $(debug_indicator_file)) || $(MAKE) clean
 
+#NOTE: An explanation of all the wonky multiline rules here - the | before prerequisites marks them as rules that need to be run, but that don't trigger the actual rule to run.  The final rule-declaration without any prerequisites are there because of the order make checks them - it first checks the last declaration (presumably it starts with the prerequisies associated with the actual definition of the rule), and then it jumps up to the first declaration and continues down in order.
+
 #Defines 'debug' as a ""shortcut"" to $(debug_indicator_file)
-debug: $(debug_indicator_file)
+debug:| $(debug_indicator_file) #Actually calls the $(debug_indicator_file) rule
+debug: zlib.h.gch #This is here so that debug will trigger rules using this one as a prerequisite to recompile if (and only if) $(debug_indicator_file) actually recompiled zlib
+debug:
 
 #Build in debug mode
 $(debug_indicator_file): g_flags += -g
@@ -46,7 +50,7 @@ runTests: tests.prog
 gdbTests: tests.prog
 	gdb -ex run --args tests.prog
 
-tests.prog: debug tests.cpp
+tests.prog: tests.cpp $(debug_indicator_file)
 	g++ -o tests.prog tests.cpp *.o -std=c++11 -g
 
 zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o var.o windInfo.o
