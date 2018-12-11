@@ -45,9 +45,6 @@ buildAsDebug: g_flags += -g
 buildAsDebug: zlib.h.gch
 	echo "zlib compiled with debugging symbols" > $(debug_indicator_file)
 
-#Compile the tests without running them
-tests: tests.prog
-
 #Compile and run the tests
 runTests: tests.prog
 	./tests.prog
