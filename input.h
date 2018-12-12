@@ -12,7 +12,7 @@ using std::string;
 #include "cinder/app/App.h"
 #endif
 
-#include "varTypes.h"
+#include "var.h"
 
 using namespace zlib; 
 

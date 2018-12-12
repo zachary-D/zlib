@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#include "varTypes.h"
+#include "var.h"
 
 namespace zlib
 {

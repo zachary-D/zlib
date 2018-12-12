@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "varConv.h"
+#include "var.h"
 #include "fileIO.h"
 
 namespace zlib
