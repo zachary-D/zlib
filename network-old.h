@@ -22,21 +22,6 @@ namespace zlib
 {
 	namespace network
 	{
-		//Generic socket exception
-		struct socketException : var::Exception
-		{
-			socketException() {}
-			socketException(string details) { this->details = details; }
-		};
-
-		//For exceptions relating to WinSock2 (windows-only)
-		struct socketWSAException : socketException
-		{
-			socketWSAException() {}
-			socketWSAException(string details) { this->details = details; }
-		};
-
-
 		//Sets everything up for networking.  Technically only needs to be run on Windows (everything is already set up on Linux)
 		//, but it's best practice to call it no matter what both for compataibilty reasons, and in case future versions of zlib use startup() for something in future versions
 		void startup();

@@ -33,6 +33,20 @@ namespace zlib
 {
 	namespace network
 	{
+		//Generic socket exception
+		struct socketException : var::Exception
+		{
+			socketException() {}
+			socketException(string details) { this->details = details; }
+		};
+
+		struct socketWSAException : socketException
+		{
+			socketWSAException() {}
+			socketWSAException(string details) { this->details = details; }
+		};
+
+		
 		void startup()
 		{
 #ifdef _WIN32
