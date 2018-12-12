@@ -32,7 +32,7 @@
 *.swp
 
 #Used to indicate that zlib was compiled in debug mode
-debug_made.txt
+debug_made
 
 # VS files that break things
 *.sdf
