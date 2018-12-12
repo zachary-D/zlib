@@ -22,10 +22,11 @@ namespace zlib
 {
 	namespace network
 	{
-#ifdef __WIN32
-		//Initialize WsaData & check for errors
-		void initWinSock();
-#endif
+		//Sets everything up for networking.  Technically only needs to be run on Windows (everything is already set up on Linux)
+		//, but it's best practice to call it no matter what both for compataibilty reasons, and in case future versions of zlib use startup() for something in future versions
+		void startup();
+		//Shuts things down (same reasoning as startup() - see notes there)
+		void cleanup();
 
 		enum sockError
 		{

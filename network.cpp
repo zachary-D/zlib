@@ -33,12 +33,25 @@ namespace zlib
 {
 	namespace network
 	{
-#ifdef _WIN32
-		WSADATA wsaData;
-
-		void initWinSock()
+		//Generic socket exception
+		struct socketException : var::Exception
 		{
-			static bool isInitialized;
+			socketException() {}
+			socketException(string details) { this->details = details; }
+		};
+
+		struct socketWSAException : socketException
+		{
+			socketWSAException() {}
+			socketWSAException(string details) { this->details = details; }
+		};
+
+		
+		void startup()
+		{
+#ifdef _WIN32
+			WSADATA wsaData;
+			static bool isInitialized = false;
 
 			//if(isInitialized != true)
 			{
@@ -50,8 +63,17 @@ namespace zlib
 				}
 				isInitialized = true;
 			}
-		}
 #endif
+		}
+
+		
+		void cleanup()
+		{
+#ifdef _WIN32
+			WSACleanup();
+#endif
+		}
+
 		
 		socketBase::socketBase()
 		{
@@ -74,9 +96,7 @@ namespace zlib
 		{
 			if(type != client && type != server) throw badType;
 
-#ifdef _WIN32
-			initWinSock();
-#elif __linux__
+#ifdef __linux__
 			//If this is -1, we need to assign it a random port (within 25000 and 30000)
 			if(clientLocalPort == -1)
 			{
@@ -121,9 +141,7 @@ namespace zlib
 
 				if(fnResult != 0)
 				{
-					error(addressError, false);
-					WSACleanup();
-					throw addressError;
+					error(addressError);
 				}
 			}
 
@@ -137,7 +155,6 @@ namespace zlib
 				{
 					error(socketCreationError, false);
 					freeaddrinfo(result);
-					WSACleanup();
 					throw socketCreationError;
 				}
 			}
@@ -168,7 +185,6 @@ namespace zlib
 				{
 					error(connectionError, false);
 					closesocket(ConnectSocket);
-					WSACleanup();
 					throw connectionError;
 				}
 #elif __linux__
@@ -209,7 +225,6 @@ namespace zlib
 					error(bindError, true);
 					freeaddrinfo(result);
 					closesocket(ConnectSocket);
-					WSACleanup();
 					throw bindError;
 				}
 
@@ -269,7 +284,6 @@ namespace zlib
 			{
 				error(sendError, true);
 				closesocket(ConnectSocket);
-				WSACleanup();
 				throw sendError;
 			}
 #elif __linux__
@@ -351,12 +365,10 @@ namespace zlib
 			{
 				error(shutdownError, true);
 				closesocket(ConnectSocket);
-				WSACleanup();
 				throw shutdownError;
 			}
 
 			closesocket(ConnectSocket);
-			WSACleanup();
 #endif
 			error(closed);
 		}
@@ -416,7 +428,6 @@ namespace zlib
 			{
 				error(listenError, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
-				WSACleanup();
 				return;
 			}
 
@@ -428,7 +439,6 @@ namespace zlib
 
 				error(acceptFailed, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
-				WSACleanup();
 				throw acceptFailed;
 			}
 #elif __linux__
@@ -450,7 +460,6 @@ namespace zlib
 			{
 				error(sendError, WSAGetLastError());
 				closesocket(ClientSocket);
-				WSACleanup();
 				return;
 			}
 #elif __linux__
@@ -498,9 +507,8 @@ namespace zlib
 #ifdef __linux__
 				error(receiveError);
 #elif _WIN32
-				error(receiveError, WSAGetLastError(), false);
+				error(receiveError, WSAGetLastError(), true);
 				closesocket(ClientSocket);
-				WSACleanup();
 #endif
 				throw receiveError;
 			}
@@ -551,12 +559,10 @@ namespace zlib
 			{
 				error(shutdownError, WSAGetLastError());
 				closesocket(ClientSocket);
-				WSACleanup();
 				return;
 			}
 
 			closesocket(ClientSocket);
-			WSACleanup();
 #endif
 			error(closed);
 		}
