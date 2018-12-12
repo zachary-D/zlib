@@ -258,6 +258,50 @@ vector<testBlock*> blocks =
 
 					return "";
 				}
+			),
+
+			//Tests smartArray::smartArray(string) constructor
+			new test(
+				"smartArray::smartArray(string) constructor test",
+				[] {
+					std::string str = "My Test String";
+
+					var::smartArray<char> arr = var::smartArray<char>::smartArrayFromString(str); 
+					
+					if(arr.size() != str.length()) return "Size of created array does not equal the size of the source!";
+
+					for(int i = 0; i < arr.size(); i++)
+					{
+						if(arr[i] != str[i]) return "smartArray does not contain correct data!";
+					}
+					
+					return "";
+				}
+			),
+
+			//Tests smartArray::getRawCopy()
+			new test(
+				"smartArray::getRawCopy() test",
+				[] {
+					int numEl = 5;
+					char * source = new char[numEl];
+
+					for(int i = 0; i < numEl; i++)
+					{
+						source[i] = (char)('a' + i);
+					}
+
+					var::smartArray<char> arr(source, numEl);
+
+					char * raw = arr.getRawCopy();
+
+					for(int i = 0; i < numEl; i++)
+					{
+						if(raw[i] != source[i]) return "Returned array does not match source array!";
+					}
+
+					return "";	
+				}
 			)
 		}
 	)

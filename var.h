@@ -1111,8 +1111,11 @@ namespace zlib
 			smartArray(unsigned size);
 			//Constructs a smartArray containing 'arr'
 			smartArray(T * arr, unsigned size);
-			//Constructs a smartArray containign 'arr'
+			//Constructs a smartArray contaning 'arr'
 			smartArray(std::initializer_list<T> arr);
+			
+			//psudo-constructor to create a smartArray<char> from a string
+			static smartArray<char> smartArrayFromString(std::string str);
 
 		private:
 			T * arr = NULL;
@@ -1130,6 +1133,9 @@ namespace zlib
 			smartArrayIterator<T> begin() { return smartArrayIterator<T>(arr); }
 			//Returns a poinrer to the element that would be *IMMEDIATELY AFTER* the last element in the array
 			smartArrayIterator<T> end() { return smartArrayIterator<T>(arr + size()); }
+
+			//Returns a *copy* of the internal array
+			T* getRawCopy();
 
 		};
 
@@ -1166,6 +1172,18 @@ namespace zlib
 				iter++;
 			}
 		}
+		
+		template<class T>
+		smartArray<char> smartArray<T>::smartArrayFromString(std::string str)
+		{
+			smartArray<char> ret(str.length());
+			for(int i = 0; i < ret.size(); i++)
+			{
+				ret[i] = str[i];
+			}
+
+			return ret;
+		}
 
 		template<class T>
 		T & smartArray<T>::operator[](unsigned index)
@@ -1173,6 +1191,20 @@ namespace zlib
 			if(index >= size()) throw smArrOutOfBoundsException(conv::toString(index) + " is outside " + conv::toString(size()));
 			return arr[index];
 		}
+
+		template<class T>
+		T * smartArray<T>::getRawCopy()
+		{
+			T * ret = new T[arrSize];
+
+			for(int i = 0; i < arrSize; i++)
+			{
+				ret[i] = arr[i];
+			}
+
+			return ret;
+		}
+
 
 		namespace geom	//As in geometry
 		{
