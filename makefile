@@ -9,7 +9,7 @@
 .PHONY: gdbTests
 
 g_flags = $(*.o) --std=c++11 -c
-debug_indicator_file = debug_made.txt
+debug_indicator_file = debug_made
 
 #Compile the library
 all: cleanIfDebug zlib.h.gch
