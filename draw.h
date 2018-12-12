@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 
 //Written by and copyright Zachary Damato
 //draw.h is part of the zlib submodule
