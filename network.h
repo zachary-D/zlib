@@ -1,5 +1,7 @@
 #pragma once
 
+//Some of this code was written using the WinSock2 Tutorial provided by Microsoft for reference.
+
 #include <string>
 #include <vector>
 
@@ -18,10 +20,20 @@ using std::string;
 #error "Platform not supported!"
 #endif
 
+#include "zlib/var.h"
+
 namespace zlib
 {
 	namespace network
 	{
+#ifdef _WIN32
+		typedef SOCKET OS_socket_base;
+#elif __linux__
+		typedef INT OS_socket_base;
+#else
+#error "OS_socket_base has not been specified for this platform!"
+#endif
+
 		//Generic socket exception
 		struct socketException : var::Exception
 		{
@@ -82,11 +94,12 @@ namespace zlib
 			int errorDetails;
 
 		protected:
+
+			OS_socket_base ConnectSocket
 #ifdef _WIN32
-			SOCKET ConnectSocket = INVALID_SOCKET;
-#elif __linux__
-			int ConnectSocket;
+				= INVALID_SOCKET
 #endif
+				;
 
 		public:
 			socketBase();
@@ -140,11 +153,7 @@ namespace zlib
 		class socketServer : public socketBase
 		{
 			//Todo: merge ConnectScoket with ClientSocket, or make it so ClientSocket is scalable, and is potentially its own object?
-#ifdef _WIN32
-			SOCKET ClientSocket;
-#elif __linux__
-			int ClientSocket;
-#endif
+			OS_socket_base ClientSocket;
 
 		public:
 			socketServer();
@@ -156,6 +165,14 @@ namespace zlib
 			void closeSocket();
 
 			~socketServer() override  { closeSocket(); }
+		};
+
+		class socketDoorbell : public socketBase
+		{
+
+
+
+
 		};
 
 		class socketClient : public socketBase

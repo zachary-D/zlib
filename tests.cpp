@@ -53,7 +53,7 @@ struct test
 	string title = "";
 	fn _test;
 
-	string run(string parentTitle, int parentPosition, int position)
+	void run(string parentTitle, int parentPosition, int position)
 	{
 		auto pFailMsg = [&parentTitle, &parentPosition, &position, this] ()
 		{

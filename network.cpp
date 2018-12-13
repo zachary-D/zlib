@@ -37,21 +37,15 @@ namespace zlib
 		{
 #ifdef _WIN32
 			WSADATA wsaData;
-			static bool isInitialized = false;
 
-			//if(isInitialized != true)
+			int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+			if(initResult != 0)
 			{
-				int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-				if(initResult != 0)
-				{
-					throw socketWSAException("Unable to initialize WinSock2");
-				}
-				isInitialized = true;
+				throw socketWSAException("Unable to initialize WinSock2");
 			}
 #endif
 		}
-
 		
 		void cleanup()
 		{
@@ -71,8 +65,7 @@ namespace zlib
 			closeSocket();
 		}
 
-		void socketBase::initializeSocket(
-			std::string address,
+		void socketBase::initializeSocket(std::string address,
 			unsigned port,
 			t_sockType type
 #ifdef __linux__
