@@ -21,7 +21,7 @@ using std::string;
 #error "Platform not supported!"
 #endif
 
-#include "zlib/var.h"
+#include "var.h"
 
 namespace zlib
 {
@@ -30,7 +30,7 @@ namespace zlib
 #ifdef _WIN32
 		typedef SOCKET OS_socket_base;
 #elif __linux__
-		typedef INT OS_socket_base;
+		typedef int OS_socket_base;
 #else
 #error "OS_socket_base has not been specified for this platform!"
 #endif
@@ -167,7 +167,7 @@ namespace zlib
 		{
 		public:
 			socketServer();
-			socketServer(unsigned localPort);
+			socketServer(OS_socket_base socket);
 
 			//void transmit(string data);
 			
