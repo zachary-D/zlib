@@ -57,7 +57,7 @@ namespace zlib
 		
 		socketBase::socketBase()
 		{
-			error(notOpened);
+			error(notOpened, true);
 		}
 
 		socketBase::~socketBase() 
@@ -340,14 +340,19 @@ namespace zlib
 			);
 
 #ifdef _WIN32
-			if(err == SOCKET_ERROR)
+			if (err == SOCKET_ERROR)
 			{
 				error(shutdownError, true);
 				closesocket(ConnectSocket);
-				throw shutdownError;
+				//throw shutdownError;
+				//We just assume that the socket was already shutdown, and leave it at that.
+				return;
 			}
-
-			closesocket(ConnectSocket);
+			//Make sure we can't call closesocket() twice if the 'throw' is somehow missed/blocked/other oddness
+			else
+			{
+				closesocket(ConnectSocket);
+			}
 #endif
 			error(closed);
 		}
@@ -393,43 +398,21 @@ namespace zlib
 
 		socketServer::socketServer()
 		{
-			error(notOpened);
+			error(notOpened, true);
 		}
 
-		socketServer::socketServer(unsigned localPort)
+		socketServer::socketServer(OS_socket_base socket)
 		{
-			initializeSocket("", localPort, server);
-			if(!usable()) return;
+			ConnectSocket = socket;
 
-			//Start listening
 #ifdef _WIN32
-			if(listen(ConnectSocket, SOMAXCONN) == SOCKET_ERROR)
-			{
-				error(listenError, WSAGetLastError(), true);
-				closesocket(ConnectSocket);
-				return;
-			}
-
-			ClientSocket = INVALID_SOCKET;
-
-			ClientSocket = accept(ConnectSocket, NULL, NULL);
-			if(ClientSocket == INVALID_SOCKET)
-			{
-
-				error(acceptFailed, WSAGetLastError(), true);
-				closesocket(ConnectSocket);
-				throw acceptFailed;
-			}
+			if (ConnectSocket == INVALID_SOCKET) throw socketServerException("Socket passed is invalid!");
 #elif __linux__
-			listen(ConnectSocket, 0);
-
-			ClientSocket = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
-
-			if(ClientSocket < 0) error(acceptFailed);
+			if (ConnectSocket < 0) throw socketServerException("Socket passes is invalid!");
 #endif
 		}
 
-		void socketServer::transmit(string data)
+		/*void socketServer::transmit(string data)
 		{
 			//cout << "outbound:" << data << endl;
 			int errSend = send(ClientSocket, data.c_str(), data.length() + 1, 0);
@@ -449,18 +432,6 @@ namespace zlib
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
 		{	
-			/*
-			cout << "Buffdump:";
-			for(unsigned i = 0; i < getBufferSize(); i++)
-			{
-				cout << recvbuf[i];
-			}
-			cout << endl;
-			cout << "vBuff:" << endl;
-			for(unsigned i = 0; i < vBuff.size(); i++)
-			{
-				cout << "<" << i << ">" << vBuff[i] << endl;
-			}*/
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
@@ -544,12 +515,55 @@ namespace zlib
 			closesocket(ClientSocket);
 #endif
 			error(closed);
+		}*/
+
+
+		socketDoorbell::socketDoorbell()
+		{
+			error(notOpened, true);
+		}
+
+		socketDoorbell::socketDoorbell(unsigned localPort)
+		{
+			initializeSocket("", localPort, server);
+			if (!usable()) throw (socketException("unknown creation exception"));
+		}
+
+		socketServer socketDoorbell::getNextConnection()
+		{
+			OS_socket_base newSock;
+
+			//Start listening
+#ifdef _WIN32
+			if (listen(ConnectSocket, SOMAXCONN) == SOCKET_ERROR)
+			{
+				error(listenError, WSAGetLastError(), true);
+				closesocket(ConnectSocket);
+				throw socketDoorbellException("Listen failed!");
+			}
+
+			newSock = INVALID_SOCKET;
+
+			newSock = accept(ConnectSocket, NULL, NULL);
+			if (newSock == INVALID_SOCKET)
+			{
+				//TODO: More checking - see if the socket is still usable or not after an accept failure
+				throw socketDoorbellException("New connection accept failed");
+			}
+#elif __linux__
+			listen(ConnectSocket, 0);
+
+			newSock = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
+
+			if (newSock < 0) throw socketDoorbellException("New connection accept failed");
+#endif
+			return socketServer(newSock);
 		}
 
 
 		socketClient::socketClient()
 		{
-			error(notOpened);
+			error(notOpened, true);
 		}
 
 		socketClient::socketClient(string remoteAddress, unsigned remotePort

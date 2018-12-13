@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <functional> // std::function
 
 using std::string;
 
@@ -46,6 +47,18 @@ namespace zlib
 		{
 			socketWSAException() {}
 			socketWSAException(string details) { this->details = details; }
+		};
+
+		struct socketDoorbellException : socketException
+		{
+			socketDoorbellException() {}
+			socketDoorbellException(string details) { this->details = details; }
+		};
+
+		struct socketServerException : socketException
+		{
+			socketServerException() {}
+			socketServerException(string details) { this->details = details; }
 		};
 
 
@@ -152,27 +165,31 @@ namespace zlib
 
 		class socketServer : public socketBase
 		{
-			//Todo: merge ConnectScoket with ClientSocket, or make it so ClientSocket is scalable, and is potentially its own object?
-			OS_socket_base ClientSocket;
-
 		public:
 			socketServer();
 			socketServer(unsigned localPort);
 
-			void transmit(string data);
+			//void transmit(string data);
 			
-			string receive();
-			void closeSocket();
+			//string receive();
+			//void closeSocket();
 
-			~socketServer() override  { closeSocket(); }
+			//~socketServer() override  { closeSocket(); }
 		};
 
 		class socketDoorbell : public socketBase
 		{
+		public:
+			socketDoorbell();
+			socketDoorbell(unsigned localPort);
 
+			//Accepts a connection and returns a socketServer element that will communicate over that connection
+			socketServer getNextConnection();
 
-
-
+			//Automatically accept and handle connections until the boolean at 'doAcceptConnections' is false.
+			//**Connections are handled by creating a new thread**, which is then detached.
+			//The threads are created to run 'handler', and the connection is passed to the function as a socketServer element
+			//void autoHandleConnections(std::function<void(socketServer)> handler, bool * doAcceptConnections);
 		};
 
 		class socketClient : public socketBase
