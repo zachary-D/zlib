@@ -22,6 +22,7 @@
 #include<strings.h>
 #include<unistd.h>
 #include<netinet/in.h>
+#include<errno.h>	//For errno (linux error state flag)
 #else
 #error "Platform not supported!"
 #endif
