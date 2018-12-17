@@ -46,6 +46,8 @@ float floatOut;
 double doubleOut;
 bool boolOut;
 
+#include <errno.h>
+
 namespace zlibdbg
 {
 	static std::mutex console;

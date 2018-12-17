@@ -141,7 +141,10 @@ namespace zlib
 #elif __linux__
 			//Create the socket
 			{
+zlibdbg::logErrno("initSocket");
+
 				ConnectSocket = socket(PF_INET, SOCK_STREAM, 0);
+zlibdbg::logErrno("initSocket");
 
 				if(ConnectSocket < 0) error(socketCreationError);
 			}
@@ -169,12 +172,15 @@ namespace zlib
 				}
 #elif __linux__
 				struct sockaddr_in serv_addr;
+zlibdbg::logErrno("initSocket");
 
 				//Get server address and port
 				{
 					struct hostent * target;
+zlibdbg::logErrno("initSocket");
 
 					target = gethostbyname(address.c_str());
+zlibdbg::logErrno("initSocket");
 
 					if(target == NULL) error(addressError);
 
@@ -190,9 +196,13 @@ namespace zlib
 
 				if(connect(ConnectSocket, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0)
 				{
+zlibdbg::logErrno("initSocket");
+
 					error(connectionError);
 					throw connectionError;
 				}
+zlibdbg::logErrno("initSocket");
+
 #endif
 			}
 			else if(type == server)
@@ -211,7 +221,10 @@ namespace zlib
 				freeaddrinfo(result);
 
 #elif __linux__
+zlibdbg::logErrno("initSocket");
+
 				ConnectSocket = socket(AF_INET, SOCK_STREAM, 0);
+zlibdbg::logErrno("initSocket");
 
 				struct sockaddr_in servaddr;
 
@@ -220,6 +233,8 @@ namespace zlib
 				servaddr.sin_port = htons(port);
 
 				bind(ConnectSocket, (struct sockaddr *) & servaddr, sizeof(servaddr));
+zlibdbg::logErrno("initSocket");
+
 #endif
 			}
 			isUsable = true;
@@ -558,9 +573,13 @@ namespace zlib
 				throw socketDoorbellException("New connection accept failed");
 			}
 #elif __linux__
+			zlibdbg::logErrno("doorb::gNC");
 			listen(ConnectSocket, 0);
+			zlibdbg::logErrno("doorb::gNC");
+
 
 			newSock = accept(ConnectSocket, (struct sockaddr *) NULL, NULL);
+zlibdbg::logErrno("doorb::gNC");
 
 			if (newSock < 0) throw socketDoorbellException("New connection accept failed");
 #endif
