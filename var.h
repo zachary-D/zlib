@@ -43,6 +43,25 @@ namespace zlib {} //This is here so we can set the using namespace below, so tha
 
 using namespace zlib;
 
+#include <mutex>
+#ifdef __linux__
+#include <errno.h>
+#endif
+
+namespace zlibdbg
+{
+	static std::mutex console;
+
+	void logErrno(string where = "")
+	{
+#ifdef __linux__
+		console.lock();
+		cout << "Errno - " << where << " :" << errno << endl;
+		console.unlock();
+#endif
+	}
+}
+
 //Note: Unless otherwise specified, all angles are assumed to be in degrees
 namespace zlib
 {

@@ -254,10 +254,13 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
+			zlibdbg::logErrno("sB::transmit");
 			//cout << "outbound:" << data << endl;
 			//For once, this is the same on Windows and Linux
 			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
-
+			
+			zlibdbg::logErrno("sB::transmit");
+			
 			//But of course this isn't
 #ifdef _WIN32
 			if(err == SOCKET_ERROR)
@@ -268,11 +271,13 @@ namespace zlib
 			}
 #elif __linux__
 			if(err < 0) error(sendError);
+			zlibdbg::logErrno("sB::transmit");
 #endif
 		}
 
 		string socketBase::receive()
 		{
+			zlibdbg::logErrno("sB::receive");
 			if (vBuff.size() != 0)
 			{
 				string ret = vBuff[0];
@@ -280,8 +285,9 @@ namespace zlib
 				//cout << "Inbound:" << ret << endl;
 				return ret;
 			}
-			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
 
+			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
+			zlibdbg::logErrno("sB::receive");
 			if(err == 0) closeSocket();
 			else if (err < 0)
 			{
