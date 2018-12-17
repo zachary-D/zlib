@@ -46,6 +46,24 @@ float floatOut;
 double doubleOut;
 bool boolOut;
 
+namespace zlibdbg
+{
+	static std::mutex console;
+
+	std::mutex & getMut()
+	{
+		return console;
+	}
+
+	void logErrno(string where)
+	{
+#ifdef __linux__
+		console.lock();
+		cout << "Errno - " << where << " :" << errno << endl;
+		console.unlock();
+#endif
+	}
+}
 
 namespace zlib
 {

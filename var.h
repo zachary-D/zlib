@@ -53,16 +53,8 @@ using namespace zlib;
 #define mydiq
 namespace zlibdbg
 {
-	static std::mutex console;
-
-	void logErrno(string loc = "")
-	{
-#ifdef __linux__
-		console.lock();
-		std::cout << "Errno - " << loc << " :" << errno << std::endl;
-		console.unlock();
-#endif
-	}
+	std::mutex & getMut();
+	void logErrno(string where = "");
 }
 #endif
 
