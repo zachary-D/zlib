@@ -35,7 +35,7 @@ using namespace std;
 #include "debug.h"
 #endif
 
-#include "math.h"
+#include "zmath.h"
 #include "var.h"
 
 using namespace zlib;
