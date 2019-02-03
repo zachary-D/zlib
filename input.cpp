@@ -11,6 +11,10 @@
 
 using std::string;
 using std::map;
+using std::cin;
+using std::getline;
+using std::cout;
+using std::endl;
 
 #ifdef ZLIB_USING_CINDER
 #include "cinder/app/App.h"
@@ -22,8 +26,7 @@ using std::map;
 #include "draw.h"
 #include "windInfo.h"
 #endif
-#include "varTypes.h"
-#include "varConv.h"
+#include "var.h"
 
 using namespace zlib;
 

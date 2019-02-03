@@ -1,6 +1,9 @@
 #include <string>
+#include <iostream>
 
 #ifdef _WIN32
+//Behind another #if to prevent conflicts with windows.h
+#ifndef _WINDOWS_
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -8,6 +11,7 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
+#endif
 
 #elif __linux__
 #include<stdlib.h>
@@ -23,7 +27,7 @@
 #endif
 
 #include "network.h"
-#include "varConv.h"
+#include "var.h"
 
 namespace zlib
 {
@@ -36,7 +40,7 @@ namespace zlib
 		{
 			static bool isInitialized;
 
-			if(isInitialized != true)
+			//if(isInitialized != true)
 			{
 				int initResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -82,7 +86,9 @@ namespace zlib
 #endif
 
 			//Swap "localhost" for the actual loopback IP we want to connect to that
-			if(conv::toLowercase(address, false) == "localhost") address = "127.0.0.1";
+			//Add auto-lowercase for localhost back again later
+			if(address == "localhost") address = "127.0.0.1";
+			//if(conv::toLowercase(address, false) == "localhost") address = "127.0.0.1";
 
 #ifdef _WIN32
 			//Create 3 addrinfo structs, just rolled into one 'line'
@@ -115,9 +121,9 @@ namespace zlib
 
 				if(fnResult != 0)
 				{
-					error(addressError);
+					error(addressError, false);
 					WSACleanup();
-					return;
+					throw addressError;
 				}
 			}
 
@@ -129,10 +135,10 @@ namespace zlib
 
 				if(ConnectSocket == INVALID_SOCKET)
 				{
-					error(socketCreationError);
+					error(socketCreationError, false);
 					freeaddrinfo(result);
 					WSACleanup();
-					return;
+					throw socketCreationError;
 				}
 			}
 #elif __linux__
@@ -141,22 +147,6 @@ namespace zlib
 				ConnectSocket = socket(PF_INET, SOCK_STREAM, 0);
 
 				if(ConnectSocket < 0) error(socketCreationError);
-			}
-
-			struct sockaddr_in serv_addr;
-
-			//Get server address and port
-			{
-				struct hostent * target;
-
-				target = gethostbyname(address.c_str());
-
-				if(target == NULL) error(addressError);
-
-				bzero((char*)& serv_addr, sizeof(serv_addr));
-				serv_addr.sin_family = AF_INET;
-				bcopy(target->h_addr, (char*)& serv_addr.sin_addr.s_addr, target->h_length);
-				serv_addr.sin_port = htons(port);
 			}
 #endif
 
@@ -176,15 +166,36 @@ namespace zlib
 
 				if(ConnectSocket == INVALID_SOCKET)
 				{
-					error(connectionError);
+					error(connectionError, false);
 					closesocket(ConnectSocket);
 					WSACleanup();
-					return;
+					throw connectionError;
 				}
 #elif __linux__
+				struct sockaddr_in serv_addr;
+
+				//Get server address and port
+				{
+					struct hostent * target;
+
+					target = gethostbyname(address.c_str());
+
+					if(target == NULL) error(addressError);
+
+					bzero((char*)& serv_addr, sizeof(serv_addr));
+					serv_addr.sin_family = AF_INET;
+					bcopy(
+						target->h_addr,
+						(char*)& serv_addr.sin_addr.s_addr,
+						target->h_length
+					);
+					serv_addr.sin_port = htons(port);
+				}
+
 				if(connect(ConnectSocket, (struct sockaddr*) & serv_addr, sizeof(serv_addr)) < 0)
 				{
 					error(connectionError);
+					throw connectionError;
 				}
 #endif
 			}
@@ -195,11 +206,11 @@ namespace zlib
 
 				if(err == SOCKET_ERROR)
 				{
-					error(bindError);
+					error(bindError, true);
 					freeaddrinfo(result);
 					closesocket(ConnectSocket);
 					WSACleanup();
-					return;
+					throw bindError;
 				}
 
 				freeaddrinfo(result);
@@ -219,16 +230,17 @@ namespace zlib
 			isUsable = true;
 		}
 
-		void socketBase::error(sockError errorState)
+		void socketBase::error(sockError errorState, bool noExcept)
 		{
 			state = errorState;
 			isUsable = false;
-#ifdef __linux__ //On linux we only close the connection in this one way/place
+#ifdef __linux__ //On linux we only close the connect	ion in this one way/place
 			close(ConnectSocket);
 #endif
+			if (!noExcept && errorState != closed && errorState != notOpened && errorState != open) throw errorState;
 		}
 
-		void socketBase::error(sockError errorState, int details)
+		void socketBase::error(sockError errorState, int details, bool noExcept)
 		{
 			state = errorState;
 			isUsable = false;
@@ -236,6 +248,7 @@ namespace zlib
 #ifdef __linux__ //On linux we only close the connection in this one way/place
 			close(ConnectSocket);
 #endif
+			if (!noExcept && errorState != closed && errorState != notOpened && errorState != open) throw errorState;
 		}
 
 		void socketBase::setBufferSize(unsigned length)
@@ -246,6 +259,7 @@ namespace zlib
 
 		void socketBase::transmit(std::string data)
 		{
+			//cout << "outbound:" << data << endl;
 			//For once, this is the same on Windows and Linux
 			int err = send(ConnectSocket, data.c_str(), data.length() + 1, 0);
 
@@ -253,10 +267,10 @@ namespace zlib
 #ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
-				error(sendError);
+				error(sendError, true);
 				closesocket(ConnectSocket);
 				WSACleanup();
-				return;
+				throw sendError;
 			}
 #elif __linux__
 			if(err < 0) error(sendError);
@@ -265,20 +279,60 @@ namespace zlib
 
 		string socketBase::receive()
 		{
-			char * buffer = new char[getBufferSize()];
-
-			int err = recv(ConnectSocket, buffer, buffer_length, 0);
+			if (vBuff.size() != 0)
+			{
+				string ret = vBuff[0];
+				vBuff.erase(vBuff.begin());
+				//cout << "Inbound:" << ret << endl;
+				return ret;
+			}
+			int err = recv(ConnectSocket, recvbuf, buffer_length, 0);
 
 			if(err == 0) closeSocket();
-			else
+			else if (err < 0)
+			{
 #ifdef _WIN32 
 				error(receiveError, WSAGetLastError());
 #elif __linux__
 				error(receiveError);
 #endif
+			}
+			string msg = "";
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				//If we hit a terminator push the message to the string-buffer
+				if (recvbuf[i] == '\000')
+				{
+					if (msg != "")//As long as it's not empty
+					{
+						vBuff.push_back(msg);
+						msg = "";
+					}
+				}
+				//Otherwise if it's any other character add it to the current message we're extracting
+				else msg += recvbuf[i];
 
-			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
-			return string(buffer).substr(0, err);
+			}
+
+			clearCharBuffer();
+
+			if (vBuff.size() != 0)
+			{
+				string ret = vBuff[0];
+				vBuff.erase(vBuff.begin());
+				//cout << "Inbound:" << ret << endl;
+				return ret;
+			}
+			else return ""; 
+
+		}
+
+		void socketBase::clearCharBuffer()
+		{
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				recvbuf[i] = '\000';
+			}
 		}
 
 		void socketBase::closeSocket()
@@ -295,15 +349,53 @@ namespace zlib
 #ifdef _WIN32
 			if(err == SOCKET_ERROR)
 			{
-				error(shutdownError);
+				error(shutdownError, true);
 				closesocket(ConnectSocket);
 				WSACleanup();
+				throw shutdownError;
 			}
 
 			closesocket(ConnectSocket);
 			WSACleanup();
 #endif
 			error(closed);
+		}
+
+		string socketBase::getErrorName(sockError e)
+		{
+			switch(e)
+			{
+			case notOpened:
+				return "notOpened";
+			case open:
+				return "open";
+			case addressError:
+				return "addressError";
+			case socketCreationError:
+				return "socketCreationError";
+			case connectionError:
+				return "connectionError";
+			case bindError:
+				return "bindError";
+			case listenError:
+				return "listenError";
+			case acceptFailed:
+				return "acceptFailed";
+			case sendError:
+				return "sendError";
+			case receiveError:
+				return "receiveError";
+			case shutdownError:
+				return "shutdownError";
+			case badType:
+				return "badType";
+			case terminated:
+				return "terminated"; 
+			case closed:
+				return "closed";
+			default:
+				return "sockError \"" + conv::toString(e) + "\" does not have a plaintext equivalent set!";
+			}
 		}
 
 
@@ -322,7 +414,7 @@ namespace zlib
 #ifdef _WIN32
 			if(listen(ConnectSocket, SOMAXCONN) == SOCKET_ERROR)
 			{
-				error(listenError, WSAGetLastError());
+				error(listenError, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
 				WSACleanup();
 				return;
@@ -334,10 +426,10 @@ namespace zlib
 			if(ClientSocket == INVALID_SOCKET)
 			{
 
-				error(acceptFailed, WSAGetLastError());
+				error(acceptFailed, WSAGetLastError(), true);
 				closesocket(ConnectSocket);
 				WSACleanup();
-				return;
+				throw acceptFailed;
 			}
 #elif __linux__
 			listen(ConnectSocket, 0);
@@ -350,6 +442,7 @@ namespace zlib
 
 		void socketServer::transmit(string data)
 		{
+			//cout << "outbound:" << data << endl;
 			int errSend = send(ClientSocket, data.c_str(), data.length() + 1, 0);
 
 #ifdef _WIN32
@@ -367,10 +460,29 @@ namespace zlib
 
 		//Todo: work on SocketServer so it doesn't create another socket, and can use socketBase::receive()
 		string socketServer::receive()
-		{
-			char * recvbuf = new char[getBufferSize()];
-			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
+		{	
+			/*
+			cout << "Buffdump:";
+			for(unsigned i = 0; i < getBufferSize(); i++)
+			{
+				cout << recvbuf[i];
+			}
+			cout << endl;
+			cout << "vBuff:" << endl;
+			for(unsigned i = 0; i < vBuff.size(); i++)
+			{
+				cout << "<" << i << ">" << vBuff[i] << endl;
+			}*/
+			if (vBuff.size() != 0)
+			{
+				string ret = vBuff[0];
+				vBuff.erase(vBuff.begin());
+				//cout << "inbound:" << ret << endl;
+				return ret;
+			}
 
+			int err = recv(ClientSocket, recvbuf, getBufferSize(), 0);
+			
 			if(err == 0)
 			{
 #ifdef _WIN32
@@ -380,22 +492,46 @@ namespace zlib
 #elif __linux__
 				error(terminated);
 #endif
-				return "";
 			}
 			else if(err < 0)
 			{
 #ifdef __linux__
 				error(receiveError);
 #elif _WIN32
-				error(receiveError, WSAGetLastError());
+				error(receiveError, WSAGetLastError(), false);
 				closesocket(ClientSocket);
 				WSACleanup();
 #endif
-				return "";
+				throw receiveError;
 			}
 
-			//We get the substring to 'err' because when err is positive (it must be to reach this point) it is the number of bytes read
-			return string(recvbuf).substr(0, err);
+			string msg = "";
+			for (unsigned i = 0; i < getBufferSize(); i++)
+			{
+				//If we hit a terminator push the message to the string-buffer
+				if (recvbuf[i] == '\000')
+				{
+					if (msg != "")//As long as it's not empty
+					{
+						vBuff.push_back(msg);
+						msg = "";
+					}
+				}
+				//Otherwise if it's any other character add it to the current message we're extracting
+				else msg += recvbuf[i];
+
+			}
+
+			clearCharBuffer();
+
+			if (vBuff.size() != 0)
+			{
+				string ret = vBuff[0];
+				vBuff.erase(vBuff.begin());
+				//cout << "Inbound:" << ret << endl;
+				return ret;
+			}
+			else return "";
 		}
 
 		void socketServer::closeSocket()
@@ -437,9 +573,9 @@ namespace zlib
 #endif
 		)
 		{
-			initializeSocket(remoteAddress, remotePort, client,
+			initializeSocket(remoteAddress, remotePort, client
 #ifdef __linux__
-			localPort
+			, localPort
 #endif
 			);
 		}

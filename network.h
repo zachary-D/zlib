@@ -1,18 +1,22 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
+using std::string;
+
 #ifdef _WIN32
-//#include <iostream>
+//Behind another #if to prevent conflicts with windows.h
+#ifndef _WINDOWS_
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-//#include <stdlib.h>
+#endif
 #elif __linux__
 #include <sys/socket.h>
 #include <netinet/in.h>
 #else
 #error "Platform not supported!"
 #endif
-
-#include "varConv.h"
 
 namespace zlib
 {
@@ -51,7 +55,11 @@ namespace zlib
 		class socketBase
 		{
 		private:
-			unsigned buffer_length = 512;
+			unsigned buffer_length = 2048;
+		public:
+			char * recvbuf = new char[buffer_length];
+			std::vector<string> vBuff;
+		private:
 
 			bool isUsable;	//True when the socket is able to send data.  False when close() has been called
 			sockError state;
@@ -80,9 +88,9 @@ namespace zlib
 			);
 
 		protected:
-			void error(sockError errorState);
+			void error(sockError errorState, bool noExcept = false);
 
-			void error(sockError errorState, int details);
+			void error(sockError errorState, int details, bool noExcept = false);
 
 		public:
 
@@ -103,7 +111,14 @@ namespace zlib
 			//Receive data through the socket
 			string receive();
 
+		protected:
+			void clearCharBuffer();
+		public:
+
 			void closeSocket();
+
+			//Returns the plaintext version of 'e'
+			static string getErrorName(sockError e);
 		};
 
 		class socketServer : public socketBase
