@@ -53,7 +53,7 @@ gdbTests: tests.prog
 tests.prog: tests.cpp $(debug_indicator_file)
 	g++ -o tests.prog tests.cpp *.o -std=c++11 -g
 
-zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o var.o windInfo.o
+zlib.h.gch: zlib.h cryptography.o draw.o fileIO.o general.o input.o math.o model.o network.o textUtils.o var.o windInfo.o
 	g++ zlib.h $(g_flags)
 
 cryptography.o: cryptography.cpp cryptography.h
@@ -79,6 +79,9 @@ model.o: model.cpp model.h
 
 network.o: network.cpp network.h
 	g++ network.cpp network.h $(g_flags)
+
+textUtils.o: textUtils.cpp textUtils.h
+	g++ textUtils.cpp textUtils.h $(g_flags)
 
 var.o: var.cpp var.h
 	g++ var.cpp var.h $(g_flags)
