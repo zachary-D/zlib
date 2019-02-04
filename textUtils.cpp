@@ -54,5 +54,24 @@ namespace zlib
 			if (first.length() > second.length()) return second;
 			return first;
 		}
+
+		string trimSpaces(string & str, std::byte modifiers)
+		{
+			string * ptr;
+			if((modifiers & CHANGE_ARGS) != NO_MOD)
+			{	//If CHANGE_ARGS is set
+				ptr = &str;	//Set the pointer to what we're workin on to the argument
+			}
+			else
+			{
+				ptr = new string();
+				(*ptr) = str;
+			}
+
+			while(ptr->size() > 0 && (*ptr)[0] == ' ') ptr->erase(ptr->begin());
+			while(ptr->size() > 0 && (*ptr)[ptr->size() - 1] == ' ') ptr->erase(ptr->begin() + ptr->size() - 1);
+
+			return *ptr;
+		}
 	}
 }
