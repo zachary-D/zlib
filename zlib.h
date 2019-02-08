@@ -19,6 +19,6 @@
 #include "math.h"
 #include "model.h"
 #include "network.h"
-#include "textUtils"
+#include "textUtils.h"
 #include "var.h"
 #include "windInfo.h"
