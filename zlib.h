@@ -16,7 +16,7 @@
 #include "fileIO.h"
 #include "general.h"
 #include "input.h"
-#include "math.h"
+#include "zmath.h"
 #include "model.h"
 #include "network.h"
 #include "textUtils.h"
