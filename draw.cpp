@@ -39,8 +39,7 @@ using namespace ci::app;
 
 #include "draw.h"
 
-#include "varConv.h"
-#include "varTypes.h"
+#include "var.h"
 #include "windInfo.h"
 
 using namespace zlib;

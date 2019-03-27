@@ -21,7 +21,7 @@
 using namespace ci;
 using namespace ci::app;
 
-#include "varTypes.h"
+#include "var.h"
 
 using namespace zlib;
 

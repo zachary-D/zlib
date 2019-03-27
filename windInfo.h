@@ -9,7 +9,7 @@
 #include<stdlib.h>
 #include<vector>
 
-#include "varTypes.h"
+#include "var.h"
 
 namespace zlib
 {

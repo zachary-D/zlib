@@ -28,7 +28,7 @@ using namespace std;
 #include "cinder/app/window.h"
 #include "cinder/gl/gl.h"
 #include "cinder/Color.h"
-#include "cinder/app/bigAddApp.h"
+//#include "cinder/app/bigAddApp.h"	//Why is this file here?  Was it some test that got left in or something?
 #endif
 
 #ifdef USING_DEBUG
