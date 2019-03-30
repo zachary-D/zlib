@@ -13,7 +13,7 @@
 #ifdef __linux__
 #include <math.h>	//Needed for pow() on linux
 #endif
-#include<time.h>
+#include<ctime>
 #include<sstream>
 #include<iterator>
 #ifdef ZLIB_ENABLE_TESTS
