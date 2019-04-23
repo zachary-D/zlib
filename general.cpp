@@ -28,7 +28,7 @@ namespace zlib
 		return (std::chrono::high_resolution_clock::now() - begin).count();
 	}
 
-	t_byte * calculateChecksum(t_byte * data, unsigned data_length, unsigned checksum_length)
+	var::t_byte * calculateChecksum(var::t_byte * data, unsigned data_length, unsigned checksum_length)
 	{
 		//Argument-checking
 		if(data_length = 0)
@@ -41,15 +41,16 @@ namespace zlib
 			//Exception - null pointer
 		}
 
-		t_byte * ret;
+		var::t_byte * ret;
 
 		try
 		{
-			ret = new t_byte[checksum_length];
+			ret = new var::t_byte[checksum_length];
 		}
 		catch(...)
 		{
 			//If we were unable to create an array of size `checksum_length`
+			throw 1;	//need to change to an actual exception
 		}
 
 		//Initialize the array
@@ -62,5 +63,7 @@ namespace zlib
 		{
 			ret[pos & checksum_length] ^= data[pos];
 		}
+
+		return ret;
 	}
 }

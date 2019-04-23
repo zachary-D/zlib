@@ -25,5 +25,5 @@ namespace zlib
 	};
 
 	//Calculates a checksum of `checksum_length` bytes from the array `data` of length `data_length` bytes
-	var::t_byte * calculateChecksum(t_byte * data, unsigned data_length, unsigned checksum_length);
+	var::t_byte * calculateChecksum(var::t_byte * data, unsigned data_length, unsigned checksum_length);
 }
