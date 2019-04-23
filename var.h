@@ -38,7 +38,7 @@ using std::vector;
 #include "cinder/app/window.h"
 #include "cinder/gl/gl.h"
 #endif
-		
+
 namespace zlib {} //This is here so we can set the using namespace below, so that if we need to include another file from zlib the zlib namespace will already be assumed
 
 using namespace zlib;
@@ -70,6 +70,8 @@ namespace zlib
 
 	namespace var
 	{
+		typedef unsigned char t_byte;
+		
 		struct Exception
 		{
 			Exception() {}
