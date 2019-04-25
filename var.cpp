@@ -14,6 +14,7 @@
 #include<new>
 #include<math.h>
 #include<cmath>
+#include <chrono>	//std::chrono::high_resolution_clock
 
 using namespace std;
 
@@ -873,6 +874,22 @@ namespace zlib
 			return seconds >= other.getTotalSeconds();
 		}
 
+		timer::timer()
+		{
+			begin = std::chrono::high_resolution_clock::now();
+		}
+
+		double timer::getTime()
+		{
+			//The result is divided by 10^9 to convert from ns to s
+			return (std::chrono::high_resolution_clock::now() - begin).count() / std::pow(10, 9);
+		}
+
+		long long int timer::getRaw()
+		{
+			return (std::chrono::high_resolution_clock::now() - begin).count();
+		}
+
 		timePeriod::timePeriod()
 		{
 			beginning = -1;
@@ -880,7 +897,7 @@ namespace zlib
 			clockSet = false;
 		}
 
-		timePeriod::timePeriod(zlib::timer & clock)
+		timePeriod::timePeriod(var::timer & clock)
 		{
 			begin(clock);
 		}
@@ -922,7 +939,7 @@ namespace zlib
 
 		timePeriod timePeriod::internalClock()
 		{
-			zlib::timer clock;
+			var::timer clock;
 			return timePeriod(clock);
 		}
 
@@ -932,7 +949,7 @@ namespace zlib
 		}
 
 
-		void timePeriod::begin(zlib::timer & clock)
+		void timePeriod::begin(var::timer & clock)
 		{
 			//Store the current time as the beginning of the clock first-thing, as it's ovb. time dependent
 			beginning = clock.getRaw();

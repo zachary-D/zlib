@@ -2,8 +2,6 @@
 #include <chrono>	//std::chrono::high_resolution_clock
 #include <cmath>
 
-#include "var.h"
-
 #include "general.h"
 
 //So we can assume zlib is the namespace incase we need to pull things from other zlib files
@@ -12,24 +10,8 @@ using namespace zlib;
 
 namespace zlib
 {
-	timer::timer()
-	{
-		begin = std::chrono::high_resolution_clock::now();
-	}
-
-	double timer::getTime()
-	{
-		//The result is divided by 10^9 to convert from ns to s
-		return (std::chrono::high_resolution_clock::now() - begin).count() / std::pow(10, 9);
-	}
-
-	long long int timer::getRaw()
-	{
-		return (std::chrono::high_resolution_clock::now() - begin).count();
-	}
-
-	var::t_byte * calculateChecksum(var::t_byte * data, unsigned data_length, unsigned checksum_length)
-	{
+		var::byte * calculateChecksum(var::byte * data, unsigned data_length, unsigned checksum_length)
+		{
 		//Argument-checking
 		if(data_length = 0)
 		{
@@ -41,11 +23,11 @@ namespace zlib
 			//Exception - null pointer
 		}
 
-		var::t_byte * ret;
+		var::byte * ret;
 
 		try
 		{
-			ret = new var::t_byte[checksum_length];
+			ret = new var::byte[checksum_length];
 		}
 		catch(...)
 		{

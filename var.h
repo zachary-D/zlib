@@ -20,11 +20,10 @@
 #include <iostream>
 #include <functional>
 #endif
+#include <chrono>
 
 using std::string;
 using std::vector;
-
-#include "general.h"
 
 #ifdef ZLIB_USING_CINDER
 #include "cinder/Color.h"
@@ -70,7 +69,7 @@ namespace zlib
 
 	namespace var
 	{
-		typedef unsigned char t_byte;
+		typedef unsigned char byte;
 		
 		struct Exception
 		{
@@ -361,6 +360,20 @@ namespace zlib
 			bool operator>=(shortTime & other);
 		};
 
+		//Tracks the amount of time since its creation, with ns precision
+		class timer
+		{
+		public:
+			timer();
+
+		private:
+			std::chrono::high_resolution_clock::time_point begin;
+
+		public:
+			double getTime();	//Returns the time in seconds since the creation of the timer
+			long long int getRaw();	//Returns the time in ns
+		};
+
 		//A pair of points in time.  The maximum time that can be stored in the beginning or the end is 9223372036854775807ns ( or 292 years)
 		struct timePeriod
 		{
@@ -386,7 +399,7 @@ namespace zlib
 			//@ Ensures:  'ending' = '-1'
 			//@ Ensuers:  'this->clock' = 'clock'
 			//@ Ensures:  'clockSet' = 'true'
-			timePeriod(zlib::timer & clock);
+			timePeriod(var::timer & clock);
 
 			//>>Creates a timePeriod that begins at 'beginning' and ends at 'ending', when they are both indicated in SECONDS
 			//@ Modifies: 'beginning', 'ending', 'clockSet'
@@ -430,7 +443,7 @@ namespace zlib
 			//@ Requires: 'clock' is a valid timer
 			//@ Ensures:  'beginning' is equal to the duration of 'clock' at the time begin() is called
 			//@ Ensures:  The internal clock ('this->clock') is a copy of 'clock', and 'clockSet' is true
-			void begin(zlib::timer & clock);
+			void begin(var::timer & clock);
 
 			//>>Sets the end point in time as the current time of the INTERNAL CLOCK.  Requires that the timePeriod was created using the timePeriod(zlib::timer) constructor, or an execption will be thrown
 			//@ Modifies: 'ending'
