@@ -22,7 +22,7 @@ using std::cout;
 using std::endl;
 #endif
 
-#include "varConv.h"
+#include "var.h"
 
 using namespace zlib;
 

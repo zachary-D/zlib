@@ -8,7 +8,7 @@
 #include<vector>
 
 #include "model.h"
-#include "varTypes.h"
+#include "var.h"
 
 using namespace zlib;
 

@@ -5,6 +5,8 @@
 
 #include <vector>
 
+#include "zmath.h"
+
 namespace zlib
 {
 	namespace math
