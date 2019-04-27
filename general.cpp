@@ -10,10 +10,10 @@ using namespace zlib;
 
 namespace zlib
 {
-		var::byte * calculateChecksum(var::byte * data, unsigned data_length, unsigned checksum_length)
-		{
+	void calculateChecksum(var::byte * data, unsigned data_length, var::byte * checksum, unsigned checksum_length)
+	{
 		//Argument-checking
-		if(data_length = 0)
+		if(data_length == 0)
 		{
 			//throw exception - cannot have 0-length checksum
 		}
@@ -23,29 +23,26 @@ namespace zlib
 			//Exception - null pointer
 		}
 
-		var::byte * ret;
-
-		try
+		if (checksum == NULL)
 		{
-			ret = new var::byte[checksum_length];
-		}
-		catch(...)
-		{
-			//If we were unable to create an array of size `checksum_length`
-			throw 1;	//need to change to an actual exception
+			//Exception - bad output
 		}
 
+		
 		//Initialize the array
 		for(unsigned i = 0; i < checksum_length; i++)
 		{
-			ret[i] = 0b0;
+			checksum[i] = 0b0;
 		}
+
 		//Actually calculate the checksum
 		for(unsigned pos = 0; pos < data_length; pos++)
 		{
-			ret[pos & checksum_length] ^= data[pos];
+			int a = pos % checksum_length;
+			var::byte first = checksum[pos % checksum_length];
+			var::byte second = data[pos];
+			var::byte result = first ^ second;
+			checksum[pos % checksum_length] ^= data[pos];
 		}
-
-		return ret;
 	}
 }
