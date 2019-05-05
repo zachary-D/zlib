@@ -21,3 +21,4 @@
 #include "network.h"
 #include "var.h"
 #include "windInfo.h"
+#include "simpleConfig.h"
