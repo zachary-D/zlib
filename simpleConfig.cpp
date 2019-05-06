@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <exception>
+#include <fstream>
 
 using std::string;
 
@@ -12,6 +13,25 @@ namespace zlib
 {
 	namespace simpleConfig
 	{
+		simpleConfigGroup::simpleConfigGroup(string filePath)
+		{
+			std::ifstream in;
+			in.open(filePath);
+
+			if (!in) throw file_cannot_be_read();
+
+			string line;
+			while (true)
+			{
+				std::getline(in, line);
+				if (!in) break;
+
+				//TODO: actually write the parser lol.  Gotta run rn
+			}
+
+			in.close();
+		}
+
 		bool simpleConfigGroup::isKeyString(string key)
 		{
 			for (auto & iter : strValues) if (iter.first == key) return true;
@@ -72,6 +92,46 @@ namespace zlib
 			if (isKeyString(key)) throw string_not_int_error();
 
 			intValues.push_back(std::pair<string, int>(key, value));
+		}
+
+		void simpleConfigGroup::save(string path)
+		{
+			//If no path is specified, use the path we loaded from
+			if (path == "")
+			{
+				//If we didn't load the file from anywhere
+				if (loadedFrom == "") throw file_location_does_not_exist();
+				path = loadedFrom;
+			}
+
+			//Escapes any quotes in the string
+			auto sanitize = [](string str) {
+				for (int i = 0; i < str.length(); i++)
+				{
+					if (str[i] == '"')
+					{
+						str.insert(str.begin() + i, '"');
+						i++;
+					}
+				}
+			};
+
+			std::ofstream out;
+			out.open(path);
+
+			if (out.bad()) throw file_cannot_be_written();
+
+			for (auto & iter : strValues)
+			{
+				out << "string \"" << iter.first << "\"=\"" << iter.second << "\"" << std::endl;
+			}
+
+			for (auto & iter : intValues)
+			{
+				out << "int \"" << iter.first << "\"=\"" << iter.second << "\"" << std::endl;
+			}
+			
+			out.close();
 		}
 	}
 }

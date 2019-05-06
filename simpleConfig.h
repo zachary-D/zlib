@@ -38,6 +38,39 @@ namespace zlib
 			}
 		};
 
+		struct file_location_does_not_exist : simpleConfig_error
+		{
+			const char * what() const throw()
+			{
+				return "The filename specified does not exist";
+			}
+
+		};
+
+		struct file_cannot_be_written : simpleConfig_error
+		{
+			const char * what() const throw()
+			{
+				return "There was an error opening that file for writing";
+			}
+		};
+
+		struct file_cannot_be_read : simpleConfig_error
+		{
+			const char * what() const throw()
+			{
+				return "Cannot read from file";
+			}
+		};
+
+		struct file_malformed : simpleConfig_error
+		{
+			const char * what() const throw()
+			{
+				return "The config file is malformed and cannot be parsed";
+			}
+		};
+
 		//A group of config keys
 		struct simpleConfigGroup
 		{

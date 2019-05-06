@@ -58,6 +58,7 @@ namespace zlib
 			void openRaw(std::string _file);	//Opens the file for writing, not preforming any checks on the filename given
 			void close();
 
+			//TODO: Replace with a stream operator ( << ) - easier and more intuitive
 			void writeRaw(char value);
 			void writeRaw(std::string value);
 			void writeEndLine() { file << std::endl; }
