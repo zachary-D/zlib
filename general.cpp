@@ -45,4 +45,18 @@ namespace zlib
 			checksum[pos % checksum_length] ^= data[pos];
 		}
 	}
+
+	bool validateChecksum(var::byte * data, unsigned data_length, var::byte * expectedChecksum, unsigned checksum_length)
+	{
+		var::byte * checksum = new var::byte[checksum_length];
+
+		calculateChecksum(data, data_length, checksum, checksum_length);
+
+		for(unsigned i = 0; i < checksum_length; i++)
+		{
+			if(expectedChecksum[i] != checksum[i]) return false;
+		}
+
+		return true;
+	}
 }
